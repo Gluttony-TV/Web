@@ -47,19 +47,19 @@ const Info: FC<IUser> = ({ timestamps, username, credentials, verified }) => {
 
    return <div css={style}>
       <Panel>
-         <label>Username</label>
-         <p>{username}</p>
+         <label htmlFor='username'>Username</label>
+         <p id='username'>{username}</p>
       </Panel>
 
       {credentials && <>
          <Panel>
-            <label>E-Mail</label>
-            <p>{credentials.email ?? 'No email provided'}</p>
+            <label htmlFor='email'>E-Mail</label>
+            <p id='email'>{credentials.email ?? 'No email provided'}</p>
          </Panel>
 
          <Panel>
-            <label>Password</label>
-            <p>***********</p>
+            <label htmlFor='password'>Password</label>
+            <p id='password'>***********</p>
             <LinkButton
                title={verified ? undefined : 'You need a verified email to reset your password'}
                disabled={!verified} onClick={reset.send}>
@@ -69,13 +69,13 @@ const Info: FC<IUser> = ({ timestamps, username, credentials, verified }) => {
       </>}
 
       <Panel>
-         <label>Joined at</label>
-         <p>{created.toLocaleString()} ({created.toRelative()})</p>
+         <label htmlFor='created-at'>Joined at</label>
+         <p id='created-at'>{created.toLocaleString()} ({created.toRelative()})</p>
       </Panel>
 
       <Panel>
-         <label>Connections</label>
-         <Icons>
+         <label htmlFor='connections'>Connections</label>
+         <Icons id='connections'>
             <Discord size='2rem' />
             <Discord size='2rem' />
          </Icons>

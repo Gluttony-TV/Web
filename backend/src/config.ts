@@ -57,6 +57,7 @@ const auth = {
 
 const tvdb = {
    key: required('TVDB_API_KEY'),
+   pin: required('TVDB_API_PIN'),
    url: env.TVDB_API_URL ?? 'https://api4.thetvdb.com/v4',
    art: env.TVDB_ART_URL ?? 'https://artworks.thetvdb.com/banners',
 }

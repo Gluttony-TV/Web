@@ -31,7 +31,7 @@ class Api {
    private request = axios.create({ baseURL: config.tvdb.url })
 
    async login() {
-      const { data } = await this.request.post('login', { apikey: config.tvdb.key })
+      const { data } = await this.request.post('login', { apikey: config.tvdb.key, pin: config.tvdb.pin })
       if (data.status !== 'success') throw new Error('Unable to login into TVDB API')
       this.token = data.data.token
    }

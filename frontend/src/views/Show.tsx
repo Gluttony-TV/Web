@@ -24,7 +24,7 @@ const Seasons: FC<{ seasons: ISeason[] }> = ({ seasons }) => {
 
    const visible = useMemo(() => {
       const type = seasons[0]?.name
-      return seasons.filter(s => s.name === type)
+      return seasons.filter(s => s.name === type && s.number)
    }, [seasons])
 
    return <ul css={{ gridArea: 'seasons' }}>

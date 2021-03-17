@@ -120,6 +120,20 @@ export interface ISeason extends IModel {
    network: INetwork
 }
 
+export interface IExtendedSeason extends IModel {
+   episodes: IEpisode[]
+}
+
 export interface IEpisode extends IModel {
-   
+   seriesId: number
+   name?: string
+   aired: string
+   runtime: number
+   nameTranslations: string[]
+   overviewTranslations: string[]
+   image: string
+   imageType: number
+   isMovie: number
+   number: number
+   seasonNumber: number
 }
