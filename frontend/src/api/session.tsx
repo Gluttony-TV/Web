@@ -18,6 +18,9 @@ export function useUser() {
    return session.user
 }
 
+export function useToken() {
+   return useContext(CONTEXT)[0]
+}
 
 export function useLogin(username: string, password: string) {
    const [, setSession] = useContext(CONTEXT)
@@ -54,12 +57,14 @@ export const SessionProvider: FC = ({ children }) => {
 
    useEffect(() => {
       refresh()
+      //eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    useEffect(() => {
       if(error instanceof ApiError && error.status === 400) {
          setStatus(AppStatus.LOGGED_OUT)
       }
+      //eslint-disable-next-line react-hooks/exhaustive-deps
    }, [error])
 
    return <CONTEXT.Provider value={[session, setSession]}>

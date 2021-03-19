@@ -1,27 +1,29 @@
-import { RouteConfig } from "react-router-config";
-import { redirect } from ".";
+import { redirect, Route } from ".";
 import Logout from "../views/Logout";
 import Profile from "../views/Profile";
 import Sessions from "../views/Sessions";
 
-const routes: RouteConfig[] = [
+const routes: Route[] = [
    {
-     path: '/logout',
-     component: Logout
+      display: 'Logout',
+      path: '/logout',
+      component: Logout,
    },
    {
-     path: '/sessions',
-     component: Sessions,
+      display: 'Sessions',
+      path: '/sessions',
+      component: Sessions,
    },
    {
-     path: '/profile',
-     component: Profile,
+      display: 'Profile',
+      path: '/profile',
+      component: Profile,
    },
    {
-     path: '/',
-     exact: true,
-     component: redirect('/profile'),
+      path: '/',
+      exact: true,
+      component: redirect('/profile'),
    },
- ]
+]
 
- export default routes
+export default routes

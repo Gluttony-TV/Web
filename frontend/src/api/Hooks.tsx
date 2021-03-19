@@ -4,6 +4,7 @@ import React, { ReactElement, useCallback, useEffect, useMemo, useState } from '
 import Cookies from 'universal-cookie'
 import ApiError from './ApiError'
 import { AppStatus } from './models'
+import { useToken } from './session'
 import { useStatus } from './status'
 config({ cancellation: true })
 
@@ -64,6 +65,7 @@ export function useRequest<R>(method: Method, endpoint: string, body?: Record<st
    const [error, setError] = useState<Error>()
    const [loading, setLoading] = useState(false)
    const [, setStatus] = useStatus()
+   const { token } = useToken()
 
    const encodedBody = body ? JSON.stringify(body) : undefined
 
@@ -73,7 +75,7 @@ export function useRequest<R>(method: Method, endpoint: string, body?: Record<st
       e?.preventDefault()
 
       return Promise.resolve<void>(
-         request<R>(method, endpoint, encodedBody)
+         request<R>(method, endpoint, encodedBody, token)
             .then(r => onSuccess?.(r))
             .then(() => cookies.get('refresh-token') ? AppStatus.LOGGED_IN : AppStatus.LOGGED_OUT)
             .catch(e => setError(e))
@@ -83,7 +85,7 @@ export function useRequest<R>(method: Method, endpoint: string, body?: Record<st
             .then(() => setLoading(false))
 
       )
-   }, [encodedBody, method, endpoint, onSuccess, setStatus])
+   }, [encodedBody, method, endpoint, onSuccess, setStatus, token])
 
    return { send, error, loading }
 }

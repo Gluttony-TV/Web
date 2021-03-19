@@ -10,16 +10,32 @@ export default (app: IRouter) => {
    const router = Router()
    app.use('/show', router)
 
+   const params = celebrate({
+      params: {
+         slug: Joi.string().required(),
+      },
+   })
+
    router.get(
       '/:slug',
-      celebrate({
-         params: {
-            slug: Joi.string().required(),
-         },
-      }),
+      params,
       wrap(async req => {
          const show = await api.getShow(req.params.slug)
          return show
+      })
+   )
+
+   router.get(
+      '/:slug/seasons',
+      params,
+      wrap(async req => {
+         const show = await api.getShow(req.params.slug)
+         if (!show) return show
+
+         const type = show.seasons[0]?.name
+         const visible = show.seasons.filter(s => s.name === type && s.number)
+
+         return Promise.all(visible.map(s => api.getSeason(s.id)))
       })
    )
 }

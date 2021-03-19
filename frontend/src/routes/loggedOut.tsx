@@ -1,8 +1,9 @@
-import { RouteConfig } from "react-router-config";
+import { Route } from ".";
 import Login from "../views/Login";
 
-const routes: RouteConfig[] = [
+const routes: Route[] = [
   {
+    display: 'Login',
     path: '/login',
     component: Login,
   },

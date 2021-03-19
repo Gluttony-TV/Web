@@ -1,20 +1,15 @@
 import styled from '@emotion/styled';
 import { transparentize } from 'polished';
 import { FC, useMemo } from 'react';
-import { useFetch } from '../api/hooks';
-import { IExtendedSeason, ISeason } from '../api/models';
+import { IExtendedSeason } from '../api/models';
 
-const Season: FC<ISeason> = ({ id, number }) => {
-   const [season] = useFetch<IExtendedSeason>(`season/${id}`)
-
-   if (season) return <Episodes {...season} />
-   else return <p>Season {number}</p>
+interface SeasonProps {
+   progress: number
 }
 
-const Episodes: FC<IExtendedSeason> = props => {
+const Season: FC<IExtendedSeason & SeasonProps> = ({ episodes, ...props }) => {
 
-   //TODO workaround because of duplicate id bug
-   const episodes = useMemo(() => props.episodes.filter((e1, i1, a) => !a.some((e2, i2) => i1 > i2 && e1.id === e2.id)), [props])
+   const progress = useMemo(() => props.progress / episodes.length, [episodes, props.progress])
 
    return <Row>
       {episodes.map(({ id, number, name }) =>
@@ -22,16 +17,28 @@ const Episodes: FC<IExtendedSeason> = props => {
             {number}
          </li>
       )}
+      <Progress progress={progress ?? 0} />
    </Row>
 }
 
+const Progress = styled.div<{ progress: number }>`
+   position: absolute;
+   background: ${p => transparentize(0.8, p.theme.secondary)};
+   height: 100%;
+   width: ${p => p.progress * 100}%;
+   transition: width 0.1s linear;
+   pointer-events: none;
+`
+
 const Row = styled.ul`
+   position: relative;
    display: grid;
    grid-auto-flow: column;
    list-style: none;
    background: ${p => transparentize(0.8, p.theme.secondary)};
    border-radius: 999px;
    width: min-content;
+   overflow: hidden;
 
    &:not(:last-of-type) {
       margin-bottom: 0.5rem;
@@ -39,8 +46,8 @@ const Row = styled.ul`
 
    li {
       text-align: center;
-      padding: 0.5rem;
-      width: 2.2rem;
+      padding: 1rem;
+      width: 3rem;
       border-radius: 999px;
       cursor: pointer;
 

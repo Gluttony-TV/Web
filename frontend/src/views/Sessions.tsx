@@ -10,7 +10,7 @@ import { Button } from '../components/Inputs';
 import { Title } from '../components/Text';
 
 const Sessions: FC = () => {
-   const [sessions] = useFetch<ISession[]>('token')
+   const [sessions] = useFetch<ISession[]>('session')
 
    const style = css`
       padding: 10px;
@@ -49,7 +49,7 @@ const Token: FC<ISession> = ({ id, reason, timestamps, active }) => {
       }
    `
 
-   const remove = useRequest('DELETE', `token/${id}`)
+   const remove = useRequest('DELETE', `session/${id}`)
 
    return <li css={style}>
       <span>{reason}</span>

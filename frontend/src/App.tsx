@@ -3,8 +3,10 @@ import { css, Theme } from '@emotion/react';
 import { FC } from 'react';
 import { renderRoutes } from "react-router-config";
 import { BrowserRouter as Router } from 'react-router-dom';
+import { AppStatus } from './api/models';
 import { SessionProvider } from './api/session';
 import { StatusProvider, useStatus } from './api/status';
+import Nav from './components/Nav';
 import StatusBanner from './components/StatusBanner';
 import routes from './routes';
 import { ThemeProvider } from './themes';
@@ -31,7 +33,8 @@ const Container: FC = () => {
 
   return <div css={style}>
     <Router>
-      <StatusBanner />
+      {status === AppStatus.OFFLINE && <StatusBanner />}
+      <Nav />
       {renderRoutes(routes[status])}
     </Router>
   </div>

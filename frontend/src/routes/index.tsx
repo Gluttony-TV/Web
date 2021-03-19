@@ -1,3 +1,4 @@
+import { StyledIcon } from '@styled-icons/styled-icon';
 import { RouteConfig } from "react-router-config";
 import { Redirect } from "react-router-dom";
 import { AppStatus } from "../api/models";
@@ -5,11 +6,16 @@ import loggedIn from "./loggedIn";
 import loggedOut from "./loggedOut";
 import online from "./online";
 
+export interface Route extends RouteConfig {
+   display?: string | StyledIcon
+   path: string
+}
+
 export function redirect(to: string) {
    return () => <Redirect to={to} />
 }
 
-const routes: Record<AppStatus, RouteConfig[]> = {
+const routes: Record<AppStatus, Route[]> = {
 
    [AppStatus.LOGGED_IN]: [
       ...loggedIn,

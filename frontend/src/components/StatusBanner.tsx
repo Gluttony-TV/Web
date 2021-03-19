@@ -1,4 +1,5 @@
-import { css } from '@emotion/css';
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
 import { FC, useMemo } from 'react';
 import { AppStatus } from '../api/models';
 import { useStatus } from '../api/status';
@@ -20,7 +21,7 @@ const StatusBanner: FC = () => {
       text-align: center;
    `, [status])
 
-   return <div className={style}>
+   return <div css={style}>
       {status}
    </div>
 }

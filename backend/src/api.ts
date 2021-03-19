@@ -8,15 +8,18 @@ interface Show {
    tvdb_id: string
    slug: string
    name: string
-   country?: string
-   director?: string
-   extended_title: string
-   image_url: string
-   network?: string
-   overview?: string
-   type: 'movie' | 'series'
-   year: string
-   status?: string
+   seasons: Array<Season>
+}
+
+interface Season {
+   id: string
+   number?: number
+   name: string
+   episodes?: Array<Episode>
+}
+
+interface Episode {
+   id: string
 }
 
 class Api {
@@ -66,7 +69,11 @@ class Api {
    }
 
    async getSeason(id: string | number) {
-      return this.cacheOr(`season/${id}`, () => this.fetch(`/seasons/${id}/extended`))
+      return this.cacheOr(`season/${id}`, async () => {
+         const season = await this.fetch<Season | null>(`/seasons/${id}/extended`)
+         const uniqueEpisodes = season?.episodes?.filter((e1, i1, a) => !a.some((e2, i2) => i2 < i1 && e1.id === e2.id))
+         return season && { ...season, episodes: uniqueEpisodes }
+      })
    }
 
    async getShow(name: string) {
