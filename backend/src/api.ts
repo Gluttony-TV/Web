@@ -3,8 +3,8 @@ import Cache from 'node-cache'
 import config, { integer } from './config'
 import { exists } from './util'
 
-interface Show {
-   id: string
+export interface Show {
+   id: number
    tvdb_id: string
    slug: string
    name: string
@@ -12,14 +12,15 @@ interface Show {
 }
 
 interface Season {
-   id: string
+   id: number
    number?: number
    name: string
    episodes?: Array<Episode>
 }
 
 interface Episode {
-   id: string
+   id: number
+   runtime: number
 }
 
 class Api {
@@ -41,7 +42,7 @@ class Api {
 
    async fetch<T>(endpoint: string) {
       try {
-         const response = await this.request.get<{ data: T }>(endpoint, {
+         const response = await this.request.get<{ data: T | undefined }>(endpoint, {
             headers: {
                Authorization: this.token ? `Bearer ${this.token}` : undefined,
             },
@@ -54,7 +55,7 @@ class Api {
       }
    }
 
-   async cacheOr<T>(key: string, getter: () => Promise<T | undefined>, additionalKeys?: (t: T) => string[]): Promise<T | undefined> {
+   async cacheOr<T>(key: string, getter: () => Promise<T>, additionalKeys?: (t: T) => string[]): Promise<T> {
       const cached = this.cache.get<T>(key)
       if (cached) return cached
 
@@ -62,7 +63,7 @@ class Api {
 
       if (exists(data)) {
          const keys = [key, ...(additionalKeys?.(data) ?? [])]
-         keys.forEach(k => this.cache.set(k, data))
+         keys.filter(exists).forEach(k => this.cache.set(k, data))
       }
 
       return data
@@ -76,21 +77,39 @@ class Api {
       })
    }
 
-   async getShow(name: string) {
+   async getShow(search: string | number, extended = true) {
+      const path = (s: string | number) => (extended ? `${s}/extended` : s)
+
       return this.cacheOr(
-         `show/${name}`,
+         `show/${path(search)}`,
          async () => {
-            const id = integer(name) ?? this.findId(name)
-            if (id) return await this.fetch<Show>(`/series/${id}/extended`)
+            const id = await this.findId(search)
+            if (id) return await this.fetch<Show>(`/series/${path(id)}`)
          },
-         s => [s.id, s.slug].map(id => `show/${id}`)
+         s => [s?.id, s?.slug].filter(exists).map(id => `show/${path(id)}`)
       )
    }
 
-   private async findId(name: string) {
+   async getShows(page = 0) {
+      return this.cacheOr('shows', async () => this.fetch<Show[]>(`series?page=${page}`))
+   }
+
+   async getEpisodes(show: string | number) {
+      return this.cacheOr(`episodes/${show}`, async () => {
+         const id = await this.findId(show)
+         const result = await this.fetch<{ episodes: Episode[] }>(`/series/${id}/episodes/official`)
+
+         return result?.episodes
+      })
+   }
+
+   private async findId(name: string | number) {
+      const id = integer(name)
+      if (exists(id)) return id
+
       const results = await this.fetch<(Show | undefined)[]>(`/search?type=series&query=${name}`)
-      console.log(results.map(r => r?.name))
-      return integer(results[0]?.tvdb_id)
+      console.log(results?.map(r => r?.name))
+      return integer(results?.[0]?.tvdb_id)
    }
 }
 

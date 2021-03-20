@@ -6,7 +6,8 @@ import { IsNull, Not } from 'typeorm'
 import config from '../config'
 import { stripHidden } from '../decorators/Hidden'
 import BadRequestError from '../error/BadRequestError'
-import { wrap, wrapAuth } from '../middleware/wrapper'
+import requires from '../middleware/requires'
+import { wrap } from '../middleware/wrapper'
 import Session from '../models/Session'
 import User from '../models/User'
 
@@ -39,10 +40,8 @@ export default (app: IRouter) => {
 
    router.head(
       '/',
-      wrapAuth(
-         () => true,
-         () => true
-      )
+      requires(),
+      wrap(() => true)
    )
 
    router.post(

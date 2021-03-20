@@ -14,6 +14,7 @@ export interface IUser extends IModel {
       email?: string
    }
    verified?: boolean
+   birth?: string
 }
 
 export interface ISession extends IModel {
@@ -136,4 +137,17 @@ export interface IEpisode extends IModel {
    isMovie: number
    number: number
    seasonNumber: number
+}
+
+export interface IProgress<S = number> extends IModel {
+   show: S
+   watched: IEpisode['id'][]
+}
+
+export interface IStats {
+   episodesWatched: number
+   finished: number
+   watching: number
+   time: number
+   showsWatched: number
 }

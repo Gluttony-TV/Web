@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt'
 import { BaseEntity, BeforeInsert, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import Hidden from '../decorators/Hidden'
+import { One } from './Relations'
 import Timestamps from './Timestamps'
-import User, { LazyOne } from './User'
+import User from './User'
 
 @Entity()
 export default class Credentials extends BaseEntity {
@@ -13,7 +14,7 @@ export default class Credentials extends BaseEntity {
    timestamps!: Timestamps
 
    @OneToOne(() => User, u => u.credentials)
-   user!: LazyOne<User>
+   user!: One<User>
 
    @Column({ unique: true, nullable: true })
    email?: string
@@ -30,8 +31,8 @@ export default class Credentials extends BaseEntity {
    salt!: string
 
    @BeforeInsert()
-   async setPassword(password?: string) {
+   async setPassword(password: string) {
       this.salt ??= bcrypt.genSaltSync()
-      this.password = bcrypt.hashSync(this.password ?? password, this.salt)
+      this.password = bcrypt.hashSync(password ?? this.password, this.salt)
    }
 }

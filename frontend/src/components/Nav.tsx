@@ -26,7 +26,7 @@ const NavBar: FC = () => {
 
 const Tab: FC<Route & {
    match: match
-}> = ({ display, path, match }) => {
+}> = ({ display, path, match, right }) => {
    const theme = useTheme()
 
    const active = match.path === path
@@ -41,6 +41,7 @@ const Tab: FC<Route & {
       height: 100%;
       display: grid;
       align-items: center;
+      justify-self: ${right ? 'end' : 'start'};
 
       background: ${base};
 

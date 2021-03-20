@@ -7,8 +7,9 @@ import loggedOut from "./loggedOut";
 import online from "./online";
 
 export interface Route extends RouteConfig {
-   display?: string | StyledIcon
    path: string
+   display?: string | StyledIcon
+   right?: boolean
 }
 
 export function redirect(to: string) {

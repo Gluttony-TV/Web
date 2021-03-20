@@ -11,9 +11,10 @@ export default async (req: Request, _: unknown, next: NextFunction) => {
    try {
       req.session = await authenticate(req)
       req.user = req.session.user
+   } catch (error) {
+      req.authError = error
+   } finally {
       next()
-   } catch (e) {
-      next(e)
    }
 }
 
@@ -30,7 +31,7 @@ function decodeJWT(token: string, secret: string) {
    }
 }
 
-export async function authenticate(req: Request) {
+async function authenticate(req: Request) {
    const [type, access_token] = req.headers.authorization?.split(' ') ?? []
 
    if (!access_token) throw new UnauthorizedError('You are not logged in')

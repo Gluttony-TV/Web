@@ -7,7 +7,7 @@ import databaseLoader, { checkAdminUser } from '../database'
 import UserSeeder from './seeds/user.seed'
 
 export type Faked<T> = {
-   [P in keyof T]: T[P] | EntityFactory<T[P], unknown> | Promise<T[P]>
+   [P in keyof T]: T[P] | undefined | EntityFactory<T[P], unknown> | Promise<T[P]>
 }
 
 async function run() {

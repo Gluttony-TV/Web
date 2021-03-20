@@ -12,8 +12,8 @@ const required = (key: string) => {
    else throw new Error(`Missing config option '${key}'`)
 }
 
-export const integer = (s?: string) => {
-   const n = Number.parseInt(s ?? '')
+export const integer = (s?: string | number) => {
+   const n = typeof s === 'number' ? s : Number.parseInt(s ?? '')
    return isNaN(n) ? undefined : n
 }
 

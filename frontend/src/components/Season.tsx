@@ -1,33 +1,59 @@
 import styled from '@emotion/styled';
 import { transparentize } from 'polished';
 import { FC, useMemo } from 'react';
-import { IExtendedSeason } from '../api/models';
+import { IExtendedSeason, IProgress } from '../api/models';
 
 interface SeasonProps {
-   progress: number
+   progress?: IProgress
 }
 
-const Season: FC<IExtendedSeason & SeasonProps> = ({ episodes, ...props }) => {
+const Season: FC<IExtendedSeason & SeasonProps> = ({ episodes, progress }) => {
 
-   const progress = useMemo(() => props.progress / episodes.length, [episodes, props.progress])
+   const watched = useMemo(() => progress?.watched ?? [], [progress])
+   //const percentage = useMemo(() => watched.length / episodes.length, [episodes, watched])
 
    return <Row>
       {episodes.map(({ id, number, name }) =>
-         <li key={id} title={name}>
+         <Episode key={id} title={name} watched={watched.includes(id)}>
             {number}
-         </li>
+         </Episode>
       )}
-      <Progress progress={progress ?? 0} />
+      {/* <Progress width={percentage ?? 0} />*/}
    </Row>
 }
 
-const Progress = styled.div<{ progress: number }>`
+/*
+const Progress = styled.div<{ width: number }>`
    position: absolute;
    background: ${p => transparentize(0.8, p.theme.secondary)};
    height: 100%;
-   width: ${p => p.progress * 100}%;
+   width: ${p => p.width * 100}%;
    transition: width 0.1s linear;
    pointer-events: none;
+`
+*/
+
+const Episode = styled.li<{ watched?: boolean }>`
+   text-align: center;
+   padding: 1rem;
+   width: 3rem;
+   cursor: pointer;
+      
+   background: ${p => transparentize(p.watched ? 0.6 : 0.8, p.theme.secondary)};
+
+   &:hover {
+      background: ${p => transparentize(p.watched ? 0.5 : 0.7, p.theme.secondary)};
+   }
+
+   &:last-of-type {
+      border-top-right-radius: 999px;
+      border-bottom-right-radius: 999px;
+   }
+
+   &:first-of-type {
+      border-top-left-radius: 999px;
+      border-bottom-left-radius: 999px;
+   }
 `
 
 const Row = styled.ul`
@@ -35,25 +61,12 @@ const Row = styled.ul`
    display: grid;
    grid-auto-flow: column;
    list-style: none;
-   background: ${p => transparentize(0.8, p.theme.secondary)};
-   border-radius: 999px;
    width: min-content;
-   overflow: hidden;
+   //border-radius: 999px;
+   //overflow: hidden;
 
    &:not(:last-of-type) {
       margin-bottom: 0.5rem;
-   }
-
-   li {
-      text-align: center;
-      padding: 1rem;
-      width: 3rem;
-      border-radius: 999px;
-      cursor: pointer;
-
-      &:hover {
-         background: ${p => transparentize(0.8, p.theme.secondary)};
-      }
    }
 `
 

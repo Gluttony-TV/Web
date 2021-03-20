@@ -2,11 +2,10 @@ import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typ
 import UUID from '../decorators/UUID'
 import BadRequestError from '../error/BadRequestError'
 import Credentials from './Credentials'
+import Progress from './Progress'
+import { Many } from './Relations'
 import Session from './Session'
 import Timestamps from './Timestamps'
-
-export type LazyMany<E extends BaseEntity> = Promise<Partial<E>[]> | Partial<E>[]
-export type LazyOne<E extends BaseEntity> = Promise<Partial<E>> | Partial<E>
 
 export enum UserRole {
    ADMIN = 'admin',
@@ -32,7 +31,13 @@ export default class User extends BaseEntity {
    role!: UserRole
 
    @OneToMany(() => Session, t => t.user, { cascade: true })
-   sessions!: LazyMany<Session>
+   sessions!: Many<Session>
+
+   @OneToMany(() => Progress, p => p.user, { cascade: true })
+   progress!: Many<Progress>
+
+   @Column('timestamp', { nullable: true })
+   birth?: Date
 
    //@OneToMany(() => Credentials, a => a.user, { cascade: true })
    //accounts!: LazyMany<Credentials>

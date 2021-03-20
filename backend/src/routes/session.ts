@@ -3,7 +3,8 @@ import { IRouter, Router } from 'express'
 import { BaseEntity } from 'typeorm'
 import { stripHidden } from '../decorators/Hidden'
 import BadRequestError from '../error/BadRequestError'
-import { wrapAuth } from '../middleware/wrapper'
+import requires from '../middleware/requires'
+import { wrap } from '../middleware/wrapper'
 import Session from '../models/Session'
 import { SESSION_COOKIE } from './auth'
 
@@ -11,13 +12,14 @@ export type StaticEntity<E extends BaseEntity> = typeof BaseEntity & { new (): E
 
 export default (app: IRouter) => {
    const router = Router()
+   router.use(requires())
    app.use('/session', router)
 
    router.get(
       '/',
-      wrapAuth(async req => {
+      wrap(async req => {
          const sessions = await Session.find({ user: req.user })
-         return sessions.map(t => ({ ...stripHidden(t), active: req.session.id === t.id }))
+         return sessions.map(t => ({ ...stripHidden(t), active: req.session?.id === t.id }))
       })
    )
 
@@ -28,7 +30,7 @@ export default (app: IRouter) => {
             id: Joi.string().required(),
          },
       }),
-      wrapAuth(async req => {
+      wrap(async req => {
          const session = await Session.findOne(req.params.id)
 
          if (!session) return null

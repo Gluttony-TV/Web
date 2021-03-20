@@ -5,7 +5,8 @@ import { transparentize } from "polished"
 import { FC, useMemo } from "react"
 import { useParams } from "react-router"
 import { useFetch, useLoading } from "../api/hooks"
-import { IExtendedSeason, IShowFull } from "../api/models"
+import { IExtendedSeason, IProgress, IShowFull } from "../api/models"
+import Image from '../components/Image'
 import Season from "../components/Season"
 import { Title as TitleBase } from "../components/Text"
 
@@ -13,10 +14,10 @@ const Show: FC = () => {
    const params = useParams<{ id: string }>()
 
    const [seasons] = useFetch<IExtendedSeason[]>(`show/${params.id}/seasons`)
+   const [progress] = useFetch<IProgress>(`progress/${params.id}`)
 
-   const progress: undefined | number = 12
    const totalEpisodes = useMemo(() => seasons?.reduce((t, s) => t + s.episodes.length, 0), [seasons])
-   const percentage = useMemo(() => totalEpisodes && progress && (progress / totalEpisodes * 100), [totalEpisodes, progress])
+   const percentage = useMemo(() => totalEpisodes && progress && (progress.watched.length / totalEpisodes * 100), [totalEpisodes, progress])
 
    return useLoading<IShowFull>(`show/${params.id}`, show =>
       <Container>
@@ -32,22 +33,17 @@ const Show: FC = () => {
 }
 
 const Seasons: FC<{
-   progress?: number
+   progress?: IProgress
    seasons?: IExtendedSeason[]
-}> = ({ seasons, ...props }) => {
+}> = ({ seasons, progress }) => {
 
    const style = css`
       grid-area: seasons;
       padding: 2rem;
    `
 
-   const progress = useMemo(() => seasons?.map((s, i) => {
-      const previous = seasons.slice(0, i).reduce((t, s) => t + s.episodes.length, 0)
-      return Math.min(s.episodes.length, Math.max(0, (props.progress ?? 0) - previous))
-   }) ?? [], [seasons, props.progress])
-
    return <ul css={style}>
-      {seasons?.map((s, i) => <Season key={s.id} progress={progress[i]} {...s} />)}
+      {seasons?.map((s, i) => <Season key={s.id} progress={progress} {...s} />)}
    </ul>
 }
 
@@ -58,8 +54,8 @@ const Name = styled.h1`
 `
 
 const Poster = styled.img`
+   ${Image.__emotion_styles};
    grid-area: poster;
-   width: 100%;
 `
 
 const Status = styled.span`

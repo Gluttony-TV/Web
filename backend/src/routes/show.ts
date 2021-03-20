@@ -19,10 +19,7 @@ export default (app: IRouter) => {
    router.get(
       '/:slug',
       params,
-      wrap(async req => {
-         const show = await api.getShow(req.params.slug)
-         return show
-      })
+      wrap(async req => api.getShow(req.params.slug))
    )
 
    router.get(

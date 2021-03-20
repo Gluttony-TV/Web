@@ -2,11 +2,14 @@ import express, { Application, Router } from 'express'
 import { join } from 'path'
 import config from '../config'
 import NotFoundError from '../error/NotFoundError'
+import authenticate from '../middleware/authenticate'
 import auth from './auth'
 import error from './error'
+import progress from './progress'
 import season from './season'
 import token from './session'
 import show from './show'
+import stats from './stats'
 
 export default (app: Application) => {
    const router = Router()
@@ -26,10 +29,14 @@ export default (app: Application) => {
       res.status(200).end()
    })
 
+   router.use(authenticate)
+
    auth(router)
    token(router)
    show(router)
    season(router)
+   progress(router)
+   stats(router)
 
    router.use('*', (_req, _res, next) => next(new NotFoundError()))
 

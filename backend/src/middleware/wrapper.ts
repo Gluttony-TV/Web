@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { BaseEntity } from 'typeorm'
 import { stripHidden } from '../decorators/Hidden'
 import NotFoundError from '../error/NotFoundError'
-import UnauthorizedError from '../error/UnauthorizedError'
-import authenticate from '../middleware/authenticate'
 import Session from '../models/Session'
 import User from '../models/User'
 
@@ -18,7 +16,6 @@ export interface AuthRequest extends Request {
 export function wrap(func: RequestHandler) {
    return (async (req: Request, res: Response, next: NextFunction) => {
       try {
-         await authenticate(req, res, (e?: any) => (req.authError = e))
          const response = await func(req, res, next)
 
          if (response === null || response === undefined) throw new NotFoundError()
@@ -27,14 +24,5 @@ export function wrap(func: RequestHandler) {
       } catch (e) {
          next(e)
       }
-   }) as RequestHandler
-}
-
-export function wrapAuth(func: RequestHandler<AuthRequest>, validate: (user: User) => boolean = () => true) {
-   return wrap(async (req: Request, res: Response, next: NextFunction) => {
-      if (req.authError) throw req.authError
-      if (!req.user || !validate(req.user)) throw new UnauthorizedError()
-
-      return func(req as AuthRequest, res, next)
    }) as RequestHandler
 }

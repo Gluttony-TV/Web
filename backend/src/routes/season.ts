@@ -17,9 +17,6 @@ export default (app: IRouter) => {
             id: Joi.string().required(),
          },
       }),
-      wrap(async req => {
-         const show = await api.getSeason(req.params.id)
-         return show
-      })
+      wrap(async req => api.getSeason(req.params.id))
    )
 }

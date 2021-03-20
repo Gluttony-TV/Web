@@ -1,6 +1,7 @@
 import { config, Promise } from 'bluebird'
 import querystring from 'query-string'
 import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router'
 import Cookies from 'universal-cookie'
 import ApiError from './ApiError'
 import { AppStatus } from './models'
@@ -88,6 +89,11 @@ export function useRequest<R>(method: Method, endpoint: string, body?: Record<st
    }, [encodedBody, method, endpoint, onSuccess, setStatus, token])
 
    return { send, error, loading }
+}
+
+export function useQuery() {
+   const { search } = useLocation()
+   return querystring.parse(search)
 }
 
 export function useEvent<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
