@@ -9,7 +9,7 @@ RUN yarn install
 # Build application
 COPY src ./src/
 COPY public ./public/
-COPY tsconfig.json ./
+COPY tsconfig.json .eslintrc ./
 RUN npm run build
 
 # Serve enviroment
