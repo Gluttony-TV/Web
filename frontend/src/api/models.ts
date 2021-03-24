@@ -38,6 +38,7 @@ export enum AppStatus {
 }
 
 export interface IShow extends IModel {
+   tvdb_id: string
    name: string
    slug: string
    image: string

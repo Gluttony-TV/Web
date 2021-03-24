@@ -22,7 +22,7 @@ export function useToken() {
    return useContext(CONTEXT)[0]
 }
 
-export function useLogin(username: string, password: string) {
+export function useLogin(data: { username: string, password: string, email?: string }, endpoint = 'auth') {
    const [, setSession] = useContext(CONTEXT)
 
    const setToken = useCallback((token: string) => {
@@ -35,8 +35,8 @@ export function useLogin(username: string, password: string) {
       return version ? `${version.name} / ${version.os}` : 'Unkown'
    }, [])
 
-   const { error, send, loading } = useRequest<ITokens>('POST', 'auth', { username, password, reason }, t => setToken(t.access_token))
-   return { error, login: send, loading }
+   const { error, send, loading } = useRequest<ITokens>('POST', endpoint, { ...data, reason }, t => setToken(t.access_token))
+   return [ error, send, loading ] as [typeof error, typeof send, typeof loading]
 }
 
 export const SessionProvider: FC = ({ children }) => {
@@ -53,7 +53,7 @@ export const SessionProvider: FC = ({ children }) => {
       setSession({ token, user: data?.user })
    }, [setSession])
 
-   const {send: refresh, error} = useRequest<ITokens>('POST', 'auth/refresh', undefined, t => setToken(t.access_token))
+   const { send: refresh, error } = useRequest<ITokens>('POST', 'auth/refresh', undefined, t => setToken(t.access_token))
 
    useEffect(() => {
       refresh()
@@ -61,7 +61,7 @@ export const SessionProvider: FC = ({ children }) => {
    }, [])
 
    useEffect(() => {
-      if(error instanceof ApiError && error.status === 400) {
+      if (error instanceof ApiError && error.status === 400) {
          setStatus(AppStatus.LOGGED_OUT)
       }
       //eslint-disable-next-line react-hooks/exhaustive-deps

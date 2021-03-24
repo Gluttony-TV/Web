@@ -62,10 +62,10 @@ export default (app: IRouter) => {
             .leftJoinAndSelect('user.credentials', 'creds')
             .getOne()
 
-         if (!user?.credentials) throw new BadRequestError('User does not exist')
+         if (!user?.credentials) throw new BadRequestError('User does not exist', 'username')
 
          if (bcrypt.compareSync(password, user.credentials.password)) return createLogin(user, reason, res)
-         else throw new BadRequestError('Invalid password')
+         else throw new BadRequestError('Invalid password', 'password')
       })
    )
 

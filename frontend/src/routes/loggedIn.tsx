@@ -1,5 +1,5 @@
 import { redirect, Route } from ".";
-import Logout from "../views/Logout";
+import Logout from "../views/auth/Logout";
 import Profile from "../views/Profile";
 import Sessions from "../views/Sessions";
 import Stats from "../views/Stats";

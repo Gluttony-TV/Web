@@ -36,7 +36,7 @@ export default (app: IRouter) => {
       wrap(async ({ user, params }) => Progress.findOne({ user, show: Number.parseInt(params.show) }))
    )
 
-   router.post(
+   router.put(
       '/:show',
       celebrate({
          params: {
@@ -47,7 +47,8 @@ export default (app: IRouter) => {
          },
       }),
       wrap(async ({ user, params, body }) => {
-         const progress = await Progress.findOneOrFail({ user, show: Number.parseInt(params.show) })
+         const show = Number.parseInt(params.show)
+         const progress = (await Progress.findOne({ user, show })) ?? Progress.create({ user, show })
          progress.watched = body.watched
          return progress.save()
       })

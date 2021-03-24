@@ -27,11 +27,6 @@ class Api {
    private cache = new Cache()
    private token: string | null = null
 
-   constructor() {
-      const events = ['set', 'del', 'expired', 'flush']
-      events.map(e => this.cache.on(e, key => console.log(`${e}(${key})`)))
-   }
-
    private request = axios.create({ baseURL: config.tvdb.url })
 
    async login() {
@@ -103,11 +98,16 @@ class Api {
       })
    }
 
+   async searchShow(by: string, limit = 10, offset = 0) {
+      const all = await this.cacheOr(`search/${by}/${offset}`, () => this.fetch<(Show | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`))
+      return all?.slice(0, limit)
+   }
+
    private async findId(name: string | number) {
       const id = integer(name)
       if (exists(id)) return id
 
-      const results = await this.fetch<(Show | undefined)[]>(`/search?type=series&query=${name}`)
+      const results = await this.searchShow(name.toString())
       console.log(results?.map(r => r?.name))
       return integer(results?.[0]?.tvdb_id)
    }

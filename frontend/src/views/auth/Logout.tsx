@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import { useRequest } from "../api/hooks";
+import { useRequest } from "../../api/hooks";
 
 const Logout: FC = () => {
 

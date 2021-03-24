@@ -3,21 +3,41 @@ import { css, jsx, useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Question } from '@styled-icons/fa-solid';
 import { lighten } from "polished";
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { matchRoutes } from "react-router-config";
 import { Link, match, useLocation } from "react-router-dom";
+import { useFetch } from "../api/hooks";
+import { IShow } from "../api/models";
 import { useStatus } from "../api/status";
 import routes, { Route } from "../routes";
+import Searchbar from "./Searchbar";
 
 const NavBar: FC = () => {
    const [status] = useStatus()
    const { pathname } = useLocation()
 
    const [{ match }] = useMemo(() => matchRoutes(routes[status], pathname), [pathname, status])
+   const [home, ...links] = routes[status].filter(r => r.display).reverse()
 
-   const links = routes[status].filter(r => r.display).reverse()
+   const [search, setSearch] = useState('')
+   const [results] = useFetch<IShow[]>('show', { search, limit: 20 }, search.length > 0)
+   const [visible, setVisible] = useState(false)
+
+   useEffect(() => setVisible(!!results), [results, setVisible])
+
+   useEffect(() => setVisible(false), [pathname])
 
    return <Nav>
+      {home && <Tab {...home} match={match} />}
+
+      <Searchbar onChange={setSearch}>
+         {visible && results?.map(show =>
+            <Link key={show.id} to={`/shows/${show.tvdb_id}`}>
+               <li>{show.name}</li>
+            </Link>
+         )}
+      </Searchbar>
+
       {links.map(route =>
          <Tab key={route.path} {...route} match={match} />
       )}
@@ -36,7 +56,6 @@ const Tab: FC<Route & {
 
    const style = css`
       text-decoration: none;
-      color: ${theme.text};
       padding: ${icon ? '0 1.2rem' : '1.2rem 2rem'};
       height: 100%;
       display: grid;
@@ -44,6 +63,10 @@ const Tab: FC<Route & {
       justify-self: ${right ? 'end' : 'start'};
 
       background: ${base};
+
+      &, &:visited {
+         color: ${theme.text};
+      }
 
       &:hover {
          background: ${lighten(0.1, base)}

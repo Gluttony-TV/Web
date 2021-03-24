@@ -1,11 +1,13 @@
 /** @jsxImportSource @emotion/react */
-import { css, Theme } from '@emotion/react';
+import { css, Global } from '@emotion/react';
+import styled from '@emotion/styled';
 import { FC } from 'react';
 import { renderRoutes } from "react-router-config";
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AppStatus } from './api/models';
 import { SessionProvider } from './api/session';
 import { StatusProvider, useStatus } from './api/status';
+import { LinkStyle } from './components/Link';
 import Nav from './components/Nav';
 import StatusBanner from './components/StatusBanner';
 import routes from './routes';
@@ -20,25 +22,30 @@ const App: FC = () => (
 const Container: FC = () => {
   const [status] = useStatus()
 
-  const style = (t: Theme) => css`
-      background: ${t.bg};
-      color: ${t.text};
-      min-height: 100vh;
-      font-family: sans-serif;
+  return <AppStyle>
 
-      input {
-        color: ${t.text};
-      }
-  `
+    <Global styles={theme => css`
 
-  return <div css={style}>
+        a {
+          ${LinkStyle({ theme })};
+        }
+        
+    `} />
+
     <Router>
       {status === AppStatus.OFFLINE && <StatusBanner />}
       <Nav />
       {renderRoutes(routes[status])}
     </Router>
-  </div>
+  </AppStyle>
 }
+
+const AppStyle = styled.div`
+  background: ${p => p.theme.bg};
+  color: ${p => p.theme.text};
+  min-height: 100vh;
+  font-family: sans-serif;
+`
 
 const Providers: FC = ({ children }) => (
   <StatusProvider>

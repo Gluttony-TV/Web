@@ -50,7 +50,7 @@ export default class User extends BaseEntity {
       const { email, password, ...user } = data
 
       const existing = await Credentials.findOne({ email })
-      if (existing) throw new BadRequestError('User with this username does already exist')
+      if (existing) throw new BadRequestError('User with this username does already exist', 'username')
 
       const credentials = Credentials.create({ email, password })
       return await User.create({ ...user, credentials }).save()

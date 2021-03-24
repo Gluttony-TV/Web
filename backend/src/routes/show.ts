@@ -17,9 +17,21 @@ export default (app: IRouter) => {
    })
 
    router.get(
+      '/',
+      celebrate({
+         query: {
+            search: Joi.string().required(),
+            limit: Joi.number().positive(),
+            offset: Joi.number().positive(),
+         },
+      }),
+      wrap(req => api.searchShow(req.query.search as string, Number.parseInt(req.query.limit as string), Number.parseInt(req.query.offset as string)))
+   )
+
+   router.get(
       '/:slug',
       params,
-      wrap(async req => api.getShow(req.params.slug))
+      wrap(req => api.getShow(req.params.slug))
    )
 
    router.get(

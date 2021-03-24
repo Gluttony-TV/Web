@@ -1,30 +1,25 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
 import { FC, useState } from "react";
-import { useLogin, useUser } from "../api/session";
-import { Button, Input } from "../components/Inputs";
-import { Title } from "../components/Text";
+import { Link } from "react-router-dom";
+import { useLogin, useUser } from "../../api/session";
+import Form from "../../components/Form";
+import { Button, Input } from "../../components/Inputs";
 
 const Login: FC = () => {
    const user = useUser()
    const [username, setUsername] = useState(user?.username ?? '')
    const [password, setPassword] = useState('')
-   const { error, login } = useLogin(username, password)
+   const [error, login] = useLogin({ username, password })
 
-   const style = css`
-      padding: 5rem;
-      display: grid;
-      justify-content: center;
-      gap: 1rem;
-   `
+   return <Form title='Log in' onSubmit={login} error={error}>
 
-   return <form css={style} onSubmit={login}>
-      <Title>Log in</Title>
-      {error && <p>{error.message}</p>}
       <Input size={2} required type='text' placeholder='Username' value={username} onUpdate={setUsername} autoComplete='username' />
       <Input size={2} required type='password' placeholder='Password' value={password} onUpdate={setPassword} autoComplete='current-password' />
-      <Button>Login</Button>
-   </form>
+
+      <Button disabled={!!error}>Login</Button>
+
+      <Link to='/register'>create new account</Link>
+   </Form>
 }
 
 export default Login

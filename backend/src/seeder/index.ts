@@ -1,9 +1,10 @@
 import { mkdirSync, unlinkSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
-import { runSeeder, tearDownDatabase, useRefreshDatabase, useSeeding } from 'typeorm-seeding'
+import { runSeeder, tearDownDatabase, useSeeding } from 'typeorm-seeding'
 import { EntityFactory } from 'typeorm-seeding/dist/entity-factory'
 import config from '../config'
-import databaseLoader, { checkAdminUser } from '../database'
+import databaseLoader from '../database'
+import User, { UserRole } from '../models/User'
 import UserSeeder from './seeds/user.seed'
 
 export type Faked<T> = {
@@ -20,8 +21,7 @@ async function run() {
 
    console.log('Database loaded')
 
-   await useRefreshDatabase({ configName })
-   await checkAdminUser()
+   await User.delete({ role: UserRole.FAKE })
    console.log('Database refreshed')
 
    await useSeeding({ configName })

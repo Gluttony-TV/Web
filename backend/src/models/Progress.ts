@@ -9,7 +9,7 @@ export default class Progress extends BaseEntity {
    @PrimaryGeneratedColumn()
    id!: number
 
-   @ManyToOne(() => User, u => u.progress)
+   @ManyToOne(() => User, u => u.progress, { onDelete: 'CASCADE' })
    user!: One<User>
 
    @Column()

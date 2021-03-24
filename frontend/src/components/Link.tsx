@@ -2,7 +2,7 @@
 import { css, Theme } from "@emotion/react";
 import styled from "@emotion/styled";
 
-const style = (p: { theme: Theme }) => css`
+export const LinkStyle = (p: { theme: Theme }) => css`
    color: ${p.theme.link.default};
    
    :visited {
@@ -15,12 +15,8 @@ const style = (p: { theme: Theme }) => css`
    }
 `
 
-export const Link = styled.link`
-   ${style}
-`
-
 export const LinkButton = styled.button`
-   ${style}
+   ${LinkStyle}
    text-decoration: underline;
    outline: none;
 `

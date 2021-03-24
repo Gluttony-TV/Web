@@ -1,4 +1,4 @@
-import { config, Promise } from 'bluebird'
+import Bluebird, { config } from 'bluebird'
 import querystring from 'query-string'
 import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
@@ -12,9 +12,9 @@ config({ cancellation: true })
 const baseURL = '/api'
 export const cookies = new Cookies()
 
-async function request<T>(method: string, endpoint: string, body?: string, token?: string) {
+async function request<T>(method: string, endpoint: string, body?: string, token?: string): Promise<T> {
    const url = `${baseURL}/${endpoint}`
-   console.count(url)
+   console.count(`[${method}] -> ${url}`)
 
    const response = await fetch(url, {
       method, body, headers: {
@@ -31,7 +31,7 @@ async function request<T>(method: string, endpoint: string, body?: string, token
 }
 
 type Query = Record<string, any>
-export function useFetch<M>(endpoint: string, query: Query = {}) {
+export function useFetch<M>(endpoint: string, query: Query = {}, fetch = true) {
    const [data, setData] = useState<M | undefined>()
 
    const url = useMemo(() => {
@@ -42,9 +42,8 @@ export function useFetch<M>(endpoint: string, query: Query = {}) {
    const { send, error, loading } = useRequest('GET', url, undefined, setData)
 
    useEffect(() => {
-      const promise = send()
-      return () => promise.cancel()
-   }, [send])
+      if (fetch) send()
+   }, [send, fetch])
 
    return [data, loading, error, send] as [M | undefined, boolean, Error | undefined, () => void]
 }
@@ -63,20 +62,23 @@ export function useLoading<M>(endpoint: string, queryOrRender: Query | Render<M>
 
 type Method = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'HEAD'
 export function useRequest<R>(method: Method, endpoint: string, body?: Record<string, any>, onSuccess?: (r: R) => unknown) {
-   const [error, setError] = useState<Error>()
+   const [error, setError] = useState<ApiError>()
    const [loading, setLoading] = useState(false)
    const [, setStatus] = useStatus()
    const { token } = useToken()
+   const [promise, setPromise] = useState<Bluebird<void>>()
 
    const encodedBody = body ? JSON.stringify(body) : undefined
 
-   const send = useCallback((e?: React.FormEvent) => {
-      setLoading(true)
-      setError(undefined)
-      e?.preventDefault()
+   useEffect(() => () => promise?.cancel())
 
-      return Promise.resolve<void>(
-         request<R>(method, endpoint, encodedBody, token)
+   const send = useCallback((e?: React.FormEvent) => {
+      setLoading(() => true)
+      setError(() => undefined)
+
+      setPromise(p => {
+         p?.cancel()
+         return Bluebird.resolve(request<R>(method, endpoint, encodedBody, token))
             .then(r => onSuccess?.(r))
             .then(() => cookies.get('refresh-token') ? AppStatus.LOGGED_IN : AppStatus.LOGGED_OUT)
             .catch(e => setError(e))
@@ -85,10 +87,28 @@ export function useRequest<R>(method: Method, endpoint: string, body?: Record<st
             })
             .then(() => setLoading(false))
 
-      )
+      })
+
+      e?.preventDefault()
    }, [encodedBody, method, endpoint, onSuccess, setStatus, token])
 
    return { send, error, loading }
+}
+
+export function useCached<T>(endpoint: string, putEndpoint = endpoint, query: Query = {}, fetch = true) {
+   const [data, loading, error, update] = useFetch<T>(endpoint, query, fetch)
+
+   const [cached, cache] = useState<Partial<T>>()
+   const clearCache = useCallback(() => cache(undefined), [cache])
+   const { send: put } = useRequest('PUT', putEndpoint, cached, update)
+
+   useEffect(() => {
+      if (cached) put()
+   }, [cached, put])
+
+   useEffect(clearCache, [clearCache, data])
+
+   return [data ? { ...data, ...cached } : undefined, cache, loading, error, update] as [typeof data, typeof cache, typeof loading, typeof error, typeof update]
 }
 
 export function useQuery() {
