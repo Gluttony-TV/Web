@@ -50,7 +50,10 @@ export default (app: IRouter) => {
          const show = Number.parseInt(params.show)
          const progress = (await Progress.findOne({ user, show })) ?? Progress.create({ user, show })
          progress.watched = body.watched
-         return progress.save()
+         if (progress.watched.length === 0) {
+            await progress.remove()
+            return true
+         } else return progress.save()
       })
    )
 }

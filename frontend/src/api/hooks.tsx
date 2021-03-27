@@ -14,7 +14,7 @@ export const cookies = new Cookies()
 
 async function request<T>(method: string, endpoint: string, body?: string, token?: string): Promise<T> {
    const url = `${baseURL}/${endpoint}`
-   console.count(`[${method}] -> ${url}`)
+   if(process.env.NODE_ENV === 'development') console.count(`[${method}] -> ${url}`)
 
    const response = await fetch(url, {
       method, body, headers: {

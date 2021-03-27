@@ -63,13 +63,15 @@ const Tab: FC<Route & {
       justify-self: ${right ? 'end' : 'start'};
 
       background: ${base};
+      //border-bottom: solid 3px ${lighten(0.2, theme.bg)};
 
       &, &:visited {
          color: ${theme.text};
       }
 
       &:hover {
-         background: ${lighten(0.1, base)}
+         background: ${lighten(0.1, base)};
+         //border-bottom: solid 3px ${lighten(0.2, base)};
       }
    `
 
@@ -80,6 +82,7 @@ const Tab: FC<Route & {
 
 const Nav = styled.nav`
    background: ${p => lighten(0.1, p.theme.bg)};
+   border-bottom: solid 3px ${p => lighten(0.2, p.theme.bg)};
    display: grid;
    grid-auto-flow: column;
    justify-content: start;

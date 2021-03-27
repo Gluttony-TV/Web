@@ -2,23 +2,28 @@
 import styled from "@emotion/styled";
 import debounce from 'lodash.debounce';
 import { darken, mix } from "polished";
-import { FC, useMemo } from "react";
+import { Dispatch, FC, KeyboardEvent, SetStateAction, useCallback, useMemo } from "react";
 import { InputStyles } from "./Inputs";
 
 const Searchbar: FC<{
-   onChange?: (value: string) => unknown
+   onChange?: Dispatch<SetStateAction<string>>
 }> = ({ onChange, children }) => {
 
    const onInput = useMemo(() => onChange && debounce(onChange, 300), [onChange])
 
+   const key = useCallback((e: KeyboardEvent) => {
+      if(e.code === 'Enter') onChange?.(v => v)
+   }, [onChange])
+
    return <div>
-      <Input type='text' placeholder='Search...' onChange={e => onInput?.(e.target.value)} />
+      <Input onKeyPress={key} type='text' placeholder='Search...' onChange={e => onInput?.(e.target.value)} />
       {children && <Dropdown>{children}</Dropdown>}
    </div>
 }
 
 const Dropdown = styled.ul`
    position: absolute;
+   z-index: 2;
    list-style: none;
    min-width: 400px;
    

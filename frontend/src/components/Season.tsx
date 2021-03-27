@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { transparentize } from 'polished';
+import { mix, transparentize } from 'polished';
 import { FC, Fragment, useCallback, useMemo } from 'react';
 import { IEpisode, IExtendedSeason, IProgress } from '../api/models';
 
@@ -10,7 +10,7 @@ export interface SeasonProps {
    moveProgress?: (episode: IEpisode['id']) => unknown
 }
 
-const Season: FC<IExtendedSeason & SeasonProps> = ({ progress, episodes, setWatched, moveProgress }) => {
+const Season: FC<IExtendedSeason & SeasonProps> = ({ progress, setWatched, moveProgress, ...props }) => {
 
    const watched = useMemo(() => progress?.watched ?? [], [progress])
    //const percentage = useMemo(() => watched.length / episodes.length, [episodes, watched])
@@ -24,15 +24,16 @@ const Season: FC<IExtendedSeason & SeasonProps> = ({ progress, episodes, setWatc
       }
    }, [setWatched, moveProgress, watched])
 
-   const split = 25
    const now = new Date().getTime()
 
-   return <Row split={split}>
-      {episodes.map(({ id, number, name, aired}) =>
+   const episodes = useMemo(() => props.episodes.sort((a, b) => a.number - b.number), [props.episodes])
+
+   return <Row split={30}>
+      {episodes.map(({ id, number, name, aired }) =>
          <Fragment key={id}>
             <Episode
                title={name}
-               due={new Date(aired).getTime() > now}
+               due={!aired || new Date(aired).getTime() > now}
                watched={watched.includes(id)}
                onClick={e => click(id, e.shiftKey)}>
                {number}
@@ -57,8 +58,16 @@ const Progress = styled.div<{ width: number }>`
 
 const grid = (...colors: string[]) => css`
    background: repeating-linear-gradient(-25deg, ${colors.map(
-      (c, i) => `${c} ${i * 10}px,${c} ${(i + 1) * 10}px`
-   ).join()});
+   (c, i) => `${c} ${i * 10}px,${c} ${(i + 1) * 10}px`
+).join()});
+`
+
+const background = (color: string) => css`
+   background: linear-gradient(${transparentize(0, color)}, ${transparentize(0.3, color)});
+   
+   &:hover {
+      background: linear-gradient(${transparentize(0.2, color)}, ${transparentize(0.5, color)});
+   }
 `
 
 const Episode = styled.li<{ watched?: boolean, due?: boolean }>`
@@ -67,23 +76,18 @@ const Episode = styled.li<{ watched?: boolean, due?: boolean }>`
    width: 3rem;
    user-select: none;
    cursor: pointer;
-      
-   background: ${p => transparentize(0.8, p.theme.secondary)};
 
-   ${p => p.watched && css`
-      background: ${transparentize(0.6, p.theme.secondary)};
-   `}
-   
-   ${p => p.due && css`
+   ${p => !p.due ? css`
+      
+      ${background(mix(0.3, p.theme.bg, p.theme.secondary))};
+      ${p.watched && background(p.theme.primary)};
+
+   ` : css`
+
       cursor: not-allowed;
       background: ${transparentize(0.9, p.theme.secondary)};
       ${grid(transparentize(0.75, p.theme.secondary), transparentize(0.8, p.theme.secondary))};
-   `}
-
-   ${p => !p.due && css`
-      &:hover {
-         background: ${transparentize(p.watched ? 0.5 : 0.7, p.theme.secondary)};
-      }
+      
    `}
 
    &:last-of-type {

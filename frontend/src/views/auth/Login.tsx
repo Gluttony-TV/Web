@@ -16,7 +16,7 @@ const Login: FC = () => {
       <Input size={2} required type='text' placeholder='Username' value={username} onUpdate={setUsername} autoComplete='username' />
       <Input size={2} required type='password' placeholder='Password' value={password} onUpdate={setPassword} autoComplete='current-password' />
 
-      <Button disabled={!!error}>Login</Button>
+      <Button>Login</Button>
 
       <Link to='/register'>create new account</Link>
    </Form>
