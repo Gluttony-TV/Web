@@ -60,10 +60,12 @@
     ]
   },
   "devDependencies": {
+    "customize-cra": "^1.0.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "husky": "^5.1.2",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
+    "react-app-rewired": "^2.1.8",
     "typescript-styled-plugin": "^0.15.0"
   },
   "husky": {
