@@ -7,13 +7,14 @@ export interface ITimestamps {
    updated: string
 }
 
-export interface IUser extends IModel {
-   timestamps: ITimestamps
+export interface ICredentials {
+   email?: string
    username: string
-   credentials?: {
-      email?: string
-   }
    verified?: boolean
+}
+
+export interface IUser extends IModel, ICredentials {
+   timestamps: ITimestamps
    birth?: string
 }
 

@@ -2,6 +2,7 @@
 import { css, Global } from '@emotion/react';
 import styled from '@emotion/styled';
 import { FC } from 'react';
+import { IntlProvider } from 'react-intl';
 import { renderRoutes } from "react-router-config";
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AppStatus } from './api/models';
@@ -51,7 +52,9 @@ const Providers: FC = ({ children }) => (
   <StatusProvider>
     <SessionProvider>
       <ThemeProvider>
-        {children}
+        <IntlProvider defaultLocale='en' locale='en' messages={{}}>
+          {children}
+        </IntlProvider>
       </ThemeProvider>
     </SessionProvider>
   </StatusProvider>

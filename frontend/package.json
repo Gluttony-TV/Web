@@ -20,6 +20,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-intl": "^3.0.0",
     "@types/react-router-config": "^5.0.2",
     "@types/react-router-dom": "^5.1.7",
     "bluebird": "^3.7.2",
@@ -32,6 +33,7 @@
     "query-string": "^6.14.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-intl": "^5.15.5",
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
@@ -41,11 +43,13 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "format": "prettier --write src/**/*.{tsx,ts}"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
+    "lang:extract": "formatjs extract src/**/*.tsx --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "format": "prettier --write src/**/*.{tsx,ts,scss}",
+    "lint": "eslint --fix src/**/*.{tsx,ts}"
   },
   "browserslist": {
     "production": [
@@ -60,7 +64,11 @@
     ]
   },
   "devDependencies": {
+    "@formatjs/cli": "^4.2.4",
+    "@formatjs/ts-transformer": "^3.3.4",
+    "babel-plugin-formatjs": "^10.2.4",
     "customize-cra": "^1.0.0",
+    "eslint-plugin-formatjs": "^2.14.3",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "husky": "^5.1.2",
     "lint-staged": "^10.5.4",

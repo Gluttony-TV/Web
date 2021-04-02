@@ -5,6 +5,7 @@ import { Discord } from "@styled-icons/fa-brands";
 import { DateTime } from 'luxon';
 import { transparentize } from 'polished';
 import { FC } from "react";
+import { FormattedMessage } from 'react-intl';
 import { useRequest } from "../api/hooks";
 import { IUser } from "../api/models";
 import { useUser } from '../api/session';
@@ -15,7 +16,12 @@ const Profile: FC = () => {
    const user = useUser()
 
    return <>
-      <Title>Your Profile</Title>
+      <Title>
+         <FormattedMessage
+            description='Profile Page Title'
+            defaultMessage='Your Profile'
+         />
+      </Title>
       {user
          ? <Info {...user} />
          : <p>Not logged in</p>
@@ -23,7 +29,7 @@ const Profile: FC = () => {
    </>
 }
 
-const Info: FC<IUser> = ({ timestamps, username, credentials, verified }) => {
+const Info: FC<IUser> = ({ timestamps, username, verified, email }) => {
    const created = DateTime.fromISO(timestamps.created)
 
    const style = css`
@@ -51,10 +57,10 @@ const Info: FC<IUser> = ({ timestamps, username, credentials, verified }) => {
          <p id='username'>{username}</p>
       </Panel>
 
-      {credentials && <>
+      {email && <>
          <Panel>
             <label htmlFor='email'>E-Mail</label>
-            <p id='email'>{credentials.email ?? 'No email provided'}</p>
+            <p id='email'>{email ?? 'No email provided'}</p>
          </Panel>
 
          <Panel>
