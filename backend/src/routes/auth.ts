@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt'
 import { celebrate, Joi } from 'celebrate'
 import { IRouter, Request, Response, Router } from 'express'
 import { sign } from 'jsonwebtoken'
-import { IsNull, Not } from 'typeorm'
 import config from '../config'
 import { stripHidden } from '../decorators/Hidden'
 import BadRequestError from '../error/BadRequestError'
@@ -23,13 +22,13 @@ export default (app: IRouter) => {
       const now = new Date().getTime()
       if (now >= token.expires_at.getTime()) throw new BadRequestError('Token expired')
 
-      return sign({ user: stripHidden(token.user), token: stripHidden(token) }, jwt.access_secret)
+      return sign({ user: token.user.joinCredentials(), token: stripHidden(token) }, jwt.access_secret)
    }
 
    async function createLogin(user: User, reason: string, res?: Response) {
       const expires_at = new Date().getTime() + expires_in * 3600 * 1000
 
-      const refresh_token = sign({ user: stripHidden(user), expires_at }, jwt.refresh_secret)
+      const refresh_token = sign({ user: user.joinCredentials(), expires_at }, jwt.refresh_secret)
       const session = await Session.create({ user, refresh_token, reason, expires_at: new Date(expires_at) }).save()
       const access_token = refreshLogin(session)
 
@@ -56,11 +55,7 @@ export default (app: IRouter) => {
       wrap(async (req, res) => {
          const { username, password, reason } = req.body
 
-         const user = await User.createQueryBuilder('user')
-            .where({ username, credentials: Not(IsNull()) })
-            .orWhere('creds.email = :username', { username })
-            .leftJoinAndSelect('user.credentials', 'creds')
-            .getOne()
+         const user = await User.findBy(username)
 
          if (!user?.credentials) throw new BadRequestError('User does not exist', 'username')
 

@@ -6,10 +6,12 @@ import express from 'express'
 import api from './api'
 import config from './config'
 import database from './database'
+import User, { UserRole } from './models/User'
 import routes from './routes'
 
 async function run() {
    await Promise.all([database(), api.login()])
+   if (false) await User.delete({ role: UserRole.FAKE })
 
    const app = express()
 

@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
+import { BaseEntity, Column, Entity, OneToMany, OneToOne } from 'typeorm'
+import { stripHidden } from '../decorators/Hidden'
 import UUID from '../decorators/UUID'
 import BadRequestError from '../error/BadRequestError'
 import Credentials from './Credentials'
@@ -21,12 +22,6 @@ export default class User extends BaseEntity {
    @Column(() => Timestamps)
    timestamps!: Timestamps
 
-   @Column()
-   username!: string
-
-   @Column({ default: false })
-   verified!: boolean
-
    @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
    role!: UserRole
 
@@ -43,16 +38,28 @@ export default class User extends BaseEntity {
    //accounts!: LazyMany<Credentials>
 
    @OneToOne(() => Credentials, c => c.user, { cascade: true, eager: true, nullable: true })
-   @JoinColumn()
    credentials?: Credentials
 
-   static async register(data: { username: string; email?: string; password: string; role?: UserRole }) {
-      const { email, password, ...user } = data
+   static findBy(username: string, email = username) {
+      const query = this.createQueryBuilder('user').orWhere('creds.email = :email OR creds.username = :username', { username, email }).leftJoinAndSelect('user.credentials', 'creds')
 
-      const existing = await Credentials.findOne({ email })
+      console.log(query.getSql())
+
+      return query.getOne()
+   }
+
+   joinCredentials() {
+      const creds = this.credentials
+      return creds ? { ...stripHidden(this), ...stripHidden(creds) } : stripHidden(this)
+   }
+
+   static async register(data: { username: string; email?: string; password: string; role?: UserRole }) {
+      const { email, username, password, ...user } = data
+
+      const existing = await this.findBy(username, email)
       if (existing) throw new BadRequestError('User with this username does already exist', 'username')
 
-      const credentials = Credentials.create({ email, password })
+      const credentials = Credentials.create({ email, password, username })
       return await User.create({ ...user, credentials }).save()
    }
 }

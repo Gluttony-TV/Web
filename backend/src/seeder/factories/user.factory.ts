@@ -17,8 +17,6 @@ define(User, (faker, ctx?: { role?: UserRole; sessions?: boolean; shows?: Show[]
    const updated = faker.date.between(created, new Date())
    user.timestamps = { created, updated }
 
-   user.username = username
-   user.verified = faker.random.boolean()
    user.credentials = factory(Credentials)({ firstName, lastName, username })
 
    if (faker.random.boolean()) user.birth = faker.date.past(40)
@@ -45,6 +43,8 @@ define(Credentials, (faker, ctx?: { firstName?: string; lastName?: string; usern
    credentials.email = faker.random.boolean() ? faker.internet.email(firstName, lastName, 'faked.com').toLowerCase() : faker.internet.email(ctx?.username, 'faked.com').toLowerCase()
 
    credentials.password = '1234'
+   credentials.username = ctx?.username
+   credentials.verified = faker.random.boolean()
 
    return credentials
 })

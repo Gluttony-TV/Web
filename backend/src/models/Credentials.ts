@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { BaseEntity, BeforeInsert, Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import Hidden from '../decorators/Hidden'
 import { One } from './Relations'
 import Timestamps from './Timestamps'
@@ -13,8 +13,12 @@ export default class Credentials extends BaseEntity {
    @Column(() => Timestamps)
    timestamps!: Timestamps
 
-   @OneToOne(() => User, u => u.credentials)
+   @OneToOne(() => User, u => u.credentials, { onDelete: 'CASCADE' })
+   @JoinColumn()
    user!: One<User>
+
+   @Column({ unique: true })
+   username!: string
 
    @Column({ unique: true, nullable: true })
    email?: string
