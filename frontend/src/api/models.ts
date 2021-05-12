@@ -51,6 +51,11 @@ export interface IShow extends IModel {
    originalCountry: string
    originalLanguage: string
    originalNetwork: INetwork
+   aliases?: Array<{
+      language: string
+      name: string
+   }>
+   name_translated: string | Record<string, string | undefined>
 }
 
 type Weekday = "sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday"

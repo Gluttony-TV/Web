@@ -18,13 +18,16 @@ const Profile: FC = () => {
    return <>
       <Title>
          <FormattedMessage
-            description='Profile Page Title'
+            description='Profile page title'
             defaultMessage='Your Profile'
          />
       </Title>
       {user
          ? <Info {...user} />
-         : <p>Not logged in</p>
+         : <FormattedMessage
+            description='Profile page not logged in'
+            defaultMessage='not logged in'
+         />
       }
    </>
 }

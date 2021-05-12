@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled"
-import { Check } from "@styled-icons/fa-solid"
+import { Check, Times } from "@styled-icons/fa-solid"
 import { transparentize } from "polished"
 import { FC, useCallback, useMemo } from "react"
 import { useParams } from "react-router"
@@ -9,6 +9,7 @@ import { IEpisode, IExtendedSeason, IProgress, IShowFull } from "../api/models"
 import Image from '../components/Image'
 import { Button } from "../components/Inputs"
 import Season from "../components/Season"
+import ShowName from "../components/ShowName"
 import { Title as TitleBase } from "../components/Text"
 
 const Show: FC = () => {
@@ -30,7 +31,7 @@ const Show: FC = () => {
       <Container>
 
          <Title>
-            <Name>{show.name}</Name>
+            <Name><ShowName {...show} /></Name>
             <Status>{show.status.name}</Status>
             {percentage > 0 && <Progress>{Math.round(percentage)}%</Progress>}
          </Title>
@@ -40,7 +41,10 @@ const Show: FC = () => {
          {episodes.length > 0 && <Seasons>
 
             <Button secondary={watchedAll} onClick={() => setProgress({ watched: watchedAll ? [] : episodes.map(e => e.id) })}>
-               <Check />
+               {watchedAll
+                  ? <Times size='80%' />
+                  : <Check size='80%' />
+               }
             </Button>
 
             <ul>

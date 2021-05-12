@@ -11,6 +11,7 @@ import { IShow } from "../api/models";
 import { useStatus } from "../api/status";
 import routes, { Route } from "../routes";
 import Searchbar from "./Searchbar";
+import ShowName from "./ShowName";
 
 const NavBar: FC = () => {
    const [status] = useStatus()
@@ -33,7 +34,9 @@ const NavBar: FC = () => {
       <Searchbar onChange={setSearch}>
          {visible && results?.map(show =>
             <Link key={show.id} to={`/shows/${show.tvdb_id}`}>
-               <li>{show.name}</li>
+               <li>
+                  <ShowName {...show} />
+               </li>
             </Link>
          )}
       </Searchbar>
@@ -57,13 +60,13 @@ const Tab: FC<Route & {
    const style = css`
       text-decoration: none;
       padding: ${icon ? '0 1.2rem' : '1.2rem 2rem'};
-      height: 100%;
+      height: calc(100% + 8px);
       display: grid;
       align-items: center;
       justify-self: ${right ? 'end' : 'start'};
 
       background: ${base};
-      //border-bottom: solid 3px ${lighten(0.2, theme.bg)};
+      border-bottom: solid 4px ${lighten(0.2, base)};
 
       &, &:visited {
          color: ${theme.text};
@@ -71,7 +74,7 @@ const Tab: FC<Route & {
 
       &:hover {
          background: ${lighten(0.1, base)};
-         //border-bottom: solid 3px ${lighten(0.2, base)};
+         border-bottom: solid 4px ${lighten(0.2, base)};
       }
    `
 
@@ -82,7 +85,7 @@ const Tab: FC<Route & {
 
 const Nav = styled.nav`
    background: ${p => lighten(0.1, p.theme.bg)};
-   border-bottom: solid 3px ${p => lighten(0.2, p.theme.bg)};
+   border-bottom: solid 4px ${p => lighten(0.3, p.theme.bg)};
    display: grid;
    grid-auto-flow: column;
    justify-content: start;

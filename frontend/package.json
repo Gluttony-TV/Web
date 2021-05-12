@@ -44,10 +44,12 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
+    "prebuild": "lang:compile",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
-    "lang:extract": "formatjs extract src/**/*.tsx --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "lang:extract": "formatjs extract src/**/*.tsx --out-file lang/en.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+    "lang:compile": "formatjs compile-folder lang --ast build/lang",
     "format": "prettier --write src/**/*.{tsx,ts,scss}",
     "lint": "eslint --fix src/**/*.{tsx,ts}"
   },

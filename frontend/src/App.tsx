@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css, Global } from '@emotion/react';
 import styled from '@emotion/styled';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { IntlProvider } from 'react-intl';
 import { renderRoutes } from "react-router-config";
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -48,16 +48,28 @@ const AppStyle = styled.div`
   font-family: sans-serif;
 `
 
-const Providers: FC = ({ children }) => (
-  <StatusProvider>
+function loadLang(key: string) {
+  return import(`../build/lang/${key}.json`)
+}
+
+const Providers: FC = ({ children }) => {
+
+  const lang = 'en'
+  const [translations, setTranslations] = useState({})
+
+  useEffect(() => {
+    loadLang(lang).then(setTranslations)
+  }, [lang])
+
+  return <StatusProvider>
     <SessionProvider>
       <ThemeProvider>
-        <IntlProvider defaultLocale='en' locale='en' messages={{}}>
+        <IntlProvider defaultLocale='en' locale={lang} messages={translations}>
           {children}
         </IntlProvider>
       </ThemeProvider>
     </SessionProvider>
   </StatusProvider>
-)
+}
 
 export default App;

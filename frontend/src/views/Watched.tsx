@@ -2,12 +2,14 @@
 import { jsx } from "@emotion/react"
 import styled from "@emotion/styled"
 import { List, Th, ThLarge } from "@styled-icons/fa-solid"
+import { transparentize } from "polished"
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { Link } from "react-router-dom"
 import { useLoading, useQuery } from "../api/hooks"
 import { IProgress, IShow } from "../api/models"
 import Image from '../components/Image'
 import { Button } from "../components/Inputs"
+import ShowName from "../components/ShowName"
 
 enum View {
    LIST = 1,
@@ -41,7 +43,7 @@ const ViewSelect: FC<{
          [View.SMALL_CELLS]: Th,
          [View.LIST]: List,
       }).map(([mode, icon]) =>
-         <Button secondary={mode !== value?.toString()} onClick={() => onChange(Number.parseInt(mode))}>
+         <Button key={mode} secondary={mode !== value?.toString()} onClick={() => onChange(Number.parseInt(mode))}>
             {jsx(icon, { size: 20 })}
          </Button>
       )}
@@ -71,7 +73,7 @@ const Cell: FC<IProgress<IShow>> = ({ show }) => {
 
          <Image title={show.name} src={show.image} alt={show.name} />
 
-         <h4>{show.name}</h4>
+         <h4><ShowName {...show} /></h4>
 
       </Panel>
    </Link>
@@ -81,7 +83,7 @@ const Grid = styled.ul<{ perRow: number }>`
    display: grid;
    justify-content: start;
    padding: 2rem;
-   gap: ${p => 14 / p.perRow}rem;
+   //gap: ${p => 14 / p.perRow}rem;
    gap: ${p => p.perRow > View.BIG_CELLS ? 0 : 2}rem;
    grid-template-columns: repeat(${p => p.perRow}, 1fr);
    list-style: none;
@@ -115,10 +117,12 @@ const Panel = styled.li`
 
    img {
       transition: clip-path 0.1s linear;
-         clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
    }
 
    &:hover {
+      //filter: drop-shadow(0 0 1rem ${p => transparentize(0.4, p.theme.primary)});
+      
       img {
          clip-path: polygon(0 0, 100% 0, 100% calc(75% - 2rem), 0% 75%);
       }
