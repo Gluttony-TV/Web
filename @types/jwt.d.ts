@@ -2,7 +2,7 @@ import 'next-auth';
 import 'next-auth/jwt';
 
 interface AdditionalJWT {
-   provider: string
+   provider?: string
    name: string
    email?: string
    image?: string

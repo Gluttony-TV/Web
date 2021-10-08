@@ -1,23 +1,27 @@
 import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = process.env
 
-if (!GITHUB_CLIENT_ID) throw new Error('Please define the GITHUB_CLIENT_ID environment variable inside .env.local')
-if (!GITHUB_CLIENT_SECRET) throw new Error('Please define the GITHUB_CLIENT_SECRET environment variable inside .env.local')
+function env(key: string) {
+   const value = process.env[key]
+   if (value) return value
+   throw new Error(`Please define the ${value} environment variable inside .env.local`)
+}
 
 export default NextAuth({
    theme: 'dark',
    providers: [
       Providers.GitHub({
-         clientId: GITHUB_CLIENT_ID,
-         clientSecret: GITHUB_CLIENT_SECRET,
-         scope: 'user:email',
+         clientId: env('GITHUB_CLIENT_ID'),
+         clientSecret: env('GITHUB_CLIENT_SECRET'),
       }),
    ],
    callbacks: {
-      async jwt(token, user, account, profile) {
-         return { ...token, provider: account?.provider! }
+      async jwt(token, _user, account) {
+         return { ...token, provider: account?.provider }
       }
+   },
+   jwt: {
+      signingKey: env('JWT_SIGNING_KEY'),
    }
 })

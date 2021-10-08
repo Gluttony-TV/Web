@@ -1,87 +1,62 @@
 
 import { debounce } from 'lodash';
-import { darken, mix } from "polished";
-import { Dispatch, FC, KeyboardEvent, SetStateAction, useCallback, useMemo } from "react";
+import { useRouter } from "next/router";
+import { lighten } from 'polished';
+import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
+import useFetch from '../hooks/useFetch';
+import { IShow } from '../models';
 import { InputStyles } from "./Inputs";
+import Link from './Link';
+import ShowName from "./ShowName";
 
-const Searchbar: FC<{
-   onChange?: Dispatch<SetStateAction<string>>
-}> = ({ onChange, children }) => {
+const Searchbar: FC = ({ children }) => {
+   const { pathname } = useRouter()
 
-   const onInput = useMemo(() => onChange && debounce(onChange, 300), [onChange])
+   const [search, setSearch] = useState('')
+   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, undefined, { enabled: search.length > 0 })
+   const [visible, setVisible] = useState(false)
+
+   useEffect(() => setVisible(!!results), [results, setVisible])
+   useEffect(() => setVisible(false), [pathname])
+
+   const onInput = useMemo(() => debounce(setSearch, 300), [setSearch])
 
    const key = useCallback((e: KeyboardEvent) => {
-      if (e.code === 'Enter') onChange?.(v => v)
-   }, [onChange])
+      if (e.code === 'Enter') setSearch?.(v => v)
+   }, [setSearch])
 
    return <div>
       <Input onKeyPress={key} type='text' placeholder='Search...' onChange={e => onInput?.(e.target.value)} />
-      {children && <Dropdown>{children}</Dropdown>}
+      <Dropdown>
+         {children}
+         {visible && results?.map(show =>
+            <Link key={show.id} href={`/show/${show.tvdb_id}`}>
+               <li>
+                  <ShowName {...show} />
+               </li>
+            </Link>
+         )}
+      </Dropdown>
    </div>
 }
 
 const Dropdown = styled.ul`
    position: absolute;
+   left: 10px;
    z-index: 2;
    list-style: none;
    min-width: 400px;
    
-   box-shadow: 4px 8px 8px 0 ${p => darken(0.9, p.theme.bg)};
+   box-shadow: 4px 8px 8px 0 #0002;
+   
    border-bottom-left-radius: 20px;
    border-bottom-right-radius: 20px;
-   overflow: hidden;
 
-   a {
-      color: ${p => p.theme.text};
-      text-decoration: none;
-   }
+   background: ${p => lighten(0.15, p.theme.bg)};
 
-   & > a {
-
-      li::after {
-         content: '';
-         position: absolute;
-         background: ${p => p.theme.primary};
-         width: 4rem;
-         height: 8rem;
-         top: -1rem;
-         right: -5rem;
-         transition: right 0.1s linear;
-         transform: rotate(20deg);
-      }
-
-      li:hover {
-         color: ${p => p.theme.primary};
-         &::after {
-            right: -1rem;
-         }
-      }
-      
-      li {
-         overflow: hidden;
-         position: relative;
-         background: ${p => mix(0.8, p.theme.bg, p.theme.secondary)};
-         padding-right: 5rem;
-         padding: 0.7rem 1rem;
-         margin: 0;
-      }
-
-      &:first-of-type {
-         li {
-            padding-top: 1.4rem;
-         }
-      }
-
-      &:last-of-type {
-         li {
-            padding-bottom: 1.4rem;
-         }
-      }
-
-      &:nth-of-type(odd) li {
-         background: ${p => mix(0.7, p.theme.bg, p.theme.secondary)};
-      }
+   li {
+      padding: 1rem;
    }
 `
 

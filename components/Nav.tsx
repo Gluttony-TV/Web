@@ -1,25 +1,12 @@
 
 import { Question } from '@styled-icons/fa-solid';
-import { useRouter } from "next/router";
 import { lighten } from "polished";
-import { createElement, FC, useEffect, useState } from 'react';
+import { createElement, FC } from 'react';
 import styled, { useTheme } from "styled-components";
-import useSWR from 'swr';
-import { IShow } from "../models";
 import Link from './Link';
 import Searchbar from "./Searchbar";
-import ShowName from "./ShowName";
 
 const NavBar: FC = () => {
-   const { pathname } = useRouter()
-
-   const [search, setSearch] = useState('')
-   const { data: results } = useSWR<IShow[]>(search.length > 0 ? `show?limit=20&search=${search}` : null)
-   const [visible, setVisible] = useState(false)
-
-   useEffect(() => setVisible(!!results), [results, setVisible])
-
-   useEffect(() => setVisible(false), [pathname])
 
    const pages: Page[] = [
       {
@@ -39,15 +26,7 @@ const NavBar: FC = () => {
    return <Nav>
       {home && <Tab {...home} />}
 
-      <Searchbar onChange={setSearch}>
-         {visible && results?.map(show =>
-            <Link key={show.id} href={`/shows/${show.tvdb_id}`}>
-               <li>
-                  <ShowName {...show} />
-               </li>
-            </Link>
-         )}
-      </Searchbar>
+      <Searchbar />
 
       {links.map(route =>
          <Tab key={route.path} {...route} />

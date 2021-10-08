@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    const progress = serialize(await Progress.findOne({ user: session?.user.email }))
 
-   const id = req.query.id!.toString()
+   const id = req.query.id as string
 
    const show = await getShow(id) as IShowFull
    const episodes = await getEpisodes(id)
@@ -147,7 +147,7 @@ const Title = styled.div`
    column-gap: 2rem;
    grid-template: 
       "name progress"
-      "status progress"
+      "status progress";
 `
 
 const Container = styled.section`

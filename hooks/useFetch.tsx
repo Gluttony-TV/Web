@@ -1,6 +1,6 @@
 import axios, { Method } from "axios";
 import { useCallback } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { QueryKey, useMutation, useQuery, useQueryClient, UseQueryOptions } from "react-query";
 
 const API = axios.create({
    baseURL: '/api/',
@@ -10,11 +10,12 @@ const API = axios.create({
    },
 })
 
-export default function useFetch<R>(key: string, url?: string) {
-   return useQuery(key, useCallback(async () => {
+export default function useFetch<R>(key: string, url?: string, config?: Omit<UseQueryOptions<unknown, unknown, R, QueryKey>, 'queryKey' | 'queryFn'>) {
+   const fetcher = useCallback(async () => {
       const { data } = await API.get<R>(url ?? key)
       return typeof data === 'string' ? JSON.parse(data) : data
-   }, [key, url]))
+   }, [key, url])
+   return useQuery(key, fetcher, config)
 }
 
 export function useManipulate<R>(method: Method, url: string, r1?: R, invalidates?: string | string[]) {

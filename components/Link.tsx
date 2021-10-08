@@ -1,26 +1,34 @@
 
-import NextLink from 'next/link';
+import NextLink, { LinkProps } from 'next/link';
+import { FC } from 'react';
 import styled, { css } from "styled-components";
 
-export const LinkStyle = css`
-   color: ${p => p.theme.link.default};
-   
-   :visited {
-      color: ${p => p.theme.link.visited};
-   }
+interface StyleProps {
+   underline: 'always' | 'hover' | 'none'
+}
 
-   :disabled {
-      color: #AAA;
-      cursor: not-allowed;
-   }
+const Style = styled.a<StyleProps>`
+   text-decoration: ${p => (p.underline === 'always' ? 'underline' : 'none')};
+   color: ${p => p.theme.text};
+   cursor: pointer;
+
+   ${p =>
+      p.underline === 'hover' &&
+      css`
+         &:hover {
+            text-decoration: underline;
+         }
+      `}
 `
 
-const Link = styled(NextLink)`
-   ${LinkStyle};
-`
+const Link: FC<LinkProps & Partial<StyleProps>> = ({ children, underline = 'none', ...props }) => (
+   <NextLink {...props} passHref>
+      <Style underline={underline}>{children}</Style>
+   </NextLink>
+)
 
 export const LinkButton = styled.button`
-   ${LinkStyle};
+   ${Style};
    text-decoration: underline;
    outline: none;
 `
