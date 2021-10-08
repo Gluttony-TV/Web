@@ -1,11 +1,25 @@
 import { DateTime } from 'luxon'
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import styled from 'styled-components'
 import { Title } from "../components/Text"
+import database from '../lib/database'
 import { IStats } from "../models"
 
-const Stats: FC<{ stats: IStats }> = ({ stats }) => {
-   
+interface Props {
+   stats: IStats
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async req => {
+   await database()
+   await getSession(req)
+
+   return { notFound: true }
+}
+
+const Stats: FC<Props> = ({ stats }) => {
+
    const birth = '1999-07-17'
 
    return <>

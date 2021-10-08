@@ -1,4 +1,6 @@
 import { List, Th, ThLarge } from "@styled-icons/fa-solid"
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { transparentize } from "polished"
 import { createElement, Dispatch, FC, SetStateAction, useState } from "react"
@@ -7,7 +9,20 @@ import Image from '../components/Image'
 import { Button } from "../components/Inputs"
 import Link from "../components/Link"
 import ShowName from "../components/ShowName"
+import database from '../lib/database'
 import { IProgress, IShow } from "../models"
+
+
+interface Props {
+   watched: IProgress<IShow>[]
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async req => {
+   await database()
+   await getSession(req)
+
+   return { notFound: true }
+}
 
 enum View {
    LIST = 1,
@@ -15,7 +30,7 @@ enum View {
    SMALL_CELLS = 14,
 }
 
-const Watched: FC<{ watched: IProgress<IShow>[] }> = ({ watched }) => {
+const Watched: FC<Props> = ({ watched }) => {
    const { query } = useRouter()
    const [view, setView] = useState(query.view ? Number.parseInt(query.view.toString()) : View.BIG_CELLS)
 

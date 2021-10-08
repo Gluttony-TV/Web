@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import { IEpisode, ISeason, IShow } from '../models'
+import { IEpisode, IShow } from '../models'
 import cacheOr from './cache'
 
 function isAxiosError(err: any): err is AxiosError {
@@ -93,10 +93,4 @@ export async function getEpisodes(show: string | number) {
 
       return result?.episodes
    })
-}
-
-export async function getSeasons(show: string | number): Promise<ISeason[]> {
-   const episodes = await getEpisodes(show)
-   const seasons: ISeason[] = []
-   return seasons
 }
