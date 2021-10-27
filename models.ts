@@ -83,7 +83,6 @@ export interface ICharacter extends IModel {
    url?: string
    nameTranslations?: string
    overviewTranslations?: string
-   aliases: null
    person: {
       name: string
       image: string

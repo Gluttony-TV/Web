@@ -55,7 +55,7 @@ export type Serialized<T> =
 export function serialize<M>(model: M, depth = 0): Serialized<M> {
    if (depth > 20) throw new Error('Recursive Serialization')
 
-   if (model === null || model === undefined) return null as Serialized<M>
+   if (model === null || model === undefined) return null as unknown as Serialized<M>
    if (Array.isArray(model)) return model.map(m => serialize(m, depth + 1)) as Serialized<M>
 
    if (model instanceof Date) return model.toISOString() as Serialized<M>
@@ -63,7 +63,7 @@ export function serialize<M>(model: M, depth = 0): Serialized<M> {
 
    if (typeof model === 'object') {
       const entries = Object.entries(model instanceof Document ? model.toObject({ virtuals: true }) : model)
-      const props = entries.filter(([, v]) => v !== undefined).reduce((o, [key, value]) => ({ ...o, [key]: serialize(value, depth + 1) }), {})
+      const props = entries.filter(([, v]) => v !== undefined && v !== null).reduce((o, [key, value]) => ({ ...o, [key]: serialize(value, depth + 1) }), {})
       if ('_id' in model) return { ...props, id: (model as unknown as Document)._id?.toString() } as Serialized<M>
       return props as Serialized<M>
    }

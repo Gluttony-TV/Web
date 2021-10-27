@@ -10,7 +10,7 @@ import LoadingIndicator from './LoadingIndicator'
 import Searchbar from './Searchbar'
 
 export const NavHeight = '5rem'
-const LoadingBarHeight = '0.5rem'
+const LoadingBarHeight = '1rem'
 
 const NavBar: FC = () => {
    const [loading, setLoading] = useState(false)
@@ -46,7 +46,7 @@ const Tab: FC<{
    const icon = typeof display !== 'string'
 
    return (
-      <TabLink key={path} href={path} active={active} {...props}>
+      <TabLink key={path} href={path} active={active} icon={icon} {...props}>
          {icon ? createElement(display ?? Question, { size: '2rem' }) : display}
       </TabLink>
    )
@@ -54,6 +54,7 @@ const Tab: FC<{
 
 const TabStyle = (color: string) => css`
    background: ${color};
+   border-bottom: solid 4px ${lighten(0.2, color)};
    &,
    &:visited {
       color: ${p => p.theme.text};
@@ -61,11 +62,12 @@ const TabStyle = (color: string) => css`
 
    &:hover {
       background: ${lighten(0.1, color)};
+      border-bottom: solid 4px ${lighten(0.2, color)};
    }
 `
 
 const TabLink = styled(Link)<{ active?: boolean; right?: boolean; icon?: boolean }>`
-   position: relative;
+   text-decoration: none;
    padding: ${p => (p.icon ? '0 1.2rem' : '1.2rem 2rem')};
    height: calc(${NavHeight} - ${LoadingBarHeight});
    display: grid;
@@ -73,27 +75,12 @@ const TabLink = styled(Link)<{ active?: boolean; right?: boolean; icon?: boolean
    justify-self: ${p => (p.right ? 'end' : 'start')};
    transition: background 0.4s ease;
 
-   ${p =>
-      p.active &&
-      css`
-         &:after {
-            content: '';
-            z-index: 1;
-            position: absolute;
-            width: 100%;
-            height: 4px;
-            top: 100%;
-            background: ${p => lighten(0.1, p.theme.primary)};
-         }
-      `}
-
    ${p => TabStyle(p.active ? p.theme.primary : lighten(0.1, p.theme.bg))};
 `
 
 const Nav = styled.nav`
-   grid-area: nav;
    background: ${p => lighten(0.1, p.theme.bg)};
-   //border-bottom: solid 4px ${p => lighten(0.3, p.theme.bg)};
+   border-bottom: solid 4px ${p => lighten(0.3, p.theme.bg)};
    display: grid;
    grid-auto-flow: column;
    justify-content: start;

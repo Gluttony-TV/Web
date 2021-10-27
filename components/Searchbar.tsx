@@ -1,23 +1,31 @@
 import { debounce } from 'lodash'
 import { lighten } from 'polished'
-import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import useFetch from '../hooks/useFetch'
 import { useRouterEvent } from '../hooks/useRouterEvent'
 import { IShow } from '../models'
-import { InputStyles } from './Inputs'
+import { Input } from './Inputs'
 import Link from './Link'
 import ShowName from './ShowName'
 
 const Searchbar: FC = ({ children }) => {
    const [search, setSearch] = useState('')
+   const debouncedSearch = useMemo(() => debounce(setSearch, 300), [setSearch])
+   const [value, setValue] = useReducer((_: string, v: string) => {
+      debouncedSearch(v)
+      return v
+   }, search)
+
    const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, undefined, { enabled: search.length > 0 })
    const [visible, setVisible] = useState(false)
 
    useEffect(() => setVisible(!!results), [results, setVisible])
-   useRouterEvent('routeChangeStart', () => setVisible(false))
-
-   const onInput = useMemo(() => debounce(setSearch, 300), [setSearch])
+   useRouterEvent('routeChangeStart', () => {
+      setSearch('')
+      setValue('')
+      setVisible(false)
+   })
 
    const key = useCallback(
       (e: KeyboardEvent) => {
@@ -28,7 +36,7 @@ const Searchbar: FC = ({ children }) => {
 
    return (
       <Style>
-         <Input onKeyPress={key} type='text' placeholder='Search...' onChange={e => onInput?.(e.target.value)} />
+         <SearchInput onKeyPress={key} type='text' placeholder='Search...' value={value} onChange={setValue} />
          <Dropdown>
             {children}
             {visible &&
@@ -45,7 +53,10 @@ const Searchbar: FC = ({ children }) => {
 }
 
 const Style = styled.div`
+   align-self: flex-start;
    position: relative;
+   height: calc(100% - 4px);
+   margin-right: 2rem;
 `
 
 const Dropdown = styled.ul`
@@ -67,13 +78,12 @@ const Dropdown = styled.ul`
    }
 `
 
-const Input = styled.input`
-   ${InputStyles};
-   width: 40vw;
+const SearchInput = styled(Input)`
    padding-left: 5rem;
    padding: 1rem;
-   margin: 0.5rem;
-   height: calc(100% - 1.5rem);
+   height: 100%;
+   margin: 0 0.5rem;
+   width: 40vw;
 `
 
 export default Searchbar
