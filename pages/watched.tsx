@@ -1,17 +1,20 @@
-import { List, Th, ThLarge } from "@styled-icons/fa-solid"
+import { List, Th, ThLarge } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
-import { transparentize } from "polished"
-import { createElement, Dispatch, FC, SetStateAction, useState } from "react"
-import styled from "styled-components"
+import { transparentize } from 'polished'
+import { createElement, Dispatch, FC, SetStateAction, useState } from 'react'
+import styled from 'styled-components'
 import Image from '../components/Image'
-import { Button } from "../components/Inputs"
-import Link from "../components/Link"
-import ShowName from "../components/ShowName"
-import database from '../lib/database'
-import { IProgress, IShow } from "../models"
-
+import { Button } from '../components/Inputs'
+import Link from '../components/Link'
+import Page from '../components/Page'
+import ShowName from '../components/ShowName'
+import { getShow } from '../lib/api'
+import database, { serialize } from '../lib/database'
+import { loginLink } from '../lib/util'
+import { IProgress, IShow } from '../models'
+import Progress from '../models/Progress'
 
 interface Props {
    watched: IProgress<IShow>[]
@@ -19,9 +22,22 @@ interface Props {
 
 export const getServerSideProps: GetServerSideProps<Props> = async req => {
    await database()
-   await getSession(req)
+   const session = await getSession(req)
 
-   return { notFound: true }
+   if (!session) return loginLink(req)
+
+   const progress = await Progress.find({ user: session.user.email })
+
+   const withShow = await Promise.all(
+      progress.map(async p => ({
+         ...serialize(p),
+         show: await getShow(p.show),
+      }))
+   )
+
+   const filtered = withShow.filter(p => !!p.show) as IProgress<IShow>[]
+
+   return { props: { watched: filtered } }
 }
 
 enum View {
@@ -34,14 +50,16 @@ const Watched: FC<Props> = ({ watched }) => {
    const { query } = useRouter()
    const [view, setView] = useState(query.view ? Number.parseInt(query.view.toString()) : View.BIG_CELLS)
 
-   return <>
-      <ViewSelect value={view} onChange={setView} />
-      <Grid perRow={view}>
-         {watched.map(progress =>
-            <Cell key={progress.id} {...progress} />
-         )}
-      </Grid>
-   </>
+   return (
+      <Page>
+         <ViewSelect value={view} onChange={setView} />
+         <Grid perRow={view}>
+            {watched.map(progress => (
+               <Cell key={progress.id} {...progress} />
+            ))}
+         </Grid>
+      </Page>
+   )
 }
 
 const ViewSelect: FC<{
@@ -53,11 +71,11 @@ const ViewSelect: FC<{
          [View.BIG_CELLS]: ThLarge,
          [View.SMALL_CELLS]: Th,
          [View.LIST]: List,
-      }).map(([mode, icon]) =>
+      }).map(([mode, icon]) => (
          <Button key={mode} secondary={mode !== value?.toString()} onClick={() => onChange(Number.parseInt(mode))}>
             {createElement(icon, { size: 20 })}
          </Button>
-      )}
+      ))}
    </IconBar>
 )
 
@@ -79,15 +97,17 @@ const IconBar = styled.div`
 `
 
 const Cell: FC<IProgress<IShow>> = ({ show }) => {
-   return <Link href={`/shows/${show.id}`}>
-      <Panel>
+   return (
+      <Link href={`/shows/${show.id}`}>
+         <Panel>
+            <Image title={show.name} src={show.image} alt={show.name} />
 
-         <Image title={show.name} src={show.image} alt={show.name} />
-
-         <h4><ShowName {...show} /></h4>
-
-      </Panel>
-   </Link>
+            <h4>
+               <ShowName {...show} />
+            </h4>
+         </Panel>
+      </Link>
+   )
 }
 
 const Grid = styled.ul<{ perRow: number }>`
@@ -95,7 +115,7 @@ const Grid = styled.ul<{ perRow: number }>`
    justify-content: start;
    padding: 2rem;
    //gap: ${p => 14 / p.perRow}rem;
-   gap: ${p => p.perRow > View.BIG_CELLS ? 0 : 2}rem;
+   gap: ${p => (p.perRow > View.BIG_CELLS ? 0 : 2)}rem;
    grid-template-columns: repeat(${p => p.perRow}, 1fr);
    list-style: none;
 `
@@ -133,16 +153,15 @@ const Panel = styled.li`
 
    &:hover {
       //filter: drop-shadow(0 0 1rem ${p => transparentize(0.4, p.theme.primary)});
-      
+
       img {
          clip-path: polygon(0 0, 100% 0, 100% calc(75% - 2rem), 0% 75%);
       }
-     
+
       h4 {
          transform: translate(-50%, 0);
       }
    }
 `
-
 
 export default Watched

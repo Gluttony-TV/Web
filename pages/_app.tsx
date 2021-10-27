@@ -23,7 +23,6 @@ const App: AppComponent = ({ Component, pageProps }) => {
                      <Nav />
                      <Component {...pageProps} />
                   </Container>
-
                </IntlProvider>
             </ThemeProvider>
          </QueryClientProvider>
@@ -31,24 +30,13 @@ const App: AppComponent = ({ Component, pageProps }) => {
    )
 }
 
-const Container = styled.div`
-   & > div {
-      overflow-x: hidden;
-      overflow-y: scroll;
-      height: 100vh;
-      padding: 1rem;
-   }
-`
+const Container = styled.div``
 
 const GlobalStyles = createGlobalStyle`
    html, body {
       font-family: sans-serif;
       background: ${theme.bg};
       color: ${theme.text};
-   }
-
-   ul {
-      list-style: none;
    }
 
    ::-webkit-scrollbar {

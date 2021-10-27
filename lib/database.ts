@@ -1,5 +1,5 @@
-
-import mongoose, { ConnectOptions, Document, Model, Schema } from 'mongoose'
+import { DateTime } from 'luxon'
+import mongoose, { ConnectOptions, Document, Model, Schema, Types } from 'mongoose'
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -13,12 +13,11 @@ if (!cached) {
 }
 
 async function database() {
-
    const { MONGODB_URI, MONGODB_DB } = process.env
-   
+
    if (!MONGODB_URI) throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
    if (!MONGODB_DB) throw new Error('Please define the MONGODB_DB environment variable inside .env.local')
-   
+
    if (cached.conn) {
       return cached.conn
    }
@@ -39,23 +38,37 @@ export function define<M>(name: string, schema: Schema<Document & M>): Model<M> 
    return mongoose.models[name] ?? mongoose.model<M>(name, schema)
 }
 
-export const serialize: {
-   <M>(model?: (Document & M) | null): M | undefined
-   <M>(model: Array<Document & M>): M[]
-} = <M>(model?: Document | Document[]) => {
+type Base = number | string | boolean
+type SerializedModel<T> = Omit<{ [P in keyof T]: Serialized<T[P]> }, keyof Document> & { id: T extends { id: infer I } ? I : never }
+// prettier-ignore
+export type Serialized<T> = 
+     T extends Date ? string 
+   : T extends DateTime ? string 
+   : T extends Array<infer I> ? Array<Serialized<I>>
+   : T extends Base ? T 
+   : T extends null ? undefined 
+   : T extends Types.ObjectId ? string 
+//   : T extends Document<unknown, unknown, infer I> ? I
+   : T extends Record<string, any> ? SerializedModel<T>
+   : never
 
-   if (model === null || model === undefined) return null
-   if (Array.isArray(model)) return model.map(m => serialize(m)) as any as M[]
+export function serialize<M>(model: M, depth = 0): Serialized<M> {
+   if (depth > 20) throw new Error('Recursive Serialization')
 
-   if (typeof model === 'object' && '_id' in model) {
-      const props = Object.entries(model instanceof Document ? model.toObject({ virtuals: true }) : model)
-         .reduce((o, [key, value]) => ({ ...o, [key]: serialize(value) }), {})
-      return { ...props, id: model._id?.toString() } as any as M
+   if (model === null || model === undefined) return null as Serialized<M>
+   if (Array.isArray(model)) return model.map(m => serialize(m, depth + 1)) as Serialized<M>
 
+   if (model instanceof Date) return model.toISOString() as Serialized<M>
+   if (model instanceof DateTime) return model.toISO() as Serialized<M>
+
+   if (typeof model === 'object') {
+      const entries = Object.entries(model instanceof Document ? model.toObject({ virtuals: true }) : model)
+      const props = entries.filter(([, v]) => v !== undefined).reduce((o, [key, value]) => ({ ...o, [key]: serialize(value, depth + 1) }), {})
+      if ('_id' in model) return { ...props, id: (model as unknown as Document)._id?.toString() } as Serialized<M>
+      return props as Serialized<M>
    }
 
-   return model
-
+   return model as Serialized<M>
 }
 
 export default database

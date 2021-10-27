@@ -1,32 +1,26 @@
-import { Github } from "@styled-icons/fa-brands";
-import { DateTime } from 'luxon';
-import { Session } from "next-auth";
-import { signOut, useSession } from 'next-auth/client';
-import { transparentize } from 'polished';
-import { FC } from "react";
-import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-import { LinkButton } from "../components/Link";
-import { Title } from '../components/Text';
+import { Github } from '@styled-icons/fa-brands'
+import { DateTime } from 'luxon'
+import { Session } from 'next-auth'
+import { signOut, useSession } from 'next-auth/client'
+import { transparentize } from 'polished'
+import { FC } from 'react'
+import { FormattedMessage } from 'react-intl'
+import styled from 'styled-components'
+import { LinkButton } from '../components/Link'
+import Page from '../components/Page'
+import { Title } from '../components/Text'
 
 const Profile: FC = () => {
    const [session] = useSession()
 
-   return <>
-      <Title>
-         <FormattedMessage
-            description='Profile page title'
-            defaultMessage='Your Profile'
-         />
-      </Title>
-      {session
-         ? <Info {...session} />
-         : <FormattedMessage
-            description='Profile page not logged in'
-            defaultMessage='not logged in'
-         />
-      }
-   </>
+   return (
+      <Page>
+         <Title>
+            <FormattedMessage description='Profile page title' defaultMessage='Your Profile' />
+         </Title>
+         {session ? <Info {...session} /> : <FormattedMessage description='Profile page not logged in' defaultMessage='not logged in' />}
+      </Page>
+   )
 }
 
 const Info: FC<Session> = ({ user }) => {
@@ -34,51 +28,43 @@ const Info: FC<Session> = ({ user }) => {
 
    const { name, email, provider } = user
 
-   return <Style>
-      <Panel>
-         <label htmlFor='username'>Username</label>
-         <p id='username'>{name}</p>
-      </Panel>
+   return (
+      <Panels>
+         <BigPanel>
+            <label htmlFor='username'>Username</label>
+            <p id='username'>{name}</p>
+         </BigPanel>
 
-      {email && <>
+         {email && (
+            <>
+               <Panel>
+                  <label htmlFor='email'>E-Mail</label>
+                  <p id='email'>{email ?? 'No email provided'}</p>
+               </Panel>
+            </>
+         )}
+
          <Panel>
-            <label htmlFor='email'>E-Mail</label>
-            <p id='email'>{email ?? 'No email provided'}</p>
+            <label htmlFor='created-at'>Joined at</label>
+            <p id='created-at'>
+               {created.toLocaleString()} ({created.toRelative()})
+            </p>
          </Panel>
-      </>}
 
-      <Panel>
-         <label htmlFor='created-at'>Joined at</label>
-         <p id='created-at'>{created.toLocaleString()} ({created.toRelative()})</p>
-      </Panel>
+         <Panel>
+            <label htmlFor='connections'>Connections</label>
+            <Icons id='connections'>{provider && <Github />}</Icons>
+         </Panel>
 
-      <Panel>
-         <label htmlFor='connections'>Connections</label>
-         <Icons id='connections'>
-            {provider && <Github />}
-         </Icons>
-      </Panel>
-
-      <LinkButton onClick={()  => signOut()}>Logout</LinkButton>
-
-   </Style>
+         <LinkButton onClick={() => signOut()}>Logout</LinkButton>
+      </Panels>
+   )
 }
 
-const Style = styled.div`
+const Panels = styled.section`
    display: grid;
-   margin: 0 auto;
-   max-width: 800px;
-   text-align: center;
    gap: 2rem;
-   grid-template:
-         "a a"
-         "b c"
-         "d e"
-         / 1fr 1fr;
-
-   & > :first-of-type {
-      grid-area: a;
-   }
+   grid-template: repeat(1fr, 2);
 `
 
 const Icons = styled.ul`
@@ -90,6 +76,7 @@ const Icons = styled.ul`
 `
 
 const Panel = styled.div`
+   text-align: center;
    display: grid;
    gap: 0.5rem;
    padding: 1rem;
@@ -104,6 +91,10 @@ const Panel = styled.div`
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
    }
+`
+
+const BigPanel = styled(Panel)`
+   grid-column: 1 / 3;
 `
 
 export default Profile

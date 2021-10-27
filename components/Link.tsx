@@ -1,7 +1,6 @@
-
-import NextLink, { LinkProps } from 'next/link';
-import { FC } from 'react';
-import styled, { css } from "styled-components";
+import NextLink, { LinkProps } from 'next/link'
+import { FC } from 'react'
+import styled, { css } from 'styled-components'
 
 interface StyleProps {
    underline: 'always' | 'hover' | 'none'
@@ -21,9 +20,11 @@ const Style = styled.a<StyleProps>`
       `}
 `
 
-const Link: FC<LinkProps & Partial<StyleProps>> = ({ children, underline = 'none', ...props }) => (
-   <NextLink {...props} passHref>
-      <Style underline={underline}>{children}</Style>
+const Link: FC<LinkProps & Partial<StyleProps>> = ({ children, href, as, underline = 'none', ...props }) => (
+   <NextLink {...props} as={as} href={href} passHref>
+      <Style {...props} underline={underline}>
+         {children}
+      </Style>
    </NextLink>
 )
 

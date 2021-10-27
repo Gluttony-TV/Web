@@ -34,7 +34,7 @@ export interface IShow extends IModel {
    name_translated: string | Record<string, string | undefined>
 }
 
-type Weekday = "sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday"
+type Weekday = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday'
 export interface IShowFull extends IShow {
    artworks: IArtwork[]
    networks: INetwork[]
@@ -92,7 +92,7 @@ export interface ICharacter extends IModel {
 }
 
 export interface ISeason extends IModel {
-   seriesId: string | number,
+   seriesId: string | number
    type: {
       name: string
       type: string
@@ -123,14 +123,7 @@ export interface IEpisode extends IModel {
 }
 
 export interface IProgress<S = number> extends IModel {
+   user: string
    show: S
    watched: IEpisode['id'][]
-}
-
-export interface IStats {
-   episodesWatched: number
-   finished: number
-   watching: number
-   time: number
-   showsWatched: number
 }

@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import { IEpisode, IShow } from '../models'
+import { IEpisode, IShow, IShowFull } from '../models'
 import cacheOr from './cache'
 
 function isAxiosError(err: any): err is AxiosError {
@@ -21,14 +21,14 @@ interface LoginResponse {
 
 async function login() {
    console.log('Logging in')
-   const { data } = await API.post('login', { apikey: TVDB_API_KEY, pin: TVDB_API_PIN }) as AxiosResponse<LoginResponse>
+   const { data } = (await API.post('login', { apikey: TVDB_API_KEY, pin: TVDB_API_PIN })) as AxiosResponse<LoginResponse>
    if (data.status !== 'success') throw new Error('Unable to login into TVDB API')
    console.log('Logged in')
    return data.data.token as string
 }
 
 async function getToken() {
-   const cached = global.api.token ?? await global.api.token_promise
+   const cached = global.api.token ?? (await global.api.token_promise)
    if (cached) return cached
    global.api.token_promise = login()
    global.api.token = await global.api.token_promise
@@ -37,21 +37,19 @@ async function getToken() {
 
 async function request<R>(endpoint: string, config?: AxiosRequestConfig) {
    try {
-
       const token = await getToken()
 
-      const { data } = await API(endpoint, {
+      const { data } = (await API(endpoint, {
          ...config,
          headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Accept: 'application/json',
             ...config?.headers,
          },
-      }) as AxiosResponse<{ data: R }>
+      })) as AxiosResponse<{ data: R }>
 
       return data.data
-
    } catch (err) {
       if (isAxiosError(err)) console.error(`Request to ${err.request?.path} failed with message`, err.response?.data)
       else if (err instanceof Error) console.error(err.message)
@@ -74,13 +72,13 @@ export async function searchShow(by: string, limit = 10, offset = 0) {
    return all?.slice(0, limit)
 }
 
-export async function getShow(search: string | number, extended = true) {
-   const path = (s: string | number) => (extended ? `${s}/extended` : s)
+export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
+   const path = (s: string | number) => ((extended !== false) ? `${s}/extended` : s)
    return cacheOr(
       `show/${path(search)}`,
       async () => {
          const id = await findId(search)
-         if (id) return await request<IShow>(`/series/${path(id)}`)
+         if (id) return await request<E extends true ? IShowFull : IShow>(`/series/${path(id)}`)
       },
       s => [s.id, s.slug].map(id => `show/${path(id)}`)
    )
