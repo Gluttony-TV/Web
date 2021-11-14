@@ -1,35 +1,44 @@
 import { debounce } from 'lodash'
+import { useRouter } from 'next/router'
 import { lighten } from 'polished'
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import useFetch from '../hooks/useFetch'
 import { useRouterEvent } from '../hooks/useRouterEvent'
+import useTranslation from '../hooks/useTranslation'
 import { IShow } from '../models'
 import { Input } from './Inputs'
 import Link from './Link'
-import ShowName from './ShowName'
 
-const Searchbar: FC = ({ children }) => {
+const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) => {
    const [search, setSearch] = useState('')
+   const router = useRouter()
    const debouncedSearch = useMemo(() => debounce(setSearch, 300), [setSearch])
    const [value, setValue] = useReducer((_: string, v: string) => {
       debouncedSearch(v)
       return v
    }, search)
 
-   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, undefined, { enabled: search.length > 0 })
+   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, { enabled: preFetch && search.length > 0 })
    const [visible, setVisible] = useState(false)
 
    useEffect(() => setVisible(!!results), [results, setVisible])
    useRouterEvent('routeChangeStart', () => {
       setSearch('')
-      setValue('')
       setVisible(false)
    })
 
    const key = useCallback(
-      (e: KeyboardEvent) => {
-         if (e.code === 'Enter') setSearch?.(v => v)
+      (e: KeyboardEvent<HTMLInputElement>) => {
+         if (e.code === 'Enter') {
+            router.push({
+               pathname: '/search',
+               query: { by: e.currentTarget.value },
+            })
+            setSearch?.(v => {
+               return v
+            })
+         }
       },
       [setSearch]
    )
@@ -42,9 +51,7 @@ const Searchbar: FC = ({ children }) => {
             {visible &&
                results?.map(show => (
                   <Link key={show.id} href={`/show/${show.tvdb_id}`}>
-                     <li>
-                        <ShowName {...show} />
-                     </li>
+                     <li>{useTranslation(show.name, show.translations)}</li>
                   </Link>
                ))}
          </Dropdown>

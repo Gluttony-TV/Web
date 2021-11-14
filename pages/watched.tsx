@@ -9,7 +9,7 @@ import Image from '../components/Image'
 import { Button } from '../components/Inputs'
 import Link from '../components/Link'
 import Page from '../components/Page'
-import ShowName from '../components/ShowName'
+import useTranslation from '../hooks/useTranslation'
 import { getShow } from '../lib/api'
 import database, { serialize } from '../lib/database'
 import { loginLink } from '../lib/util'
@@ -98,13 +98,11 @@ const IconBar = styled.div`
 
 const Cell: FC<IProgress<IShow>> = ({ show }) => {
    return (
-      <Link href={`/shows/${show.id}`}>
+      <Link href={`/show/${show.id}`}>
          <Panel>
             <Image title={show.name} src={show.image} alt={show.name} />
 
-            <h4>
-               <ShowName {...show} />
-            </h4>
+            <h4>{useTranslation(show.name, show.translations)}</h4>
          </Panel>
       </Link>
    )

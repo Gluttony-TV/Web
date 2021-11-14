@@ -19,19 +19,20 @@ export interface IShow extends IModel {
    name: string
    slug: string
    image: string
-   firstAired: string
-   lastAired: string
-   nextAired?: string
+   image_url: string
+   thumbnail: string
+   first_air_time: string
+   next_air_time?: string
+   year: string
    score: string
    status: IStatus
    originalCountry: string
    originalLanguage: string
    originalNetwork: INetwork
-   aliases?: Array<{
-      language: string
-      name: string
-   }>
-   name_translated: string | Record<string, string | undefined>
+   aliases?: string[]
+   translations: Record<string, string>
+   overview: string
+   overviews?: Record<string, string>
 }
 
 type Weekday = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday'

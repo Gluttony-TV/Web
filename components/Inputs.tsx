@@ -10,6 +10,8 @@ export const InputStyles = css<{ size?: number; error?: boolean }>`
    background: ${p => lighten(0.2, p.theme.bg)};
    border: 2px solid ${p => (p.error ? p.theme.error : 'transparent')};
 
+   transition: box-shadow 0.1s ease, outline 0.1s ease, background 0.1s ease;
+
    &:hover {
       box-shadow: 0 0 0 2px ${p => p.theme.primary};
    }

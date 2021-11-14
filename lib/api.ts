@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
 import { IEpisode, IShow, IShowFull } from '../models'
 import cacheOr from './cache'
+import { exists } from './util'
 
 function isAxiosError(err: any): err is AxiosError {
    return err.isAxiosError === true
@@ -20,10 +21,8 @@ interface LoginResponse {
 }
 
 async function login() {
-   console.log('Logging in')
    const { data } = (await API.post('login', { apikey: TVDB_API_KEY, pin: TVDB_API_PIN })) as AxiosResponse<LoginResponse>
    if (data.status !== 'success') throw new Error('Unable to login into TVDB API')
-   console.log('Logged in')
    return data.data.token as string
 }
 
@@ -68,12 +67,13 @@ async function findId(name: string | number) {
 }
 
 export async function searchShow(by: string, limit = 10, offset = 0) {
+   if (!by) return []
    const all = await cacheOr(`search/${by}/${offset}`, () => request<(IShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`))
-   return all?.slice(0, limit)
+   return all?.slice(0, limit).filter(exists)
 }
 
 export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
-   const path = (s: string | number) => ((extended !== false) ? `${s}/extended` : s)
+   const path = (s: string | number) => (extended !== false ? `${s}/extended` : s)
    return cacheOr(
       `show/${path(search)}`,
       async () => {

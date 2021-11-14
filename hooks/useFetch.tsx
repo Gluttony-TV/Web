@@ -1,34 +1,60 @@
-import axios, { Method } from "axios";
-import { useCallback } from "react";
-import { QueryKey, useMutation, useQuery, useQueryClient, UseQueryOptions } from "react-query";
+import axios, { AxiosRequestConfig, Method } from 'axios'
+import { isUndefined, omitBy } from 'lodash'
+import { ApiError } from 'next/dist/server/api-utils'
+import { ParsedUrlQueryInput, stringify } from 'querystring'
+import { useCallback, useMemo } from 'react'
+import { QueryKey, useMutation, useQuery, useQueryClient, UseQueryOptions } from 'react-query'
 
 const API = axios.create({
    baseURL: '/api/',
    responseType: 'json',
    headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
    },
 })
 
-export default function useFetch<R>(key: string, url?: string, config?: Omit<UseQueryOptions<unknown, unknown, R, QueryKey>, 'queryKey' | 'queryFn'>) {
+export default function useFetch<R>(
+   endpoint: string,
+   {
+      key,
+      query = {},
+      responseType,
+      method,
+      ...options
+   }: {
+      key?: QueryKey
+      query?: ParsedUrlQueryInput
+   } & Omit<UseQueryOptions<R, ApiError, R>, 'queryKey' | 'queryFn'> &
+      Pick<AxiosRequestConfig, 'responseType' | 'method'> = {}
+) {
+   const url = useMemo(() => {
+      const filteredQuery = omitBy(query, isUndefined)
+      if (Object.values(filteredQuery).length > 0) return `${endpoint}?${stringify(filteredQuery)}`
+      return endpoint
+   }, [endpoint, query])
+
    const fetcher = useCallback(async () => {
-      const { data } = await API.get<R>(url ?? key)
-      return typeof data === 'string' ? JSON.parse(data) : data
-   }, [key, url])
-   return useQuery(key, fetcher, config)
+      const { data } = await API(url ?? key, { method: method ?? 'get', responseType })
+      return (typeof data === 'string' ? JSON.parse(data) : data) as R
+   }, [key, endpoint])
+
+   return useQuery(key || url, fetcher, options)
 }
 
 export function useManipulate<R>(method: Method, url: string, r1?: R, invalidates?: string | string[]) {
    const client = useQueryClient()
 
-   const send = useCallback((r2: R) => {
-      const data = r1 ?? r2
-      if (data) client.setQueryData(url, data)
-      return API({ url, method, data })
-   }, [method, url, invalidates])
+   const send = useCallback(
+      (r2: R) => {
+         const data = r1 ?? r2
+         if (data) client.setQueryData(url, data)
+         return API({ url, method, data })
+      },
+      [method, url, invalidates]
+   )
 
    const invalidate = useCallback(() => {
-      const keys = [url, ...Array.isArray(invalidates) ? invalidates : [invalidates]]
+      const keys = [url, ...(Array.isArray(invalidates) ? invalidates : [invalidates])]
       keys.forEach(key => client.invalidateQueries(key))
    }, [invalidates])
 

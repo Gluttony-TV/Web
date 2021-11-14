@@ -9,9 +9,9 @@ import Image from '../../components/Image'
 import { Button } from '../../components/Inputs'
 import Page from '../../components/Page'
 import Season from '../../components/Season'
-import ShowName from '../../components/ShowName'
 import { Title as TitleBase } from '../../components/Text'
 import useFetch, { useManipulate } from '../../hooks/useFetch'
+import useTranslation from '../../hooks/useTranslation'
 import { getEpisodes, getShow } from '../../lib/api'
 import database, { serialize } from '../../lib/database'
 import { IEpisode, IProgress, IShowFull } from '../../models'
@@ -49,43 +49,69 @@ const Show: FC<Props> = ({ seasons, show }) => {
    const setWatched = useCallback((watched: IProgress['watched']) => setProgress({ watched }), [setProgress])
 
    const episodes = useMemo(() => seasons?.reduce((a, b) => [...a, ...b], [] as IEpisode[]) ?? [], [seasons])
-   const percentage = useMemo(() => (episodes.length && progress?.watched.length && (progress.watched.length / episodes.length) * 100) ?? 0, [episodes, progress])
-   const watchedAll = useMemo(() => progress && episodes && progress.watched.length === episodes.length, [progress, episodes])
+   const aired = useMemo(
+      () => episodes.filter(({ aired }) => aired && new Date(aired).getTime() <= Date.now()),
+      [episodes]
+   )
+   const watchable = useMemo(
+      () => aired.filter(({ seasonNumber, id }) => seasonNumber > 0 || progress?.watched.includes(id)),
+      [aired, progress]
+   )
+
+   const percentage = useMemo(
+      () => (aired.length && progress?.watched.length && (progress.watched.length / aired.length) * 100) ?? 0,
+      [aired, progress]
+   )
+
+   const watchedAll = useMemo(
+      () => progress && watchable && progress.watched.length >= watchable.length,
+      [progress, watchable]
+   )
 
    const moveProgress = useCallback(
       (to: IEpisode['id']) => {
-         const watched = episodes.filter((_, i) => i <= episodes.findIndex(e => e.id === to)).map(e => e.id)
+         const index = episodes.findIndex(e => e.id === to)
+         const watched = watchable
+            .filter(({ id }) => episodes.findIndex(it => it.id === id) <= index)
+            .filter(e => e.seasonNumber > 0 || progress?.watched.includes(e.id))
+            .map(e => e.id)
          setWatched(watched)
       },
       [episodes]
    )
 
    return (
-      <Container>
+      <Style>
          <Title>
-            <Name>
-               <ShowName {...show} />
-            </Name>
+            <Name>{useTranslation(show.name, show.translations)}</Name>
             <Status>{show.status.name}</Status>
             {percentage > 0 && <ProgressSpan>{Math.round(percentage)}%</ProgressSpan>}
          </Title>
 
-         <Poster src={show.image} alt={`Artwork for ${show.name}`} />
+         <p>{useTranslation(show.overview, show.overviews)}</p>
+
+         <Poster src={show.image_url ?? show.image} alt={`Artwork for ${show.name}`} />
 
          {episodes.length > 0 && (
             <Seasons>
-               <Button secondary={watchedAll} onClick={() => setWatched(watchedAll ? [] : episodes.map(e => e.id))}>
+               <Button secondary={watchedAll} onClick={() => setWatched(watchedAll ? [] : watchable.map(e => e.id))}>
                   {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
                </Button>
 
                <ul>
                   {seasons?.map((episodes, i) => (
-                     <Season episodes={episodes} key={i} progress={progress} setWatched={setWatched} moveProgress={moveProgress} />
+                     <Season
+                        episodes={episodes}
+                        key={i}
+                        progress={progress}
+                        setWatched={setWatched}
+                        moveProgress={moveProgress}
+                     />
                   ))}
                </ul>
             </Seasons>
          )}
-      </Container>
+      </Style>
    )
 }
 
@@ -105,7 +131,7 @@ const Seasons = styled.ul`
 `
 
 const Name = styled(TitleBase)`
-   letter-spacing: 0.5rem;
+   letter-spacing: 0.2rem;
    font-size: 3rem;
 `
 
@@ -144,9 +170,10 @@ const Title = styled.div`
       'status progress';
 `
 
-const Container = styled(Page)`
+const Style = styled(Page)`
    grid-template:
       'title poster'
+      'overview poster'
       'seasons poster'
       '. poster'
       / 2fr 1fr;
