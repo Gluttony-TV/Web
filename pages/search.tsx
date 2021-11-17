@@ -33,7 +33,7 @@ const Search: FC<Props> = ({ results }) => {
    )
 }
 
-const Result: FC<IShow> = ({ name, year, thumbnail, translations, overview, overviews, tvdb_id, ...rest }) => {
+const Result: FC<IShow> = ({ name, year, thumbnail, translations, overview, overviews, tvdb_id }) => {
    return (
       <Link href={`/show/${tvdb_id}`}>
          <ResultStyle>
