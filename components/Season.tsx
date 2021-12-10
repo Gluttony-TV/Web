@@ -110,8 +110,6 @@ const Row = styled.ul`
    display: grid;
    grid-template-columns: repeat(auto-fill, 2rem);
    list-style: none;
-   width: 50vw;
-   max-width: 100%;
 
    &:not(:last-of-type) {
       margin-bottom: 0.5rem;

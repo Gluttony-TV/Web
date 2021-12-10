@@ -24,6 +24,7 @@ const NavBar: FC = () => {
             <Searchbar />
             <Tab display='Profile' path='/profile' />
             <Tab display='Watched' path='/watched' />
+            <Tab display='News' path='/news' />
             <Tab display='Stats' path='/stats' />
          </Nav>
          <LoadingIndicator visible={loading} height={LoadingBarHeight} />

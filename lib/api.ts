@@ -21,7 +21,10 @@ interface LoginResponse {
 }
 
 async function login() {
-   const { data } = (await API.post('login', { apikey: TVDB_API_KEY, pin: TVDB_API_PIN })) as AxiosResponse<LoginResponse>
+   const { data } = (await API.post('login', {
+      apikey: TVDB_API_KEY,
+      pin: TVDB_API_PIN,
+   })) as AxiosResponse<LoginResponse>
    if (data.status !== 'success') throw new Error('Unable to login into TVDB API')
    return data.data.token as string
 }
@@ -68,7 +71,9 @@ async function findId(name: string | number) {
 
 export async function searchShow(by: string, limit = 10, offset = 0) {
    if (!by) return []
-   const all = await cacheOr(`search/${by}/${offset}`, () => request<(IShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`))
+   const all = await cacheOr(`search/${by}/${offset}`, () =>
+      request<(IShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`)
+   )
    return all?.slice(0, limit).filter(exists)
 }
 

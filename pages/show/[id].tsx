@@ -121,9 +121,9 @@ const Seasons = styled.ul`
    display: grid;
    column-gap: 2rem;
    grid-template:
-      'seasons button .' 3rem
-      'seasons . .'
-      / auto 3rem 1fr;
+      'seasons button' 3rem
+      'seasons .'
+      / minmax(20vw, 1000px) 3rem;
 
    ul {
       grid-area: seasons;
