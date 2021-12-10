@@ -1,7 +1,13 @@
 import Cache from 'node-cache'
 
-export default async function cacheOr<T>(key: string, supplier: () => T | Promise<T>, additionalKeys?: (t: NonNullable<T>) => string[]): Promise<T> {
-   global.cache = global.cache ?? new Cache({ stdTTL: 60 })
+const stdTTL = process.env.NODE_ENV === 'development' ? 60 : 600
+
+export default async function cacheOr<T>(
+   key: string,
+   supplier: () => T | Promise<T>,
+   additionalKeys?: (t: NonNullable<T>) => string[]
+): Promise<T> {
+   global.cache = global.cache ?? new Cache({ stdTTL })
    const promise = `${key}#promise`
 
    const cached = global.cache.get<T>(key) ?? global.cache.get<Promise<T>>(promise)
