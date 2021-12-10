@@ -1,38 +1,30 @@
 import { mix, transparentize } from 'polished'
-import { FC, Fragment, useCallback, useMemo } from 'react'
+import { Dispatch, FC, Fragment, SetStateAction, useCallback, useMemo } from 'react'
 import styled, { css } from 'styled-components'
-import { IEpisode, IProgress } from '../models'
+import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
+import { IEpisode } from '../models'
 
-export interface SeasonProps {
-   progress?: IProgress
-   setWatched: (episodes: IEpisode['id'][]) => unknown
-   moveProgress?: (episode: IEpisode['id']) => unknown
-}
-
-const Season: FC<
-   SeasonProps & {
-      episodes: IEpisode[]
-   }
-> = ({ progress, setWatched, moveProgress, ...props }) => {
-   const watched = useMemo(() => progress?.watched ?? [], [progress])
-   //const percentage = useMemo(() => watched.length / episodes.length, [episodes, watched])
-
+const Season: FC<{
+   setWatched: Dispatch<SetStateAction<IEpisode['id'][]>>
+   moveProgress?: Dispatch<IEpisode['id']>
+   episodes: IExtendedEpisode[]
+}> = ({ setWatched, moveProgress, episodes }) => {
    const click = useCallback(
-      (id: IEpisode['id'], shift: boolean) => {
+      (episode: Pick<IExtendedEpisode, 'id' | 'watched' | 'due'>, shift: boolean) => {
+         if (episode.due) return
          if (shift && moveProgress) {
-            moveProgress(id)
+            moveProgress(episode.id)
          } else {
-            if (watched.includes(id)) setWatched(watched.filter(e => e !== id))
-            else setWatched([...watched, id])
+            if (episode.watched) setWatched(w => w.filter(e => e !== episode.id))
+            else setWatched(w => [...w, episode.id])
          }
       },
-      [setWatched, moveProgress, watched]
+      [setWatched, moveProgress]
    )
 
    const now = Date.now()
 
-   const episodes = useMemo(() => props.episodes.sort((a, b) => a.number - b.number), [props.episodes])
-   const wrappedEpisodes = useMemo<IEpisode[][]>(() => {
+   const wrappedEpisodes = useMemo<IExtendedEpisode[][]>(() => {
       if (episodes.length < 20) return [episodes]
       return [episodes.slice(0, 10), episodes.slice(episodes.length - 10)]
    }, [episodes])
@@ -42,13 +34,13 @@ const Season: FC<
          {wrappedEpisodes.map((episodes, i) => (
             <Fragment key={i}>
                {i !== 0 && <Episode>...</Episode>}
-               {episodes.map(({ id, number, name, aired, seasonNumber }) => (
+               {episodes.map(({ number, name, aired, seasonNumber, ...episode }) => (
                   <Episode
-                     key={id}
+                     key={episode.id}
                      title={`Season ${seasonNumber} - ${name}`}
-                     due={!aired || new Date(aired).getTime() > now}
-                     watched={watched.includes(id)}
-                     onClick={e => click(id, e.shiftKey)}>
+                     disabled={new Date(aired).getTime() > now}
+                     watched={episode.watched}
+                     onClick={e => click(episode, e.shiftKey)}>
                      {number}
                   </Episode>
                ))}
@@ -59,7 +51,10 @@ const Season: FC<
 }
 
 const grid = (...colors: string[]) => css`
-   background: repeating-linear-gradient(-25deg, ${colors.map((c, i) => `${c} ${i * 10}px,${c} ${(i + 1) * 10}px`).join()});
+   background: repeating-linear-gradient(
+      -25deg,
+      ${colors.map((c, i) => `${c} ${i * 10}px,${c} ${(i + 1) * 10}px`).join()}
+   );
 `
 
 const background = (color: string) => css`
@@ -70,7 +65,7 @@ const background = (color: string) => css`
    }
 `
 
-const Episode = styled.li<{ watched?: boolean; due?: boolean }>`
+const Episode = styled.button<{ watched?: boolean; disabled?: boolean }>`
    text-align: center;
    padding: 0.5rem;
    font-size: 0.8rem;
@@ -78,15 +73,16 @@ const Episode = styled.li<{ watched?: boolean; due?: boolean }>`
    cursor: pointer;
 
    ${p =>
-      !p.due
+      p.disabled
          ? css`
-              ${background(mix(0.3, p.theme.bg, p.theme.secondary))};
-              ${p.watched && background(p.theme.primary)};
-           `
-         : css`
               cursor: not-allowed;
               background: ${transparentize(0.9, p.theme.secondary)};
               ${grid(transparentize(0.75, p.theme.secondary), transparentize(0.8, p.theme.secondary))};
+              ${p.watched && background(p.theme.error)};
+           `
+         : css`
+              ${background(mix(0.3, p.theme.bg, p.theme.secondary))};
+              ${p.watched && background(p.theme.primary)};
            `}
 
    &:last-of-type {
@@ -106,7 +102,7 @@ const Episode = styled.li<{ watched?: boolean; due?: boolean }>`
    }
 `
 
-const Row = styled.ul`
+const Row = styled.div`
    display: grid;
    grid-template-columns: repeat(auto-fill, 2rem);
    list-style: none;

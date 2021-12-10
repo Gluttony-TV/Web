@@ -1,8 +1,9 @@
-import { Home, Question } from '@styled-icons/fa-solid'
+import { CookieBite, Question } from '@styled-icons/fa-solid'
 import { StyledIcon } from '@styled-icons/styled-icon'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { lighten } from 'polished'
-import { createElement, FC, useState } from 'react'
+import { createElement, FC, useState, VFC } from 'react'
 import styled, { css } from 'styled-components'
 import { useRouterEvent } from '../hooks/useRouterEvent'
 import Link from './Link'
@@ -16,21 +17,37 @@ const NavBar: FC = () => {
    const [loading, setLoading] = useState(false)
    useRouterEvent('routeChangeStart', () => setLoading(true))
    useRouterEvent('routeChangeComplete', () => setLoading(false))
+   const { status } = useSession()
 
    return (
       <Wrapper>
          <Nav>
-            <Tab display={Home} path='/' />
+            <Tab display={CookieBite} path='/' />
             <Searchbar />
-            <Tab display='Profile' path='/profile' />
-            <Tab display='Watched' path='/watched' />
-            <Tab display='News' path='/news' />
-            <Tab display='Stats' path='/stats' />
+            {status === 'authenticated' && <LoggedIn />}
+            {status === 'unauthenticated' && <LoggedOut />}
          </Nav>
          <LoadingIndicator visible={loading} height={LoadingBarHeight} />
       </Wrapper>
    )
 }
+
+const LoggedIn: VFC = () => (
+   <>
+      <Tab display='Profile' path='/profile' />
+      <Tab display='Watched' path='/watched' />
+      <Tab display='News' path='/news' />
+      <Tab display='Stats' path='/stats' />
+   </>
+)
+
+const LoggedOut: VFC = () => (
+   <>
+      <TabLink as='button' onClick={() => signIn()}>
+         Login
+      </TabLink>
+   </>
+)
 
 const Wrapper = styled.section`
    height: ${NavHeight};

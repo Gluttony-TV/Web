@@ -1,6 +1,6 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { Session } from 'next-auth'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { ApiError } from 'next/dist/server/api-utils'
 import database from './database'
 

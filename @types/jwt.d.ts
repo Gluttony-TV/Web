@@ -1,24 +1,17 @@
-import 'next-auth';
-import 'next-auth/jwt';
-
-interface AdditionalJWT {
-   provider?: string
-   name: string
-   email?: string
-   image?: string
-}
-
-declare module 'next-auth/jwt' {
-
-   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-   export interface JWT extends AdditionalJWT { }
-
-}
+import 'next-auth'
+import 'next-auth/jwt'
 
 declare module 'next-auth' {
-
+   // eslint-disable-next-line @typescript-eslint/no-empty-interface
    export interface Session {
-      user: AdditionalJWT
+      user: User & {
+      }
    }
 
+   export interface User {
+      provider?: string
+      name: string
+      email: string
+      image?: string
+   }
 }

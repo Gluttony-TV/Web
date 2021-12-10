@@ -1,10 +1,11 @@
-import { Provider as AuthProvider } from 'next-auth/client'
+import { SessionProvider } from 'next-auth/react'
 import { AppComponent } from 'next/dist/shared/lib/router/router'
 import { darken } from 'polished'
 import React from 'react'
 import { IntlProvider } from 'react-intl'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
+import Head from '../components/Head'
 import Nav from '../components/Nav'
 import theme from '../lib/theme'
 import '../style/reset.css'
@@ -13,10 +14,11 @@ const client = new QueryClient()
 
 const App: AppComponent = ({ Component, pageProps }) => {
    return (
-      <AuthProvider session={pageProps.session}>
+      <SessionProvider session={pageProps.session}>
          <QueryClientProvider client={client}>
             <ThemeProvider theme={theme}>
                <IntlProvider locale='en'>
+                  <Head />
                   <GlobalStyles />
 
                   <Container>
@@ -26,7 +28,7 @@ const App: AppComponent = ({ Component, pageProps }) => {
                </IntlProvider>
             </ThemeProvider>
          </QueryClientProvider>
-      </AuthProvider>
+      </SessionProvider>
    )
 }
 

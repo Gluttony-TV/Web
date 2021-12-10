@@ -4,8 +4,8 @@ import { IEpisode, IShow, IShowFull } from '../models'
 import cacheOr from './cache'
 import { exists } from './util'
 
-function isAxiosError(err: any): err is AxiosError {
-   return err.isAxiosError === true
+function isAxiosError(err: unknown): err is AxiosError {
+   return (err as AxiosError).isAxiosError === true
 }
 
 const { TVDB_API_KEY, TVDB_API_PIN } = process.env

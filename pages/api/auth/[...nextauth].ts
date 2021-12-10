@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
-import Providers from 'next-auth/providers'
+import GitHub from 'next-auth/providers/github'
+import theme from '../../../lib/theme'
 
 function env(key: string) {
    const value = process.env[key]
@@ -8,22 +9,23 @@ function env(key: string) {
 }
 
 export default NextAuth({
-   theme: 'dark',
+   secret: env('JWT_SECRET'),
+   theme: {
+      colorScheme: 'dark',
+      brandColor: theme.primary,
+   },
    providers: [
-      Providers.GitHub({
+      GitHub({
          clientId: env('GITHUB_CLIENT_ID'),
          clientSecret: env('GITHUB_CLIENT_SECRET'),
       }),
    ],
    callbacks: {
-      async jwt(token, _user, account) {
+      async jwt({ token, account }) {
          return { ...token, provider: account?.provider }
       },
-      async signIn(user) {
+      async signIn({ user }) {
          return !!user.email
       },
-   },
-   jwt: {
-      signingKey: process.env.JWT_SIGNING_KEY,
    },
 })

@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { darken } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'

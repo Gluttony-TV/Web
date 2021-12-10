@@ -1,12 +1,12 @@
 import { List, Th, ThLarge } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { transparentize } from 'polished'
 import { createElement, Dispatch, FC, SetStateAction, useState } from 'react'
 import styled from 'styled-components'
+import Button from '../components/Button'
 import Image from '../components/Image'
-import { Button } from '../components/Inputs'
 import Link from '../components/Link'
 import Page from '../components/Page'
 import useTranslation from '../hooks/useTranslation'
@@ -22,8 +22,8 @@ interface Props {
 
 export const getServerSideProps: GetServerSideProps<Props> = async req => {
    await database()
-   const session = await getSession(req)
 
+   const session = await getSession(req)
    if (!session) return loginLink(req)
 
    const progress = await Progress.find({ user: session.user.email })

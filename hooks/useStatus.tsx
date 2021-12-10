@@ -1,9 +1,12 @@
-import { useSession } from "next-auth/client";
-import { AppStatus } from "../models";
+import { useSession } from 'next-auth/react'
+import { AppStatus } from '../models'
 
+/**
+ * @deprecated
+ */
 export default function useStatus(): AppStatus {
-   const [session, loading] = useSession()
-   if (loading) return AppStatus.LOADING
-   if (session) return AppStatus.LOGGED_IN
+   const { status } = useSession()
+   if (status === 'loading') return AppStatus.LOADING
+   if (status === 'authenticated') return AppStatus.LOGGED_IN
    return AppStatus.LOGGED_OUT
 }

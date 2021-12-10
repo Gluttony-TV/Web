@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Page from '../components/Page'

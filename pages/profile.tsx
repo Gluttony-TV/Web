@@ -1,63 +1,60 @@
 import { Github } from '@styled-icons/fa-brands'
 import { DateTime } from 'luxon'
-import { Session } from 'next-auth'
-import { signOut, useSession } from 'next-auth/client'
+import { GetServerSideProps, NextPage } from 'next'
+import { User } from 'next-auth'
+import { getSession, signOut } from 'next-auth/react'
 import { transparentize } from 'polished'
-import { FC } from 'react'
 import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 import { LinkButton } from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
+import { loginLink } from '../lib/util'
 
-const Profile: FC = () => {
-   const [session] = useSession()
+export const getServerSideProps: GetServerSideProps<User> = async req => {
+   const session = await getSession(req)
+   if (!session) return loginLink(req)
+   return { props: session.user }
+}
+
+const Profile: NextPage<User> = ({ name, email, provider }) => {
+   const created = DateTime.now()
 
    return (
       <Page>
          <Title>
             <FormattedMessage description='Profile page title' defaultMessage='Your Profile' />
          </Title>
-         {session ? <Info {...session} /> : <FormattedMessage description='Profile page not logged in' defaultMessage='not logged in' />}
+         <Panels>
+            <BigPanel>
+               <label htmlFor='username'>Username</label>
+               <p id='username'>{name}</p>
+            </BigPanel>
+
+            {email && (
+               <>
+                  <Panel>
+                     <label htmlFor='email'>E-Mail</label>
+                     <p id='email'>{email ?? 'No email provided'}</p>
+                  </Panel>
+               </>
+            )}
+
+            <Panel>
+               <label htmlFor='created-at'>Joined at</label>
+               <p id='created-at'>
+                  {created.toLocaleString()} ({created.toRelative()})
+               </p>
+            </Panel>
+
+            <Panel>
+               <label htmlFor='connections'>Connections</label>
+               <Icons id='connections'>{provider && <Github />}</Icons>
+            </Panel>
+
+            <LinkButton onClick={() => signOut()}>Logout</LinkButton>
+         </Panels>
       </Page>
-   )
-}
-
-const Info: FC<Session> = ({ user }) => {
-   const created = DateTime.now()
-
-   const { name, email, provider } = user
-
-   return (
-      <Panels>
-         <BigPanel>
-            <label htmlFor='username'>Username</label>
-            <p id='username'>{name}</p>
-         </BigPanel>
-
-         {email && (
-            <>
-               <Panel>
-                  <label htmlFor='email'>E-Mail</label>
-                  <p id='email'>{email ?? 'No email provided'}</p>
-               </Panel>
-            </>
-         )}
-
-         <Panel>
-            <label htmlFor='created-at'>Joined at</label>
-            <p id='created-at'>
-               {created.toLocaleString()} ({created.toRelative()})
-            </p>
-         </Panel>
-
-         <Panel>
-            <label htmlFor='connections'>Connections</label>
-            <Icons id='connections'>{provider && <Github />}</Icons>
-         </Panel>
-
-         <LinkButton onClick={() => signOut()}>Logout</LinkButton>
-      </Panels>
    )
 }
 

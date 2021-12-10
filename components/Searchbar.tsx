@@ -19,7 +19,9 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
       return v
    }, search)
 
-   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, { enabled: preFetch && search.length > 0 })
+   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, {
+      enabled: preFetch && search.length > 0,
+   })
    const [visible, setVisible] = useState(false)
 
    useEffect(() => setVisible(!!results), [results, setVisible])
@@ -46,6 +48,7 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
    return (
       <Style>
          <SearchInput onKeyPress={key} type='text' placeholder='Search...' value={value} onChange={setValue} />
+         <Highlight />
          <Dropdown>
             {children}
             {visible &&
@@ -58,6 +61,23 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
       </Style>
    )
 }
+
+const Highlight = styled.div`
+   position: absolute;
+   z-index: 1;
+   width: 0;
+   height: 0;
+   background: ${p => p.theme.primary};
+   left: 0;
+   top: 100%;
+   transition: height 0.1s linear, width 0.1s linear;
+
+   input:focus-visible + & {
+      transition: width 0.4s ease-out;
+      height: 4px;
+      width: 100%;
+   }
+`
 
 const Style = styled.div`
    align-self: flex-start;
@@ -85,12 +105,24 @@ const Dropdown = styled.ul`
    }
 `
 
-const SearchInput = styled(Input)`
+const SearchInput = styled(Input).attrs({ autoComplete: 'off' })`
+   position: relative;
    padding-left: 5rem;
    padding: 1rem;
    height: 100%;
-   margin: 0 0.5rem;
    width: 40vw;
+
+   ::placeholder {
+      color: ${p => lighten(0.5, p.theme.bg)};
+   }
+
+   outline: none !important;
+   box-shadow: none !important;
+
+   &:hover,
+   &:focus-visible {
+      background: ${p => lighten(0.3, p.theme.bg)};
+   }
 `
 
 export default Searchbar

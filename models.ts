@@ -122,7 +122,7 @@ export interface IEpisode extends IModel {
    seasonNumber: number
 }
 
-export interface IProgress<S = number> extends IModel {
+export interface IProgress<S = IShow['id']> extends IModel {
    user: string
    show: S
    watched: IEpisode['id'][]
