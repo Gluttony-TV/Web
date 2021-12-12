@@ -1,8 +1,9 @@
-import { mix, transparentize } from 'polished'
+import { mix } from 'polished'
 import { Dispatch, FC, Fragment, SetStateAction, useCallback, useMemo } from 'react'
 import styled, { css } from 'styled-components'
 import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
 import { IEpisode } from '../models'
+import { gradient, striped } from '../style/styles'
 
 const Season: FC<{
    setWatched: Dispatch<SetStateAction<IEpisode['id'][]>>
@@ -50,21 +51,6 @@ const Season: FC<{
    )
 }
 
-const grid = (...colors: string[]) => css`
-   background: repeating-linear-gradient(
-      -25deg,
-      ${colors.map((c, i) => `${c} ${i * 10}px,${c} ${(i + 1) * 10}px`).join()}
-   );
-`
-
-const background = (color: string) => css`
-   background: linear-gradient(${transparentize(0, color)}, ${transparentize(0.3, color)});
-
-   &:hover {
-      background: linear-gradient(${transparentize(0.2, color)}, ${transparentize(0.5, color)});
-   }
-`
-
 const Episode = styled.button<{ watched?: boolean; disabled?: boolean }>`
    text-align: center;
    padding: 0.5rem;
@@ -76,13 +62,12 @@ const Episode = styled.button<{ watched?: boolean; disabled?: boolean }>`
       p.disabled
          ? css`
               cursor: not-allowed;
-              background: ${transparentize(0.9, p.theme.secondary)};
-              ${grid(transparentize(0.75, p.theme.secondary), transparentize(0.8, p.theme.secondary))};
-              ${p.watched && background(p.theme.error)};
+              ${striped(p.theme.secondary)};
+              ${p.watched && gradient(p.theme.error)};
            `
          : css`
-              ${background(mix(0.3, p.theme.bg, p.theme.secondary))};
-              ${p.watched && background(p.theme.primary)};
+              ${gradient(mix(0.3, p.theme.bg, p.theme.secondary))};
+              ${p.watched && gradient(p.theme.primary)};
            `}
 
    &:last-of-type {
