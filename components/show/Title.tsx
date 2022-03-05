@@ -35,7 +35,6 @@ const ProgressSpan = styled.span`
 `
 
 const Name = styled(Title)`
-   letter-spacing: 0.2rem;
    font-size: 3rem;
 `
 
