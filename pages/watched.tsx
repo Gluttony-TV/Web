@@ -1,4 +1,4 @@
-import { List, Th, ThLarge } from '@styled-icons/fa-solid'
+import { Th, ThLarge } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -41,9 +41,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 }
 
 enum View {
-   LIST = 1,
-   BIG_CELLS = 7,
-   SMALL_CELLS = 14,
+   BIG_CELLS = 200,
+   SMALL_CELLS = 100,
 }
 
 const Watched: FC<Props> = ({ watched }) => {
@@ -53,9 +52,9 @@ const Watched: FC<Props> = ({ watched }) => {
    return (
       <Page>
          <ViewSelect value={view} onChange={setView} />
-         <Grid perRow={view}>
+         <Grid size={view}>
             {watched.map(progress => (
-               <Cell key={progress.id} {...progress} />
+               <Cell key={progress.id} size={view} {...progress} />
             ))}
          </Grid>
       </Page>
@@ -70,7 +69,6 @@ const ViewSelect: FC<{
       {Object.entries({
          [View.BIG_CELLS]: ThLarge,
          [View.SMALL_CELLS]: Th,
-         [View.LIST]: List,
       }).map(([mode, icon]) => (
          <Button key={mode} secondary={mode !== value?.toString()} onClick={() => onChange(Number.parseInt(mode))}>
             {createElement(icon, { size: 20 })}
@@ -96,11 +94,11 @@ const IconBar = styled.div`
    }
 `
 
-const Cell: FC<IProgress<IShow>> = ({ show }) => {
+const Cell: FC<IProgress<IShow> & { size: View }> = ({ show, size }) => {
    return (
       <Link href={`/show/${show.id}`}>
          <Panel>
-            <Image title={show.name} src={show.image} alt={show.name} />
+            <Image title={show.name} src={show.image} alt={show.name} width={size} height={(size / 256) * 376} />
 
             <h4>{useTranslation(show.name, show.translations)}</h4>
          </Panel>
@@ -108,14 +106,13 @@ const Cell: FC<IProgress<IShow>> = ({ show }) => {
    )
 }
 
-const Grid = styled.ul<{ perRow: number }>`
+const Grid = styled.ul<{ size: View }>`
    display: grid;
    justify-content: start;
    padding: 2rem;
-   //gap: ${p => 14 / p.perRow}rem;
-   gap: ${p => (p.perRow > View.BIG_CELLS ? 0 : 2)}rem;
-   grid-template-columns: repeat(${p => p.perRow}, 1fr);
-   list-style: none;
+   gap: ${p => p.size * 0.1}px;
+   grid-template-columns: repeat(auto-fill, ${p => p.size}px);
+   width: 90vw;
 `
 
 const Panel = styled.li`

@@ -62,6 +62,10 @@ const GlobalStyles = createGlobalStyle`
    ::-webkit-scrollbar-thumb:hover {
       background: ${darken(0.07, theme.bg)};
    }
+
+   ul, ol {
+      list-style: none;
+   }
 `
 
 export default App

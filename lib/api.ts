@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import { IEpisode, IShow, IShowFull } from '../models'
+import { extendEpisodes } from '../hooks/useEpisodesInfo'
+import { IEpisode, IProgress, IShow, IShowFull } from '../models'
 import cacheOr from './cache'
 import { exists } from './util'
 
@@ -77,23 +78,37 @@ export async function searchShow(by: string, limit = 10, offset = 0) {
    return all?.slice(0, limit).filter(exists)
 }
 
-export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
-   const path = (s: string | number) => (extended !== false ? `${s}/extended` : s)
-   return cacheOr(
-      `show/${path(search)}`,
-      async () => {
-         const id = await findId(search)
-         if (id) return await request<E extends true ? IShowFull : IShow>(`/series/${path(id)}`)
-      },
-      s => [s.id, s.slug].map(id => `show/${path(id)}`)
-   )
+interface Translation {
+   name: string
+   overview: string
 }
 
-export async function getEpisodes(show: string | number) {
+export function getTranslation(show: IShowFull['id'], lang = 'eng') {
+   const uri = `series/${show}/translations/${lang}`
+   return cacheOr(uri, () => request<Translation>(uri).catch(() => ({})))
+}
+
+export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
+   const path = (s: string | number) => (extended !== false ? `${s}/extended` : s)
+   const id = await cacheOr(`search/${search}`, () => findId(search))
+   if (!id) return undefined
+   const [show, translation] = await Promise.all([
+      cacheOr(
+         `series/${path(search)}`,
+         () => request<E extends true ? IShowFull : IShow>(`/series/${path(id)}`),
+         s => [s.id, s.slug].map(id => `show/${path(id)}`)
+      ),
+      getTranslation(id),
+   ])
+
+   return { ...show, ...translation }
+}
+
+export async function getEpisodes(show: string | number, progress?: IProgress) {
    return cacheOr(`episodes/${show}`, async () => {
       const id = await findId(show)
       const result = await request<{ episodes: IEpisode[] }>(`/series/${id}/episodes/official`)
-
-      return result?.episodes
+      if (!result) return []
+      return extendEpisodes(result.episodes, progress)
    })
 }

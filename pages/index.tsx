@@ -3,14 +3,12 @@ import { FC } from 'react'
 import { LinkButton } from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
-import useStatus from '../hooks/useStatus'
-import { AppStatus } from '../models'
 
 const Home: FC = () => {
    const { data: session } = useSession()
-   const status = useStatus()
+   const { status } = useSession()
 
-   if (status === AppStatus.LOGGED_IN)
+   if (status === 'authenticated')
       return (
          <Page>
             <Title>Welcome {session?.user.email}!</Title>

@@ -14,6 +14,7 @@ import { getEpisodes, getShow } from '../../../lib/api'
 import database, { serialize } from '../../../lib/database'
 import { IEpisode, IProgress, IShowFull } from '../../../models'
 import Progress from '../../../models/Progress'
+
 export interface Props {
    show: IShowFull
    episodes: IEpisode[]
@@ -46,7 +47,7 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
 
          <p>{useTranslation(show.overview, show.overviews)}</p>
 
-         <Poster src={show.image_url ?? show.image} alt={`Artwork for ${show.name}`} />
+         <Poster src={show.image_url ?? show.image} alt={`Artwork for ${show.name}`} height={1000} width={680} />
 
          {episodes.length > 0 && (
             <Seasons>
@@ -73,6 +74,10 @@ const More = styled(ButtonLink)`
    justify-self: center;
 `
 
+const Poster = styled(Image)`
+   grid-area: poster;
+`
+
 const Seasons = styled.ul`
    grid-area: seasons;
    padding: 2rem;
@@ -87,10 +92,6 @@ const Seasons = styled.ul`
    ul {
       grid-area: seasons;
    }
-`
-
-const Poster = styled(Image)`
-   grid-area: poster;
 `
 
 const Style = styled(Page)`

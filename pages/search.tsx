@@ -40,7 +40,7 @@ const Result: FC<IShow> = ({ name, year, thumbnail, translations, overview, over
             <h3>{useTranslation(name, translations)}</h3>
             <Overview>{useTranslation(overview, overviews)}</Overview>
             <span>{year}</span>
-            <Image src={thumbnail} alt={name} />
+            <Thumbnail src={thumbnail} alt={name} width={140} height={200} />
          </ResultStyle>
       </Link>
    )
@@ -55,6 +55,13 @@ const Overview = styled.div`
    -webkit-box-orient: vertical;
 `
 
+const Thumbnail = styled(Image)`
+   justify-self: end;
+   width: unset;
+   grid-area: image;
+   margin: -2rem;
+`
+
 const ResultStyle = styled.div`
    background: #0001;
    padding: 2rem;
@@ -65,14 +72,6 @@ const ResultStyle = styled.div`
       'year image'
       / 3fr 1fr;
    align-items: center;
-
-   ${Image} {
-      justify-self: end;
-      width: unset;
-      grid-area: image;
-      height: 200px;
-      margin: -2rem;
-   }
 `
 
 const Style = styled(Page)`

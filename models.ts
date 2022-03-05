@@ -14,6 +14,11 @@ export enum AppStatus {
    LOADING = 'loading',
 }
 
+export interface Alias {
+   language: string
+   name: string
+}
+
 export interface IShow extends IModel {
    tvdb_id: string
    name: string
@@ -29,7 +34,7 @@ export interface IShow extends IModel {
    originalCountry: string
    originalLanguage: string
    originalNetwork: INetwork
-   aliases?: string[]
+   aliases?: Alias[]
    translations: Record<string, string>
    overview: string
    overviews?: Record<string, string>
@@ -110,8 +115,8 @@ export interface IExtendedSeason extends IModel {
 
 export interface IEpisode extends IModel {
    seriesId: number
-   name?: string
-   aired?: string
+   name: string
+   aired: string
    runtime: number
    nameTranslations: string[]
    overviewTranslations: string[]

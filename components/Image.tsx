@@ -1,29 +1,10 @@
-import { lighten } from "polished";
-import styled from "styled-components";
+import NextImage, { ImageProps } from 'next/image'
+import { VFC } from 'react'
 
-export default styled.img`
-   height: 100%;
-   width: 100%;
-   position: relative;
-   object-fit: contain;
+const Image: VFC<ImageProps> = ({ className, ...props }) => (
+   <span className={className}>
+      <NextImage objectFit='cover' {...props} />
+   </span>
+)
 
-   &::before {
-      content: '';
-      position: absolute;
-      background: ${p => lighten(0.2, p.theme.bg)};
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-   }
-
-   &::after {
-      position: absolute;
-      content: attr(alt);
-      color: ${p => p.theme.text};
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-style: italic;
-   }
-`
+export default Image

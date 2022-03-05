@@ -1,4 +1,3 @@
-import { orderBy } from 'lodash'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { darken } from 'polished'
@@ -8,6 +7,7 @@ import Image from '../components/Image'
 import Link from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
+import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
 import useTranslation from '../hooks/useTranslation'
 import { getEpisodes, getShow } from '../lib/api'
 import database from '../lib/database'
@@ -18,7 +18,7 @@ import Progress from '../models/Progress'
 interface Props {
    shows: Array<
       IShow & {
-         missing: number
+         missing: IExtendedEpisode[]
       }
    >
 }
@@ -29,20 +29,25 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!session) return loginLink(req)
 
-   const progress = await Progress.find({ user: session.user.email })
+   const progresses = await Progress.find({ user: session.user.email })
 
    const shows = await Promise.all(
-      progress.map(async p => {
-         const [show, episodes] = await Promise.all([getShow(p.show), getEpisodes(p.show)])
-         if (!show) return null
-         const watched = episodes.filter(e => p.watched.includes(e.id))
-         const [lastWatched] = orderBy(watched, e => new Date(e.aired), 'desc')
+      progresses.map(async progress => {
+         const [show, episodes] = await Promise.all([getShow(progress.show), getEpisodes(progress.show, progress)])
+         if (!show || episodes.length === 0) return null
+
+         const watched = episodes.filter(e => e.watched)
+         const lastWatched = watched[watched.length - 1]
+
+         if(!lastWatched) return null
+
          const missing = episodes.filter(e => {
+            if (e.ignore) return false
             if (e.seasonNumber === lastWatched.seasonNumber) return e.number > lastWatched.number
             return e.seasonNumber > lastWatched.seasonNumber
-         }).length
+         })
 
-         if (missing === 0) return null
+         if (missing.length === 0) return null
 
          return { ...show, missing }
       })
@@ -60,14 +65,18 @@ const Watched: FC<Props> = ({ shows }) => {
             {shows.map(show => (
                <ShowPanel href={`/show/${show.id}`} key={show.id}>
                   <h3>{useTranslation(show.name, show.translations)}</h3>
-                  <i>{show.missing} missing episodes</i>
-                  <Image src={show.image} />
+                  <i title={show.missing.map(e => e.name).join()}>{show.missing.length} missing episodes</i>
+                  <Poster src={show.image} height={200} width={140} />
                </ShowPanel>
             ))}
          </Grid>
       </Page>
    )
 }
+
+const Poster = styled(Image)`
+   grid-area: img;
+`
 
 const Grid = styled.div`
    display: grid;
@@ -85,11 +94,6 @@ const ShowPanel = styled(Link)`
    grid-template:
       'name img'
       'info img';
-
-   ${Image} {
-      grid-area: img;
-      height: 200px;
-   }
 `
 
 export default Watched

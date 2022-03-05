@@ -39,7 +39,6 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
                   <h4>Season {number}</h4>
                   {episodes.map(e => (
                      <Episode key={e.id} watched={e.watched} due={e.due}>
-                        {console.log(e)}
                         <span>{e.name}</span>
                         <span>{e.aired && DateTime.fromISO(e.aired).toLocaleString()}</span>
                      </Episode>
