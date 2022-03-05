@@ -111,7 +111,7 @@ export interface IExtendedSeason extends IModel {
 export interface IEpisode extends IModel {
    seriesId: number
    name?: string
-   aired: string
+   aired?: string
    runtime: number
    nameTranslations: string[]
    overviewTranslations: string[]

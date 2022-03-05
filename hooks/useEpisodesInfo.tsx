@@ -17,7 +17,7 @@ export function useEpisodesInfo({ episodes, progress }: { episodes: IEpisode[]; 
          episodes.map<IExtendedEpisode>(e => {
             const watched = !!progress?.watched.includes(e.id)
             const special = e.seasonNumber <= 0
-            const due = new Date(e.aired) > now
+            const due = !e.aired || new Date(e.aired) > now
             const ignore = !watched && (special || due)
             return {
                ...e,
@@ -29,7 +29,10 @@ export function useEpisodesInfo({ episodes, progress }: { episodes: IEpisode[]; 
          }),
       [episodes, progress]
    )
-   const seasons = useMemo(() => Object.values(groupBy(extendedEpisodes, e => e.seasonNumber)), [extendedEpisodes])
+   const seasons = useMemo(() => {
+      const grouped = groupBy(extendedEpisodes, e => e.seasonNumber)
+      return Object.entries(grouped).map(([number, episodes]) => ({number, episodes}))
+   }, [extendedEpisodes])
    const aired = useMemo(() => extendedEpisodes.filter(e => !e.due), [extendedEpisodes])
    const watchedAll = useMemo(() => !extendedEpisodes.some(e => !e.ignore && !e.watched), [extendedEpisodes])
 

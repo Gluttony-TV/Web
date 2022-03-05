@@ -55,8 +55,8 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
                </Button>
 
                <ul>
-                  {seasons?.map((episodes, i) => (
-                     <Season episodes={episodes} key={i} setWatched={setWatched} moveProgress={moveProgress} />
+                  {seasons?.map((season, i) => (
+                     <Season {...season} key={i} setWatched={setWatched} moveProgress={moveProgress} />
                   ))}
                </ul>
 
