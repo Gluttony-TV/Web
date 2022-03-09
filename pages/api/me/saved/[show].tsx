@@ -4,14 +4,13 @@ import withSession, { methodSwitch } from '../../../../lib/wrapper'
 import List from '../../../../models/List'
 
 const get = withSession(async (req, res, session) => {
-   validate(req, {
+   const { query } = validate(req, {
       query: {
-         show: Joi.string(),
+         show: Joi.number().required(),
       },
    })
 
-   const show = req.query.show as string
-   const lists = await List.find({ user: session.user.id, show })
+   const lists = await List.find({ user: session.user.id, shows: { $elemMatch: { id: query.show } } })
 
    res.json(lists)
 })

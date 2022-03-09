@@ -1,5 +1,6 @@
 import { Discord, Github, Google } from '@styled-icons/fa-brands'
 import { Plug } from '@styled-icons/fa-solid'
+import { StyledIcon } from '@styled-icons/styled-icon'
 import { DateTime } from 'luxon'
 import { GetServerSideProps, NextPage } from 'next'
 import { User } from 'next-auth'
@@ -26,7 +27,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    return { props: serialize({ ...session.user, accounts }) }
 }
 
-const ICONS = {
+const ICONS: Record<string, StyledIcon | undefined> = {
    github: Github,
    google: Google,
    discord: Discord,

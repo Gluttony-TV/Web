@@ -12,3 +12,9 @@ export async function loginLink(_req: GetServerSidePropsContext) {
       },
    }
 }
+
+export function env(key: string) {
+   const value = process.env[key]
+   if (value) return value
+   throw new Error(`Please define the ${key} environment variable inside .env.local`)
+}

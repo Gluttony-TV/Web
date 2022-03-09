@@ -1,7 +1,6 @@
 import { transparentize } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'
-import useTranslation from '../../hooks/useTranslation'
 import { IShow } from '../../models'
 import Head from '../Head'
 import { Title } from '../Text'
@@ -11,12 +10,11 @@ const ShowTitle: FC<
       percentage?: number
       noTitle?: boolean
    }
-> = ({ name, translations, percentage = 0, status, noTitle }) => {
-   const title = useTranslation(name, translations)
+> = ({ name, percentage = 0, status, noTitle }) => {
    return (
       <Style>
-         {noTitle || <Head title={title} />}
-         <Name>{title}</Name>
+         {noTitle || <Head title={name} />}
+         <Name>{name}</Name>
          <Status>{status.name}</Status>
          {percentage > 0 && <ProgressSpan>{Math.max(100, Math.min(0, Math.round(percentage)))}%</ProgressSpan>}
       </Style>

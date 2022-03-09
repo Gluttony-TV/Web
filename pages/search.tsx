@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import Image from '../components/Image'
 import Link from '../components/Link'
 import Page from '../components/Page'
-import useTranslation from '../hooks/useTranslation'
 import { searchShow } from '../lib/api'
 import database from '../lib/database'
 import { IShow } from '../models'
@@ -33,12 +32,12 @@ const Search: FC<Props> = ({ results }) => {
    )
 }
 
-const Result: FC<IShow> = ({ name, year, thumbnail, translations, overview, overviews, tvdb_id }) => {
+const Result: FC<IShow> = ({ name, year, thumbnail, overview, tvdb_id }) => {
    return (
       <Link href={`/show/${tvdb_id}`}>
          <ResultStyle>
-            <h3>{useTranslation(name, translations)}</h3>
-            <Overview>{useTranslation(overview, overviews)}</Overview>
+            <h3>{name}</h3>
+            <Overview>{overview}</Overview>
             <span>{year}</span>
             <Thumbnail src={thumbnail} alt={name} width={140} height={200} />
          </ResultStyle>

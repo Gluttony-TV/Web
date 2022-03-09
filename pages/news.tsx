@@ -8,7 +8,6 @@ import Link from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
 import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
-import useTranslation from '../hooks/useTranslation'
 import { getEpisodes, getShow } from '../lib/api'
 import database from '../lib/database'
 import { exists, loginLink } from '../lib/util'
@@ -64,7 +63,7 @@ const Watched: FC<Props> = ({ shows }) => {
          <Grid>
             {shows.map(show => (
                <ShowPanel href={`/show/${show.id}`} key={show.id}>
-                  <h3>{useTranslation(show.name, show.translations)}</h3>
+                  <h3>{show.name}</h3>
                   <i title={show.missing.map(e => e.name).join()}>{show.missing.length} missing episodes</i>
                   <Poster src={show.image} height={200} width={140} />
                </ShowPanel>

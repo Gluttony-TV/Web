@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import mongoose, { ConnectOptions, Document, Model, Schema, Types } from 'mongoose'
+import { env } from './util'
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -8,17 +9,12 @@ import mongoose, { ConnectOptions, Document, Model, Schema, Types } from 'mongoo
  */
 let cached = global.mongo
 
-if (!cached) {
-   cached = global.mongo = { conn: undefined, promise: undefined }
-}
+if (!cached) cached = global.mongo = { conn: undefined, promise: undefined }
 
 async function database() {
-   const { MONGODB_URI } = process.env
-   if (!MONGODB_URI) throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
+   const MONGODB_URI = env('DB_URI')
 
-   if (cached.conn) {
-      return cached.conn
-   }
+   if (cached.conn) return cached.conn
 
    if (!cached.promise) {
       const opts: ConnectOptions = {

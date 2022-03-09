@@ -1,19 +1,19 @@
 import { useRouter } from 'next/router'
 import { SetStateAction, useCallback } from 'react'
 import { IEpisode, IProgress, IShow } from '../models'
+import useResource from './api/useResource'
+import useSubmit from './api/useSubmit'
 import { useEpisodesInfo } from './useEpisodesInfo'
-import useFetch, { useManipulate } from './useFetch'
 
 export function useProgress({ show, ...props }: { show?: IShow['id']; episodes: IEpisode[]; progress?: IProgress }) {
    const { id } = useRouter().query
-   const { data: progress } = useFetch<IProgress>(`me/progress/${show ?? id}`, { initialData: props.progress })
+   const { data: progress } = useResource<IProgress>(`me/progress/${show ?? id}`, { initialData: props.progress })
    const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
 
-   const { mutate: setProgress } = useManipulate<Partial<IProgress>>('put', `me/progress/${show ?? id}`)
+   const { mutate: setProgress } = useSubmit<Partial<IProgress>>(`me/progress/${show ?? id}`, { method: 'PUT' })
    const setWatched = useCallback(
       (value: SetStateAction<IProgress['watched']>) => {
          const watched = typeof value === 'function' ? value(progress?.watched ?? []) : value
-         console.log(watched)
          setProgress({ watched })
       },
       [setProgress, progress]
@@ -28,13 +28,13 @@ export function useProgress({ show, ...props }: { show?: IShow['id']; episodes: 
             .map(e => e.id)
          setWatched(watched)
       },
-      [episodes]
+      [episodes, setWatched]
    )
 
    const watchAll = useCallback(() => {
       if (watchedAll) setWatched([])
       else setWatched(episodes.filter(e => !e.ignore).map(e => e.id))
-   }, [watchedAll, episodes])
+   }, [watchedAll, episodes, setWatched])
 
    return { progress, setWatched, moveProgress, watchAll, episodes, watchedAll, ...rest }
 }

@@ -17,7 +17,7 @@ function getSlug(req: NextApiRequest) {
 
 const get = withSession(async (req, res, session) => {
    const slug = getSlug(req)
-   const list = await List.findOne({ user: session.user.id, slug })
+   const list = await List.findOne({ user: session.user.id, slug }, { shows: false })
 
    if (list) {
       res.json(list)

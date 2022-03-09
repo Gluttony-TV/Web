@@ -1,15 +1,14 @@
 import { Check, Heart, Times } from '@styled-icons/fa-solid'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession } from 'next-auth/react'
-import { useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import Button, { ButtonLink } from '../../../components/Button'
 import Image from '../../../components/Image'
-import {} from '../../../components/Inputs'
 import Page from '../../../components/Page'
 import Season from '../../../components/Season'
 import ShowTitle from '../../../components/show/Title'
-import useFetch, { useManipulate } from '../../../hooks/useFetch'
+import useSubmit from '../../../hooks/api/useSubmit'
+import useTransformed from '../../../hooks/api/useTransformed'
 import { useProgress } from '../../../hooks/useProgress'
 import { getEpisodes, getShow } from '../../../lib/api'
 import database, { serialize } from '../../../lib/database'
@@ -50,14 +49,20 @@ const FAVOURITE_LIST = 'favourite'
 
 const Show: NextPage<Props> = ({ show, ...props }) => {
    const { setWatched, watchAll, moveProgress, seasons, percentage, watchedAll, episodes } = useProgress(props)
-   const { data: lists, refetch } = useFetch<IList[]>(`me/saved/${show.id}`)
-   const { mutate } = useManipulate('put', `me/list/${FAVOURITE_LIST}`)
-   const isFavourite = useMemo(() => lists?.some(it => it.slug === FAVOURITE_LIST), [lists])
-   const toggleFavourite = useCallback(() => {
-      const operation = isFavourite ? 'remove' : 'add'
-      mutate({ [operation]: [show.id] })
-      refetch()
-   }, [mutate, isFavourite])
+
+   const { data: isFavourite } = useTransformed<IList[], boolean>(
+      `me/saved/${show.id}`,
+      lists => lists.some(it => it.slug === FAVOURITE_LIST),
+      { key: `me/favourite/${show.id}` }
+   )
+
+   const toggleFavourite = useSubmit(`me/list/${FAVOURITE_LIST}`, {
+      method: 'PUT',
+      data: { [isFavourite ? 'remove' : 'add']: [show.id] },
+      mutates: {
+         [`me/favourite/${show.id}`]: () => !isFavourite,
+      },
+   })
 
    return (
       <Style>
@@ -72,7 +77,7 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
                <Button secondary={watchedAll} onClick={watchAll}>
                   {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
                </Button>
-               <Button secondary={!isFavourite} onClick={toggleFavourite}>
+               <Button secondary={isFavourite} onClick={toggleFavourite.mutate}>
                   <Heart />
                </Button>
 

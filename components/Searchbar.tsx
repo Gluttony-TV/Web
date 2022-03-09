@@ -3,9 +3,8 @@ import { useRouter } from 'next/router'
 import { lighten } from 'polished'
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import styled from 'styled-components'
-import useFetch from '../hooks/useFetch'
+import useResource from '../hooks/api/useResource'
 import { useRouterEvent } from '../hooks/useRouterEvent'
-import useTranslation from '../hooks/useTranslation'
 import { IShow } from '../models'
 import { Input } from './Inputs'
 import Link from './Link'
@@ -19,7 +18,7 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
       return v
    }, search)
 
-   const { data: results } = useFetch<IShow[]>(`/show?limit=20&search=${search}`, {
+   const { data: results } = useResource<IShow[]>(`/show?limit=20&search=${search}`, {
       enabled: preFetch && search.length > 0,
    })
    const [visible, setVisible] = useState(false)
@@ -42,7 +41,7 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
             })
          }
       },
-      [setSearch]
+      [setSearch, router]
    )
 
    return (
@@ -54,7 +53,7 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
             {visible &&
                results?.map(show => (
                   <Link key={show.id} href={`/show/${show.tvdb_id}`}>
-                     <li>{useTranslation(show.name, show.translations)}</li>
+                     <li>{show.name}</li>
                   </Link>
                ))}
          </Dropdown>

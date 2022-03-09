@@ -9,7 +9,6 @@ import Button from '../components/Button'
 import Image from '../components/Image'
 import Link from '../components/Link'
 import Page from '../components/Page'
-import useTranslation from '../hooks/useTranslation'
 import { getShow } from '../lib/api'
 import database, { serialize } from '../lib/database'
 import { loginLink } from '../lib/util'
@@ -100,7 +99,7 @@ const Cell: FC<IProgress<IShow> & { size: View }> = ({ show, size }) => {
          <Panel>
             <Image title={show.name} src={show.image} alt={show.name} width={size} height={(size / 256) * 376} />
 
-            <h4>{useTranslation(show.name, show.translations)}</h4>
+            <h4>{show.name}</h4>
          </Panel>
       </Link>
    )

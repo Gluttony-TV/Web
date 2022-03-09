@@ -3,13 +3,8 @@ import NextAuth, { Session } from 'next-auth'
 import GitHub from 'next-auth/providers/github'
 import database from '../../../lib/database'
 import theme from '../../../lib/theme'
+import { env } from '../../../lib/util'
 import Account from '../../../models/Account'
-
-function env(key: string) {
-   const value = process.env[key]
-   if (value) return value
-   throw new Error(`Please define the ${key} environment variable inside .env.local`)
-}
 
 export default NextAuth({
    secret: env('JWT_SECRET'),

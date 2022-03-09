@@ -2,7 +2,7 @@ import { FilterQuery } from 'mongoose'
 import * as Joi from 'types-joi'
 import validate from '../../../../lib/validate'
 import withSession, { methodSwitch } from '../../../../lib/wrapper'
-import List from '../../../../models/List'
+import List, { IList } from '../../../../models/List'
 
 const get = withSession(async (req, res, session) => {
    const { query } = validate(req, {
@@ -11,7 +11,7 @@ const get = withSession(async (req, res, session) => {
       },
    })
 
-   const filter: FilterQuery<List> = { user: session.user.id }
+   const filter: FilterQuery<IList> = { user: session.user.id }
    if (query.visibility) filter.public = query.visibility === 'public'
    const lists = await List.find(filter)
    res.json(lists)
