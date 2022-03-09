@@ -41,12 +41,12 @@ export default function useFetch<R>(
    return useQuery(key || url, fetcher, options)
 }
 
-export function useManipulate<R>(method: Method, url: string, r1?: R, invalidates?: string | string[]) {
+export function useManipulate<R>(method: Method, url: string, body?: R, invalidates?: string | string[]) {
    const client = useQueryClient()
 
    const send = useCallback(
-      (r2: R) => {
-         const data = r1 ?? r2
+      (callbackBody?: R) => {
+         const data = body ?? callbackBody
          if (data) client.setQueryData(url, data)
          return API({ url, method, data })
       },

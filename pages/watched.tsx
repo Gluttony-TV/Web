@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    const session = await getSession(req)
    if (!session) return loginLink(req)
 
-   const progress = await Progress.find({ user: session.user.email })
+   const progress = await Progress.find({ user: session.user.id })
 
    const withShow = await Promise.all(
       progress.map(async p => ({

@@ -6,10 +6,10 @@ import useFetch, { useManipulate } from './useFetch'
 
 export function useProgress({ show, ...props }: { show?: IShow['id']; episodes: IEpisode[]; progress?: IProgress }) {
    const { id } = useRouter().query
-   const { data: progress } = useFetch<IProgress>(`progress/${show ?? id}`, { initialData: props.progress })
+   const { data: progress } = useFetch<IProgress>(`me/progress/${show ?? id}`, { initialData: props.progress })
    const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
 
-   const { mutate: setProgress } = useManipulate<Partial<IProgress>>('put', `progress/${show ?? id}`)
+   const { mutate: setProgress } = useManipulate<Partial<IProgress>>('put', `me/progress/${show ?? id}`)
    const setWatched = useCallback(
       (value: SetStateAction<IProgress['watched']>) => {
          const watched = typeof value === 'function' ? value(progress?.watched ?? []) : value

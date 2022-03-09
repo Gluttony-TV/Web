@@ -1,23 +1,38 @@
-import { Github } from '@styled-icons/fa-brands'
+import { Discord, Github, Google } from '@styled-icons/fa-brands'
+import { Plug } from '@styled-icons/fa-solid'
 import { DateTime } from 'luxon'
 import { GetServerSideProps, NextPage } from 'next'
 import { User } from 'next-auth'
 import { getSession, signOut } from 'next-auth/react'
 import { transparentize } from 'polished'
+import { createElement } from 'react'
 import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 import { LinkButton } from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
+import { serialize } from '../lib/database'
 import { loginLink } from '../lib/util'
+import Account, { IAccount } from '../models/Account'
 
-export const getServerSideProps: GetServerSideProps<User> = async req => {
+type Props = User & { accounts: IAccount[] }
+
+export const getServerSideProps: GetServerSideProps<Props> = async req => {
    const session = await getSession(req)
    if (!session) return loginLink(req)
-   return { props: session.user }
+
+   const accounts = await Account.find({ userId: session.user.id })
+
+   return { props: serialize({ ...session.user, accounts }) }
 }
 
-const Profile: NextPage<User> = ({ name, email, provider }) => {
+const ICONS = {
+   github: Github,
+   google: Google,
+   discord: Discord,
+}
+
+const Profile: NextPage<Props> = ({ name, email, accounts }) => {
    const created = DateTime.now()
 
    return (
@@ -49,7 +64,15 @@ const Profile: NextPage<User> = ({ name, email, provider }) => {
 
             <Panel>
                <label htmlFor='connections'>Connections</label>
-               <Icons id='connections'>{provider && <Github />}</Icons>
+               <Icons id='connections'>
+                  {accounts.map(({ provider, providerAccountId }) =>
+                     createElement(ICONS[provider] ?? Plug, {
+                        key: `${provider}-${providerAccountId}`,
+                        size: '1em',
+                        title: provider,
+                     })
+                  )}
+               </Icons>
             </Panel>
 
             <LinkButton onClick={() => signOut()}>Logout</LinkButton>
@@ -68,8 +91,9 @@ const Icons = styled.ul`
    display: grid;
    grid-auto-flow: column;
    justify-content: center;
-   gap: 0.6rem;
-   padding: 0.6rem;
+   gap: 0.6em;
+   font-size: 1.5em;
+   padding: 0.6em;
 `
 
 const Panel = styled.div`

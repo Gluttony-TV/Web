@@ -1,15 +1,14 @@
-import Joi from "joi";
-import { searchShow } from "../../../lib/api";
-import validate from "../../../lib/validate";
-import { forMethod } from "../../../lib/wrapper";
+import * as Joi from 'types-joi'
+import { searchShow } from '../../../lib/api'
+import validate from '../../../lib/validate'
+import { forMethod } from '../../../lib/wrapper'
 
 export default forMethod('get', async (req, res) => {
-
-   await validate(req, {
+   validate(req, {
       query: {
          search: Joi.string().required(),
          limit: Joi.number(),
-      }
+      },
    })
 
    const search = req.query.search as string
@@ -20,5 +19,4 @@ export default forMethod('get', async (req, res) => {
    } else {
       res.json([])
    }
-
 })

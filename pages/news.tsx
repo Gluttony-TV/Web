@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!session) return loginLink(req)
 
-   const progresses = await Progress.find({ user: session.user.email })
+   const progresses = await Progress.find({ user: session.user.id })
 
    const shows = await Promise.all(
       progresses.map(async progress => {
@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
          const watched = episodes.filter(e => e.watched)
          const lastWatched = watched[watched.length - 1]
 
-         if(!lastWatched) return null
+         if (!lastWatched) return null
 
          const missing = episodes.filter(e => {
             if (e.ignore) return false

@@ -1,21 +1,24 @@
-import { Check, Times } from '@styled-icons/fa-solid'
+import { Check, Heart, Times } from '@styled-icons/fa-solid'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession } from 'next-auth/react'
+import { useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import Button, { ButtonLink } from '../../../components/Button'
 import Image from '../../../components/Image'
-import { } from '../../../components/Inputs'
+import {} from '../../../components/Inputs'
 import Page from '../../../components/Page'
 import Season from '../../../components/Season'
 import ShowTitle from '../../../components/show/Title'
+import useFetch, { useManipulate } from '../../../hooks/useFetch'
 import { useProgress } from '../../../hooks/useProgress'
-import useTranslation from '../../../hooks/useTranslation'
 import { getEpisodes, getShow } from '../../../lib/api'
 import database, { serialize } from '../../../lib/database'
 import { IEpisode, IProgress, IShowFull } from '../../../models'
+import List, { IList } from '../../../models/List'
 import Progress from '../../../models/Progress'
 
 export interface Props {
+   lists?: IList[]
    show: IShowFull
    episodes: IEpisode[]
    progress?: IProgress
@@ -31,21 +34,36 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!show) return { notFound: true }
 
-   const progress = (session && (await Progress.findOne({ user: session.user.email, show: show.id }))) ?? undefined
+   const [progress, lists] = session
+      ? await Promise.all([
+           Progress.findOne({ user: session.user.id, show: show.id }),
+           List.find({ user: session.user.id, show: show.id }),
+        ])
+      : []
 
    return {
-      props: serialize({ show, episodes, progress }),
+      props: serialize({ show, episodes, progress, lists }),
    }
 }
 
+const FAVOURITE_LIST = 'favourite'
+
 const Show: NextPage<Props> = ({ show, ...props }) => {
    const { setWatched, watchAll, moveProgress, seasons, percentage, watchedAll, episodes } = useProgress(props)
+   const { data: lists, refetch } = useFetch<IList[]>(`me/saved/${show.id}`)
+   const { mutate } = useManipulate('put', `me/list/${FAVOURITE_LIST}`)
+   const isFavourite = useMemo(() => lists?.some(it => it.slug === FAVOURITE_LIST), [lists])
+   const toggleFavourite = useCallback(() => {
+      const operation = isFavourite ? 'remove' : 'add'
+      mutate({ [operation]: [show.id] })
+      refetch()
+   }, [mutate, isFavourite])
 
    return (
       <Style>
          <ShowTitle {...show} percentage={percentage} />
 
-         <p>{useTranslation(show.overview, show.overviews)}</p>
+         <p>{show.overview}</p>
 
          <Poster src={show.image_url ?? show.image} alt={`Artwork for ${show.name}`} height={1000} width={680} />
 
@@ -53,6 +71,9 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
             <Seasons>
                <Button secondary={watchedAll} onClick={watchAll}>
                   {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
+               </Button>
+               <Button secondary={!isFavourite} onClick={toggleFavourite}>
+                  <Heart />
                </Button>
 
                <ul>
