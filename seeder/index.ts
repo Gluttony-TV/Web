@@ -1,38 +1,34 @@
 import { faker, Faker } from '@faker-js/faker'
 import { config } from 'dotenv'
-import { ObjectId } from 'mongodb'
 import { Model } from 'mongoose'
-import database from '../lib/database'
+import { DeepPartial } from '../lib/util'
 
 config({ path: './.env.local' })
 
-type Builder<M> = (faker: Faker) => M
+type Builder<M> = (faker: Faker) => DeepPartial<M>
 
 class Factory<M> {
-   constructor(private builder: Builder<M>) {}
+   constructor(private builder: Builder<M>, private model: Model<M>) {}
 
-   private CREATED: M[] = []
-
-   create() {
-      const created = this.builder(faker)
-      this.CREATED.push(created)
-      return created
+   private build(ctx: DeepPartial<M>) {
+      return { ...this.builder(faker), ...ctx }
    }
 
-   createMany(amount: number) {
-      return new Array(amount).fill(null).map(() => this.create())
+   async create(ctx: DeepPartial<M> = {}) {
+      const created = this.build(ctx)
+      return this.model.insertMany(created)
    }
 
-   async run(model: Model<M>) {
-      console.log('creating', this.CREATED.length, model.modelName)
-      await model.insertMany(this.CREATED.map(m => ({ ...m, _id: new ObjectId() })))
+   async createMany(amount: number, ctx: DeepPartial<M> = {}) {
+      const created = new Array(amount).fill(null).map(() => this.build(ctx))
+      return this.model.insertMany(created)
    }
 }
 
 const FACTORIES = new Map<Model<any>, Factory<any>>()
 
 export function createFactory<M>(model: Model<M>, builder: Builder<M>) {
-   const factory = new Factory(builder)
+   const factory = new Factory(builder, model)
    FACTORIES.set(model, factory)
 }
 
@@ -40,10 +36,4 @@ export function factory<M>(model: Model<M>): Factory<M> {
    const factory = FACTORIES.get(model)
    if (factory) return factory
    throw new Error(`Factory missing for ${model.modelName}`)
-}
-
-export async function runFactories() {
-   await database()
-   const factories = [...FACTORIES.entries()]
-   await Promise.all(factories.map(([model, factory]) => factory.run(model)))
 }

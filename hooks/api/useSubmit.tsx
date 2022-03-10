@@ -12,21 +12,18 @@ export type SubmitOptions<D> = FetchOptions<D> & {
 
 export default function useSubmit<R, D = unknown>(
    url: string,
-   { method = 'POST', data, mutates = {}, ...options }: SubmitOptions<D>
+   { method = 'POST', mutates = {}, ...options }: SubmitOptions<D>
 ) {
    const client = useQueryClient()
 
-   const fetch = useFetch<R>(url, { method, data, ...options })
+   const fetch = useFetch<R>(url, { method, ...options })
    const send = useCallback(
       (arg?: D | SyntheticEvent) => {
-         if (isEvent(arg)) {
-            arg.preventDefault()
-            return fetch()
-         } else {
-            return fetch({ data: data ?? arg })
-         }
+         if (isEvent(arg)) arg.preventDefault()
+         const data = isEvent(arg) ? options.data : arg
+         return fetch({ data })
       },
-      [data, fetch]
+      [options.data, fetch]
    )
 
    return useMutation(send, {

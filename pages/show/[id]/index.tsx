@@ -1,6 +1,6 @@
 import { Check, Heart, Times } from '@styled-icons/fa-solid'
 import { GetServerSideProps, NextPage } from 'next'
-import { getSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 import styled from 'styled-components'
 import Button, { ButtonLink } from '../../../components/Button'
 import Image from '../../../components/Image'
@@ -48,12 +48,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 const FAVOURITE_LIST = 'favourite'
 
 const Show: NextPage<Props> = ({ show, ...props }) => {
+   const { status } = useSession()
    const { setWatched, watchAll, moveProgress, seasons, percentage, watchedAll, episodes } = useProgress(props)
 
    const { data: isFavourite } = useTransformed<IList[], boolean>(
       `me/saved/${show.id}`,
       lists => lists.some(it => it.slug === FAVOURITE_LIST),
-      { key: `me/favourite/${show.id}` }
+      { key: `me/favourite/${show.id}`, enabled: status === 'authenticated' }
    )
 
    const toggleFavourite = useSubmit(`me/list/${FAVOURITE_LIST}`, {
@@ -74,12 +75,16 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
 
          {episodes.length > 0 && (
             <Seasons>
-               <Button secondary={watchedAll} onClick={watchAll}>
-                  {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
-               </Button>
-               <Button secondary={isFavourite} onClick={toggleFavourite.mutate}>
-                  <Heart />
-               </Button>
+               {status === 'authenticated' && (
+                  <>
+                     <Button secondary={watchedAll} onClick={watchAll}>
+                        {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
+                     </Button>
+                     <Button secondary={isFavourite} onClick={toggleFavourite.mutate}>
+                        <Heart />
+                     </Button>
+                  </>
+               )}
 
                <ul>
                   {seasons?.map((season, i) => (

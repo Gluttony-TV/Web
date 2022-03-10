@@ -6,7 +6,7 @@ import { IEpisode } from '../models'
 import { gradient, striped } from '../style/styles'
 
 const Season: FC<{
-   setWatched: Dispatch<SetStateAction<IEpisode['id'][]>>
+   setWatched?: Dispatch<SetStateAction<IEpisode['id'][]>>
    moveProgress?: Dispatch<IEpisode['id']>
    episodes: IExtendedEpisode[]
 }> = ({ setWatched, moveProgress, episodes }) => {
@@ -15,7 +15,7 @@ const Season: FC<{
          if (episode.due) return
          if (shift && moveProgress) {
             moveProgress(episode.id)
-         } else {
+         } else if (setWatched) {
             if (episode.watched) setWatched(w => w.filter(e => e !== episode.id))
             else setWatched(w => [...w, episode.id])
          }
@@ -51,7 +51,7 @@ const Season: FC<{
    )
 }
 
-const Episode = styled.button<{ watched?: boolean; disabled?: boolean }>`
+const Episode = styled.button<{ watched?: boolean; disabled?: boolean; onClick?: unknown }>`
    text-align: center;
    padding: 0.5rem;
    font-size: 0.8rem;

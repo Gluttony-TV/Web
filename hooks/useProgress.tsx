@@ -1,3 +1,5 @@
+import { Dispatch, DispatchWithoutAction } from 'hoist-non-react-statics/node_modules/@types/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { SetStateAction, useCallback } from 'react'
 import { IEpisode, IProgress, IShow } from '../models'
@@ -5,9 +7,27 @@ import useResource from './api/useResource'
 import useSubmit from './api/useSubmit'
 import { useEpisodesInfo } from './useEpisodesInfo'
 
-export function useProgress({ show, ...props }: { show?: IShow['id']; episodes: IEpisode[]; progress?: IProgress }) {
+type ProgressContext = ReturnType<typeof useEpisodesInfo> & {
+   progress?: IProgress
+   setWatched?: Dispatch<SetStateAction<IProgress['watched']>>
+   moveProgress?: Dispatch<IEpisode['id']>
+   watchAll?: DispatchWithoutAction
+}
+
+export function useProgress({
+   show,
+   ...props
+}: {
+   show?: IShow['id']
+   episodes: IEpisode[]
+   progress?: IProgress
+}): ProgressContext {
+   const { status } = useSession()
    const { id } = useRouter().query
-   const { data: progress } = useResource<IProgress>(`me/progress/${show ?? id}`, { initialData: props.progress })
+   const { data: progress } = useResource<IProgress>(`me/progress/${show ?? id}`, {
+      initialData: props.progress,
+      enabled: status === 'authenticated',
+   })
    const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
 
    const { mutate: setProgress } = useSubmit<Partial<IProgress>>(`me/progress/${show ?? id}`, { method: 'PUT' })
@@ -36,5 +56,7 @@ export function useProgress({ show, ...props }: { show?: IShow['id']; episodes: 
       else setWatched(episodes.filter(e => !e.ignore).map(e => e.id))
    }, [watchedAll, episodes, setWatched])
 
-   return { progress, setWatched, moveProgress, watchAll, episodes, watchedAll, ...rest }
+   if (status === 'authenticated')
+      return { progress, setWatched, moveProgress, watchAll, episodes, watchedAll, ...rest }
+   return { episodes, watchedAll, ...rest }
 }

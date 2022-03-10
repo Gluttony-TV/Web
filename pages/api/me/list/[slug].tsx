@@ -1,5 +1,6 @@
 import { UpdateQuery } from 'mongoose'
 import { NextApiRequest } from 'next'
+import { ApiError } from 'next/dist/server/api-utils'
 import * as Joi from 'types-joi'
 import validate from '../../../../lib/validate'
 import withSession, { methodSwitch } from '../../../../lib/wrapper'
@@ -22,7 +23,7 @@ const get = withSession(async (req, res, session) => {
    if (list) {
       res.json(list)
    } else {
-      res.status(404).send(null)
+      throw new ApiError(404, 'List not found')
    }
 })
 

@@ -3,6 +3,7 @@ import slugify from 'slugify'
 import { define } from '../lib/database'
 
 export interface IList {
+   _id: string
    user: string
    name: string
    slug: string

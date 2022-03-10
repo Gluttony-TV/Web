@@ -2,6 +2,7 @@ import { Schema } from 'mongoose'
 import { define } from '../lib/database'
 
 export interface IUser {
+   _id: string
    name: string
    email?: string
    image?: string
