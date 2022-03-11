@@ -1,10 +1,36 @@
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
 import NextAuth, { Session } from 'next-auth'
-import GitHub from 'next-auth/providers/github'
+import { Provider } from 'next-auth/providers'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GitHubProvider from 'next-auth/providers/github'
 import database from '../../../lib/database'
 import theme from '../../../lib/theme'
 import { env } from '../../../lib/util'
 import Account from '../../../models/Account'
+import { ISettings } from '../../../models/Settings'
+import User from '../../../models/User'
+
+const providers: Provider[] = []
+
+providers.push(
+   GitHubProvider({
+      clientId: env('GITHUB_CLIENT_ID'),
+      clientSecret: env('GITHUB_CLIENT_SECRET'),
+   })
+)
+
+if (process.env.NODE_ENV === 'development')
+   providers.push(
+      CredentialsProvider({
+         name: 'seeder user',
+         credentials: {
+            email: { label: 'email', type: 'text', placeholder: 'E-Mail' },
+         },
+         async authorize(credentials) {
+            return await User.findOne({ ...credentials, seeded: true })
+         },
+      })
+   )
 
 export default NextAuth({
    secret: env('JWT_SECRET'),
@@ -13,20 +39,24 @@ export default NextAuth({
       colorScheme: 'dark',
       brandColor: theme.primary,
    },
-   providers: [
-      GitHub({
-         clientId: env('GITHUB_CLIENT_ID'),
-         clientSecret: env('GITHUB_CLIENT_SECRET'),
-      }),
-   ],
+   session: {
+      strategy: 'jwt',
+   },
+   providers,
    adapter: MongoDBAdapter(database().then(d => d.connection.getClient())),
    callbacks: {
-      async session({ session, user }): Promise<Session> {
-         session.user.id = user.id
+      async session({ session, user, token }): Promise<Session> {
+         session.user.id = user?.id ?? token.sub
          return session
       },
    },
    events: {
+      async createUser({ user }) {
+         await User.findByIdAndUpdate(user.id, {
+            settings: {} as ISettings,
+            joinedAt: new Date().toISOString(),
+         })
+      },
       async signIn({ account, profile }) {
          const { providerAccountId } = account
          if (profile) {

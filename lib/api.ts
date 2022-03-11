@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import { extendEpisodes } from '../hooks/useEpisodesInfo'
-import { IEpisode, IProgress, IShow, IShowFull } from '../models'
+import { extendEpisodes, IEpisode } from '../models/Episode'
+import { IProgress } from '../models/Progress'
+import { IShow, IShowFull } from '../models/Show'
 import cacheOr, { cache } from './cache'
 import { exists } from './util'
 
@@ -105,7 +106,7 @@ export async function getShow<E extends boolean = true>(search: string | number,
    return { ...show, ...translation }
 }
 
-export async function getEpisodes(show: string | number, progress?: IProgress) {
+export function getEpisodes(show: string | number, progress?: IProgress) {
    return cacheOr(
       `episodes/${show}`,
       async () => {
@@ -116,4 +117,8 @@ export async function getEpisodes(show: string | number, progress?: IProgress) {
       },
       10
    )
+}
+
+export function getTrendingShows() {
+   return request<IShow[]>('series/filter?lang=eng&sort=score&year=2021&country=usa')
 }

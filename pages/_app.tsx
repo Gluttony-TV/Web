@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import Head from '../components/Head'
 import Nav from '../components/Nav'
+import Tooltip from '../components/Tooltip'
 import theme from '../lib/theme'
 import '../style/reset.css'
 
@@ -23,6 +24,7 @@ const App: AppComponent = ({ Component, pageProps }) => {
 
                   <Container>
                      <Nav />
+                     <Tooltip />
                      <Component {...pageProps} />
                   </Container>
                </IntlProvider>

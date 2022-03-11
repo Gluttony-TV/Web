@@ -6,7 +6,7 @@ import Link from '../components/Link'
 import Page from '../components/Page'
 import { searchShow } from '../lib/api'
 import database from '../lib/database'
-import { IShow } from '../models'
+import { IShow } from '../models/Show'
 
 interface Props {
    results: IShow[]
@@ -39,7 +39,7 @@ const Result: FC<IShow> = ({ name, year, thumbnail, overview, tvdb_id }) => {
             <h3>{name}</h3>
             <Overview>{overview}</Overview>
             <span>{year}</span>
-            <Thumbnail src={thumbnail} alt={name} width={140} height={200} />
+            {thumbnail ? <Thumbnail src={thumbnail} alt={name} width={140} height={200} /> : <NoThumnail />}
          </ResultStyle>
       </Link>
    )
@@ -52,6 +52,10 @@ const Overview = styled.div`
    line-clamp: 4;
    -webkit-line-clamp: 4;
    -webkit-box-orient: vertical;
+`
+
+const NoThumnail = styled.div`
+   grid-area: image;
 `
 
 const Thumbnail = styled(Image)`

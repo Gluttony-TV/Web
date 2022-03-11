@@ -7,12 +7,12 @@ import Image from '../components/Image'
 import Link from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
-import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
 import { getEpisodes, getShow } from '../lib/api'
 import database from '../lib/database'
 import { exists, loginLink } from '../lib/util'
-import { IShow } from '../models'
+import { IExtendedEpisode } from '../models/Episode'
 import Progress from '../models/Progress'
+import { IShow } from '../models/Show'
 
 interface Props {
    shows: Array<

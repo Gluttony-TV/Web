@@ -2,7 +2,7 @@ import { Schema, Types } from 'mongoose'
 import { define } from '../lib/database'
 
 export interface IAccount {
-   _id: string
+   id: string
    provider: string
    type?: string
    providerAccountId?: string
@@ -45,5 +45,7 @@ const schema = new Schema({
    id_token: String,
    scope: String,
 })
+
+schema.set('toJSON', { virtuals: true })
 
 export default define<IAccount>('Account', schema)

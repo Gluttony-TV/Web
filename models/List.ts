@@ -3,7 +3,7 @@ import slugify from 'slugify'
 import { define } from '../lib/database'
 
 export interface IList {
-   _id: string
+   id: string
    user: string
    name: string
    slug: string
@@ -37,6 +37,8 @@ const schema = new Schema({
       ],
    },
 })
+
+schema.set('toJSON', { virtuals: true })
 
 schema.index({ user: 1, name: -1 }, { unique: true })
 

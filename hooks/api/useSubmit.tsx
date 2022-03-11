@@ -6,13 +6,13 @@ function isEvent<T>(value?: T | SyntheticEvent): value is SyntheticEvent {
    return !!value && 'preventDefault' in value && typeof value.preventDefault === 'function'
 }
 
-export type SubmitOptions<D> = FetchOptions<D> & {
-   mutates?: Record<string, () => unknown>
+export type SubmitOptions<R, D> = FetchOptions<D> & {
+   mutates?: Record<string, (data: R) => unknown>
 }
 
 export default function useSubmit<R, D = unknown>(
    url: string,
-   { method = 'POST', mutates = {}, ...options }: SubmitOptions<D>
+   { method = 'POST', mutates = {}, ...options }: SubmitOptions<R, D>
 ) {
    const client = useQueryClient()
 
@@ -27,10 +27,10 @@ export default function useSubmit<R, D = unknown>(
    )
 
    return useMutation(send, {
-      onSuccess: () => {
+      onSuccess: data => {
          Object.entries(mutates).forEach(([key, supplier]) => {
             client.invalidateQueries(key)
-            client.setQueryData(key, supplier())
+            client.setQueryData(key, supplier(data))
          })
       },
    })

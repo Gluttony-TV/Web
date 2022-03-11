@@ -5,7 +5,7 @@ import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useStat
 import styled from 'styled-components'
 import useResource from '../hooks/api/useResource'
 import { useRouterEvent } from '../hooks/useRouterEvent'
-import { IShow } from '../models'
+import { IShow } from '../models/Show'
 import { Input } from './Inputs'
 import Link from './Link'
 

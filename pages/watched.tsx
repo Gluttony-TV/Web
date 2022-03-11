@@ -9,11 +9,10 @@ import Button from '../components/Button'
 import Image from '../components/Image'
 import Link from '../components/Link'
 import Page from '../components/Page'
-import { getShow } from '../lib/api'
 import database, { serialize } from '../lib/database'
 import { loginLink } from '../lib/util'
-import { IProgress, IShow } from '../models'
-import Progress from '../models/Progress'
+import Progress, { IProgress, withShows } from '../models/Progress'
+import { IShow } from '../models/Show'
 
 interface Props {
    watched: IProgress<IShow>[]
@@ -25,18 +24,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    const session = await getSession(req)
    if (!session) return loginLink(req)
 
-   const progress = await Progress.find({ user: session.user.id })
+   const progresses = await Progress.find({ user: session.user.id })
+   const watched = await withShows(progresses)
 
-   const withShow = await Promise.all(
-      progress.map(async p => ({
-         ...serialize(p),
-         show: await getShow(p.show),
-      }))
-   )
-
-   const filtered = withShow.filter(p => !!p.show) as IProgress<IShow>[]
-
-   return { props: { watched: filtered } }
+   return { props: serialize({ watched }) }
 }
 
 enum View {

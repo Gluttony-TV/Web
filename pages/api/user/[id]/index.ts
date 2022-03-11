@@ -11,7 +11,8 @@ export default forMethod('get', async (req, res) => {
       },
    })
 
-   const user = await User.findOne({ _id: query.id, settings: { visibility: { profile: true } } })
+   const user = await User.findOne({ _id: query.id, 'settings.visibility.profile': true })
+
    if (user) {
       res.json(user)
    } else {

@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!session) return loginLink(req)
 
-   const progress = await Progress.find({ user: session.user.email })
+   const progress = await Progress.find({ user: session.user.id })
    const episodesWatched = progress.reduce((total, p) => total + p.watched.length, 0)
 
    const stats: IStats = {
@@ -69,7 +69,8 @@ const Relative: FC<IStats & { birth: string }> = ({ birth, time }) => {
             Wasted <Increasing>{time}</Increasing> minutes
          </p>
          <p>
-            Lived for <Increasing>{years}</Increasing> years, <Increasing>{days}</Increasing> days and <Increasing>{minutes}</Increasing> minutes
+            Lived for <Increasing>{years}</Increasing> years, <Increasing>{days}</Increasing> days and{' '}
+            <Increasing>{minutes}</Increasing> minutes
          </p>
          <p>
             That makes a total of <Increasing>{totalMinutes}</Increasing> minutes

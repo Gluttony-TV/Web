@@ -1,20 +1,21 @@
-import { Check, Heart, Times } from '@styled-icons/fa-solid'
+import { Check, Pen, Times } from '@styled-icons/fa-solid'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession, useSession } from 'next-auth/react'
+import { createElement, useReducer } from 'react'
 import styled from 'styled-components'
 import Button, { ButtonLink } from '../../../components/Button'
+import FavouriteButton from '../../../components/FavouriteButton'
 import Image from '../../../components/Image'
 import Page from '../../../components/Page'
 import Season from '../../../components/Season'
 import ShowTitle from '../../../components/show/Title'
-import useSubmit from '../../../hooks/api/useSubmit'
-import useTransformed from '../../../hooks/api/useTransformed'
 import { useProgress } from '../../../hooks/useProgress'
 import { getEpisodes, getShow } from '../../../lib/api'
 import database, { serialize } from '../../../lib/database'
-import { IEpisode, IProgress, IShowFull } from '../../../models'
+import { IEpisode } from '../../../models/Episode'
 import List, { IList } from '../../../models/List'
-import Progress from '../../../models/Progress'
+import Progress, { IProgress } from '../../../models/Progress'
+import { IShowFull } from '../../../models/Show'
 
 export interface Props {
    lists?: IList[]
@@ -45,29 +46,16 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    }
 }
 
-const FAVOURITE_LIST = 'favourite'
-
 const Show: NextPage<Props> = ({ show, ...props }) => {
    const { status } = useSession()
    const { setWatched, watchAll, moveProgress, seasons, percentage, watchedAll, episodes } = useProgress(props)
-
-   const { data: isFavourite } = useTransformed<IList[], boolean>(
-      `me/saved/${show.id}`,
-      lists => lists.some(it => it.slug === FAVOURITE_LIST),
-      { key: `me/favourite/${show.id}`, enabled: status === 'authenticated' }
-   )
-
-   const toggleFavourite = useSubmit(`me/list/${FAVOURITE_LIST}`, {
-      method: 'PUT',
-      data: { [isFavourite ? 'remove' : 'add']: [show.id] },
-      mutates: {
-         [`me/favourite/${show.id}`]: () => !isFavourite,
-      },
-   })
+   const [editing, toggleEdit] = useReducer((b: boolean) => !b, false)
 
    return (
       <Style>
-         <ShowTitle {...show} percentage={percentage} />
+         <ShowTitle {...show} percentage={percentage}>
+            <FavouriteButton show={show.id} />
+         </ShowTitle>
 
          <p>{show.overview}</p>
 
@@ -77,18 +65,26 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
             <Seasons>
                {status === 'authenticated' && (
                   <>
-                     <Button secondary={watchedAll} onClick={watchAll}>
-                        {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
+                     <Button secondary={editing} onClick={toggleEdit}>
+                        {createElement(editing ? Check : Pen, { size: '1em' })}
                      </Button>
-                     <Button secondary={isFavourite} onClick={toggleFavourite.mutate}>
-                        <Heart />
-                     </Button>
+                     {editing && (
+                        <Button secondary={watchedAll} onClick={watchAll}>
+                           {watchedAll ? <Times size='80%' /> : <Check size='80%' />}
+                        </Button>
+                     )}
                   </>
                )}
 
                <ul>
                   {seasons?.map((season, i) => (
-                     <Season {...season} key={i} setWatched={setWatched} moveProgress={moveProgress} />
+                     <Season
+                        {...season}
+                        key={i}
+                        editing={editing}
+                        setWatched={setWatched}
+                        moveProgress={moveProgress}
+                     />
                   ))}
                </ul>
 

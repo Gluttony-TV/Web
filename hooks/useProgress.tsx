@@ -1,8 +1,9 @@
-import { Dispatch, DispatchWithoutAction } from 'hoist-non-react-statics/node_modules/@types/react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import { SetStateAction, useCallback } from 'react'
-import { IEpisode, IProgress, IShow } from '../models'
+import { Dispatch, DispatchWithoutAction, SetStateAction, useCallback } from 'react'
+import { IEpisode } from '../models/Episode'
+import { IProgress } from '../models/Progress'
+import { IShow } from '../models/Show'
 import useResource from './api/useResource'
 import useSubmit from './api/useSubmit'
 import { useEpisodesInfo } from './useEpisodesInfo'
@@ -24,13 +25,17 @@ export function useProgress({
 }): ProgressContext {
    const { status } = useSession()
    const { id } = useRouter().query
-   const { data: progress } = useResource<IProgress>(`me/progress/${show ?? id}`, {
+   const endpoint = `me/progress/${show ?? id}`
+   const { data: progress } = useResource<IProgress>(endpoint, {
       initialData: props.progress,
       enabled: status === 'authenticated',
    })
    const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
 
-   const { mutate: setProgress } = useSubmit<Partial<IProgress>>(`me/progress/${show ?? id}`, { method: 'PUT' })
+   const { mutate: setProgress } = useSubmit<Partial<IProgress>>(endpoint, {
+      method: 'PUT',
+      mutates: { [endpoint]: update => ({ ...progress, ...update }) },
+   })
    const setWatched = useCallback(
       (value: SetStateAction<IProgress['watched']>) => {
          const watched = typeof value === 'function' ? value(progress?.watched ?? []) : value

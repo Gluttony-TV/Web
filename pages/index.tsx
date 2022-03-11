@@ -2,7 +2,7 @@ import { signIn, useSession } from 'next-auth/react'
 import { FC } from 'react'
 import { LinkButton } from '../components/Link'
 import Page from '../components/Page'
-import { Title } from '../components/Text'
+import { Colored, Title } from '../components/Text'
 
 const Home: FC = () => {
    const { data: session } = useSession()
@@ -11,7 +11,9 @@ const Home: FC = () => {
    if (status === 'authenticated')
       return (
          <Page>
-            <Title>Welcome {session?.user.email}!</Title>
+            <Title>
+               Welcome <Colored>{session?.user.name}</Colored>
+            </Title>
          </Page>
       )
    else

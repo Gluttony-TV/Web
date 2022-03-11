@@ -1,9 +1,6 @@
-import { Schema, Types } from 'mongoose'
-import { define } from '../lib/database'
+import { Schema } from 'mongoose'
 
 export interface ISettings {
-   _id: string
-   user: string
    visibility: {
       profile: boolean
       progress: boolean
@@ -11,16 +8,11 @@ export interface ISettings {
    }
 }
 
-const schema = new Schema({
-   user: {
-      type: Types.ObjectId,
-      required: true,
-      unique: true,
-   },
+const Settings = new Schema({
    visibility: {
       profile: {
          type: Boolean,
-         default: false,
+         default: true,
       },
       progress: {
          type: Boolean,
@@ -33,4 +25,4 @@ const schema = new Schema({
    },
 })
 
-export default define<ISettings>('Settings', schema)
+export default Settings

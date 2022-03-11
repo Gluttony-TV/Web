@@ -39,7 +39,7 @@ export default function useFetch<R, D = unknown>(
       async (additionalOptions?: Partial<FetchOptions<D>>) => {
          try {
             const { data } = await API(url, { method, ...options, ...omitBy(additionalOptions, isUndefined) })
-            return (typeof data === 'string' ? JSON.parse(data) : data) as R
+            return (typeof data === 'string' && data ? JSON.parse(data) : data) as R
          } catch (e) {
             if (isAxiosError(e))
                throw new RequestError(e.response?.data?.message ?? e.response?.statusText, e.response?.status)

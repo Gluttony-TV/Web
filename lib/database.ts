@@ -32,9 +32,8 @@ export function define<M>(name: string, schema: Schema<Document & M>): Model<M> 
 }
 
 type Base = number | string | boolean
-type SerializedModel<T> = Omit<{ [P in keyof T]: Serialized<T[P]> }, keyof Document> & {
-   _id: T extends { id: infer I } ? I : never
-}
+type SerializedObject<T> = { [P in keyof T]: Serialized<T[P]> }
+type SerializedModel<T> = Omit<SerializedObject<T>, Exclude<keyof Document, 'id'>>
 
 // prettier-ignore
 export type Serialized<T> = 
@@ -62,7 +61,6 @@ export function serialize<M>(model: M, depth = 0): Serialized<M> {
       const props = entries
          .filter(([, v]) => v !== undefined && v !== null)
          .reduce((o, [key, value]) => ({ ...o, [key]: serialize(value, depth + 1) }), {})
-      if ('_id' in model) return { ...props, _id: (model as unknown as Document)._id?.toString() } as Serialized<M>
       return props as Serialized<M>
    }
 

@@ -1,17 +1,21 @@
 import { mix } from 'polished'
-import { Dispatch, FC, Fragment, SetStateAction, useCallback, useMemo } from 'react'
+import { Dispatch, Fragment, SetStateAction, useCallback, useMemo, VFC } from 'react'
 import styled, { css } from 'styled-components'
-import { IExtendedEpisode } from '../hooks/useEpisodesInfo'
-import { IEpisode } from '../models'
+import useTooltip from '../hooks/useTooltip'
+import { IEpisode, IExtendedEpisode } from '../models/Episode'
 import { gradient, striped } from '../style/styles'
 
-const Season: FC<{
+const Season: VFC<{
    setWatched?: Dispatch<SetStateAction<IEpisode['id'][]>>
    moveProgress?: Dispatch<IEpisode['id']>
    episodes: IExtendedEpisode[]
-}> = ({ setWatched, moveProgress, episodes }) => {
+   editing?: boolean
+}> = ({ setWatched, moveProgress, episodes, editing }) => {
+   useTooltip()
+
    const click = useCallback(
       (episode: Pick<IExtendedEpisode, 'id' | 'watched' | 'due'>, shift: boolean) => {
+         if (!editing) return
          if (episode.due) return
          if (shift && moveProgress) {
             moveProgress(episode.id)
@@ -20,7 +24,7 @@ const Season: FC<{
             else setWatched(w => [...w, episode.id])
          }
       },
-      [setWatched, moveProgress]
+      [setWatched, moveProgress, editing]
    )
 
    const now = Date.now()
@@ -38,9 +42,11 @@ const Season: FC<{
                {episodes.map(({ number, name, aired, seasonNumber, ...episode }) => (
                   <Episode
                      key={episode.id}
+                     data-tip={name}
                      title={`Season ${seasonNumber} - ${name}`}
                      disabled={new Date(aired).getTime() > now}
                      watched={episode.watched}
+                     editing={editing}
                      onClick={e => click(episode, e.shiftKey)}>
                      {number}
                   </Episode>
@@ -51,12 +57,12 @@ const Season: FC<{
    )
 }
 
-const Episode = styled.button<{ watched?: boolean; disabled?: boolean; onClick?: unknown }>`
+const Episode = styled.button<{ watched?: boolean; disabled?: boolean; editing?: boolean }>`
    text-align: center;
    padding: 0.5rem;
    font-size: 0.8rem;
    user-select: none;
-   cursor: pointer;
+   cursor: ${p => (p.editing ? 'pointer' : 'default')};
 
    ${p =>
       p.disabled

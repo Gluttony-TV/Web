@@ -1,9 +1,8 @@
-import { Discord, Github, Google } from '@styled-icons/fa-brands'
+import { Dev, Discord, Github, Google } from '@styled-icons/fa-brands'
 import { Plug } from '@styled-icons/fa-solid'
 import { StyledIcon } from '@styled-icons/styled-icon'
 import { DateTime } from 'luxon'
 import { GetServerSideProps, NextPage } from 'next'
-import { User } from 'next-auth'
 import { getSession, signOut } from 'next-auth/react'
 import { transparentize } from 'polished'
 import { createElement } from 'react'
@@ -12,19 +11,26 @@ import styled from 'styled-components'
 import { LinkButton } from '../components/Link'
 import Page from '../components/Page'
 import { Title } from '../components/Text'
-import { serialize } from '../lib/database'
+import useTooltip from '../hooks/useTooltip'
+import { serialize, Serialized } from '../lib/database'
 import { loginLink } from '../lib/util'
 import Account, { IAccount } from '../models/Account'
+import User, { IUser } from '../models/User'
 
-type Props = User & { accounts: IAccount[] }
+type Props = Serialized<{ user: IUser; accounts: IAccount[] }>
 
 export const getServerSideProps: GetServerSideProps<Props> = async req => {
    const session = await getSession(req)
    if (!session) return loginLink(req)
 
-   const accounts = await Account.find({ userId: session.user.id })
+   const [user, accounts] = await Promise.all([
+      User.findById(session.user.id),
+      Account.find({ userId: session.user.id }),
+   ])
 
-   return { props: serialize({ ...session.user, accounts }) }
+   if (!user) return { notFound: true }
+
+   return { props: serialize({ user, accounts }) }
 }
 
 const ICONS: Record<string, StyledIcon | undefined> = {
@@ -33,8 +39,9 @@ const ICONS: Record<string, StyledIcon | undefined> = {
    discord: Discord,
 }
 
-const Profile: NextPage<Props> = ({ name, email, accounts }) => {
-   const created = DateTime.now()
+const Profile: NextPage<Props> = ({ user, accounts }) => {
+   useTooltip()
+   const created = DateTime.fromISO(user.joinedAt)
 
    return (
       <Page>
@@ -44,14 +51,14 @@ const Profile: NextPage<Props> = ({ name, email, accounts }) => {
          <Panels>
             <BigPanel>
                <label htmlFor='username'>Username</label>
-               <p id='username'>{name}</p>
+               <p id='username'>{user.name}</p>
             </BigPanel>
 
-            {email && (
+            {user.email && (
                <>
                   <Panel>
                      <label htmlFor='email'>E-Mail</label>
-                     <p id='email'>{email ?? 'No email provided'}</p>
+                     <p id='email'>{user.email ?? 'No email provided'}</p>
                   </Panel>
                </>
             )}
@@ -66,11 +73,12 @@ const Profile: NextPage<Props> = ({ name, email, accounts }) => {
             <Panel>
                <label htmlFor='connections'>Connections</label>
                <Icons id='connections'>
+                  {user.seeded && <Dev size='1em' data-tip='Development User' />}
                   {accounts.map(({ provider, providerAccountId }) =>
                      createElement(ICONS[provider] ?? Plug, {
+                        'data-tip': provider,
                         key: `${provider}-${providerAccountId}`,
                         size: '1em',
-                        title: provider,
                      })
                   )}
                </Icons>

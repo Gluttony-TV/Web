@@ -1,3 +1,4 @@
+import { createElement, FC } from 'react'
 import styled, { css } from 'styled-components'
 import { InputStyles } from './Inputs'
 import Link, { LinkProps } from './Link'
@@ -5,6 +6,7 @@ import Link, { LinkProps } from './Link'
 export interface ButtonProps {
    round?: boolean
    secondary?: boolean
+   disabled?: boolean
 }
 
 const ButtonStyle = css<ButtonProps>`
@@ -25,8 +27,11 @@ const Button = styled.button`
    ${ButtonStyle};
 `
 
-export const ButtonLink = styled(Link)<LinkProps & ButtonProps>`
+const ButtonLinkStyle = styled(Link)`
    ${ButtonStyle};
 `
+
+export const ButtonLink: FC<LinkProps & ButtonProps> = ({ children, ...props }) =>
+   createElement(props.disabled ? Button : ButtonLinkStyle, props, children)
 
 export default Button

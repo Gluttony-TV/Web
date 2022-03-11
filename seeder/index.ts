@@ -5,22 +5,22 @@ import { DeepPartial } from '../lib/util'
 
 config({ path: './.env.local' })
 
-type Builder<M> = (faker: Faker) => DeepPartial<M>
+type Builder<M> = (faker: Faker) => DeepPartial<M> | Promise<DeepPartial<M>>
 
 class Factory<M> {
    constructor(private builder: Builder<M>, private model: Model<M>) {}
 
-   private build(ctx: DeepPartial<M>) {
-      return { ...this.builder(faker), ...ctx }
+   private async build(ctx: DeepPartial<M>) {
+      return { ...(await this.builder(faker)), ...ctx }
    }
 
    async create(ctx: DeepPartial<M> = {}) {
-      const created = this.build(ctx)
+      const created = await this.build(ctx)
       return this.model.insertMany(created)
    }
 
    async createMany(amount: number, ctx: DeepPartial<M> = {}) {
-      const created = new Array(amount).fill(null).map(() => this.build(ctx))
+      const created = await Promise.all(new Array(amount).fill(null).map(() => this.build(ctx)))
       return this.model.insertMany(created)
    }
 }

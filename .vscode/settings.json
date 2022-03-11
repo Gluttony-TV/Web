@@ -1,5 +1,6 @@
 {
    "sonarlint.connectedMode.project": {
       "projectKey": "gluttony"
-   }
+   },
+   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

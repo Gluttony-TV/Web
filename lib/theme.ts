@@ -7,11 +7,11 @@ const theme: DefaultTheme = {
    error: '#cf2351',
    warning: '#dbb921',
    ok: '#65db21',
-   primary: '#1DB954',
+   primary: '#872ce8',
    secondary: lighten(0.2, '#3e4247'),
    link: {
-      default: '#1DB954',
-      visited: '#1DB954',
+      default: '#872ce8',
+      visited: '#872ce8',
    },
 }
 
