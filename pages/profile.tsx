@@ -1,6 +1,6 @@
 import { Dev, Discord, Github, Google } from '@styled-icons/fa-brands'
 import { Plug } from '@styled-icons/fa-solid'
-import { StyledIcon } from '@styled-icons/styled-icon'
+import { StyledIcon, StyledIconProps } from '@styled-icons/styled-icon'
 import { DateTime } from 'luxon'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession, signOut } from 'next-auth/react'
@@ -79,7 +79,7 @@ const Profile: NextPage<Props> = ({ user, accounts }) => {
                         'data-tip': provider,
                         key: `${provider}-${providerAccountId}`,
                         size: '1em',
-                     })
+                     } as StyledIconProps)
                   )}
                </Icons>
             </Panel>
