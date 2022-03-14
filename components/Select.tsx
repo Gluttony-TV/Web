@@ -1,6 +1,6 @@
+import { InputStyles } from 'components/Inputs'
 import { ChangeEvent, Dispatch, ReactNode, SelectHTMLAttributes, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
-import { InputStyles } from './Inputs'
 
 type Value = undefined | null | string | number
 interface Entry<V> {

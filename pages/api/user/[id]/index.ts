@@ -1,8 +1,8 @@
+import validate from 'lib/validate'
+import { forMethod } from 'lib/wrapper'
+import User from 'models/Users'
 import { ApiError } from 'next/dist/server/api-utils'
 import Joi from 'types-joi'
-import validate from '../../../../lib/validate'
-import { forMethod } from '../../../../lib/wrapper'
-import User from '../../../../models/User'
 
 export default forMethod('get', async (req, res) => {
    const { query } = validate(req, {

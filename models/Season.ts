@@ -1,7 +1,7 @@
-import { IEpisode } from "./Episode";
-import { INetwork } from "./Show";
+import { IEpisode } from './Episodes'
+import { INetwork } from './Shows'
 
-export interface ISeason {
+interface ISeason {
    id: number
    seriesId: string | number
    type: {
@@ -15,7 +15,7 @@ export interface ISeason {
    network: INetwork
 }
 
-export interface IExtendedSeason {
+interface IExtendedSeason {
    id: number
    episodes: IEpisode[]
 }

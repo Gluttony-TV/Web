@@ -1,24 +1,24 @@
+import { getShow } from 'lib/api'
+import { define, serialize } from 'lib/database'
+import { exists } from 'lib/util'
 import { Schema, Types } from 'mongoose'
-import { getShow } from '../lib/api'
-import { define, serialize } from '../lib/database'
-import { exists } from '../lib/util'
-import { IEpisode } from './Episode'
-import { IShow } from './Show'
+import { IEpisode } from './Episodes'
+import { IShow } from './Shows'
 
-export interface IProgress<S = IShow['id']> {
+interface IProgress {
    id: string
-   user: string
-   show: S
+   userId: string
+   showId: IShow['id']
+   show?: IShow
    watched: IEpisode['id'][]
 }
 
-
 const schema = new Schema({
-   user: {
+   userId: {
       type: Types.ObjectId,
       required: true,
    },
-   show: {
+   showId: {
       type: Number,
       required: true,
    },
@@ -31,8 +31,8 @@ schema.set('toJSON', { virtuals: true })
 
 schema.index({ user: 1, show: -1 }, { unique: true })
 
-export async function withShow(progress: IProgress): Promise<IProgress<IShow> | undefined> {
-   const show = await getShow(progress.show)
+export async function withShow(progress: IProgress): Promise<IProgress | undefined> {
+   const show = await getShow(progress.showId)
    return show && { ...serialize(progress), show }
 }
 

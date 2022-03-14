@@ -1,14 +1,14 @@
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
+import database from 'lib/database'
+import theme from 'lib/theme'
+import { env } from 'lib/util'
+import Account from 'models/Accounts'
+import { ISettings } from 'models/Settings'
+import User from 'models/Users'
 import NextAuth, { Session } from 'next-auth'
 import { Provider } from 'next-auth/providers'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GitHubProvider from 'next-auth/providers/github'
-import database from '../../../lib/database'
-import theme from '../../../lib/theme'
-import { env } from '../../../lib/util'
-import Account from '../../../models/Account'
-import { ISettings } from '../../../models/Settings'
-import User from '../../../models/User'
 
 const providers: Provider[] = []
 

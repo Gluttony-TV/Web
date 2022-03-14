@@ -1,21 +1,22 @@
 import { Th, ThLarge } from '@styled-icons/fa-solid'
+import { initializeApollo } from 'apollo/client'
+import Button from 'components/Button'
+import Image from 'components/Image'
+import Link from 'components/Link'
+import Page from 'components/Page'
+import { BaseShowFragment, ProgressWithShowFragment } from 'generated/client'
+import { UserProgressesDocument } from 'generated/server'
+import database from 'lib/database'
+import { loginLink } from 'lib/util'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { transparentize } from 'polished'
 import { createElement, Dispatch, FC, SetStateAction, useState } from 'react'
 import styled from 'styled-components'
-import Button from '../components/Button'
-import Image from '../components/Image'
-import Link from '../components/Link'
-import Page from '../components/Page'
-import database, { serialize } from '../lib/database'
-import { loginLink } from '../lib/util'
-import Progress, { IProgress, withShows } from '../models/Progress'
-import { IShow } from '../models/Show'
 
 interface Props {
-   watched: IProgress<IShow>[]
+   watched: ProgressWithShowFragment[]
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async req => {
@@ -24,10 +25,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    const session = await getSession(req)
    if (!session) return loginLink(req)
 
-   const progresses = await Progress.find({ user: session.user.id })
-   const watched = await withShows(progresses)
+   const client = initializeApollo()
+   const { data } = await client.query({ query: UserProgressesDocument })
+   const watched = data.progresses ?? []
 
-   return { props: serialize({ watched }) }
+   return { props: { watched } }
 }
 
 enum View {
@@ -84,7 +86,7 @@ const IconBar = styled.div`
    }
 `
 
-const Cell: FC<IProgress<IShow> & { size: View }> = ({ show, size }) => {
+const Cell: FC<{ size: View; show: BaseShowFragment }> = ({ show, size }) => {
    return (
       <Link href={`/show/${show.id}`}>
          <Panel>

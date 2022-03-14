@@ -1,0 +1,18 @@
+fragment baseUser on User {
+   id
+   name
+   joinedAt
+   email
+}
+
+query user($id: ID!) {
+   user: getUser(id: $id) {
+      ...baseUser
+   }
+}
+
+query users {
+   users: listUsers {
+      ...baseUser
+   }
+}

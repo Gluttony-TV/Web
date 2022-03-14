@@ -1,8 +1,7 @@
-
-import { FC } from 'react';
-import styled from 'styled-components';
-import useStatus from '../hooks/useStatus';
-import { AppStatus } from '../models';
+import useStatus from 'hooks/useStatus'
+import { AppStatus } from 'models'
+import { FC } from 'react'
+import styled from 'styled-components'
 
 const colors: Record<AppStatus, string> = {
    [AppStatus.LOGGED_IN]: '#74cc39',
@@ -12,12 +11,9 @@ const colors: Record<AppStatus, string> = {
 }
 
 const StatusBanner: FC = () => {
-
    const status = useStatus()
 
-   return <Style status={status}>
-      {status}
-   </Style>
+   return <Style status={status}>{status}</Style>
 }
 
 const Style = styled.div<{ status: AppStatus }>`

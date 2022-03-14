@@ -1,0 +1,21 @@
+type Season {
+   id: Int!
+   seriesId: String!
+   name: String!
+   number: Int!
+   image: String!
+   network: Network!
+   episodes: Episode!
+}
+
+type Episode {
+   id: Int!
+   seriesId: Int!
+   name: String!
+   aired: String
+   runtime: Int!
+   image: String!
+   isMovie: Int!
+   number: Int!
+   seasonNumber: Int!
+}

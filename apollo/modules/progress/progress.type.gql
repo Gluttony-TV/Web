@@ -1,0 +1,18 @@
+type Query {
+   listProgresses: [Progress!]!
+   getProgress(show: Int!): Progress
+   progressesOf(user: ID!): [Progress!]
+}
+
+type Mutation {
+   setWatched(show: Int!, episodes: [Int!]!): Progress!
+}
+
+type Progress {
+   id: ID!
+   userId: ID!
+   showId: Int!
+   show: Show!
+   user: User!
+   watched: [Int!]!
+}

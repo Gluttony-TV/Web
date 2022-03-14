@@ -1,8 +1,8 @@
+import validate from 'lib/validate'
+import withSession, { methodSwitch } from 'lib/wrapper'
+import List, { IList } from 'models/Lists'
 import { FilterQuery } from 'mongoose'
 import * as Joi from 'types-joi'
-import validate from '../../../../lib/validate'
-import withSession, { methodSwitch } from '../../../../lib/wrapper'
-import List, { IList } from '../../../../models/List'
 
 const get = withSession(async (req, res, session) => {
    const { query } = validate(req, {
@@ -11,7 +11,7 @@ const get = withSession(async (req, res, session) => {
       },
    })
 
-   const filter: FilterQuery<IList> = { user: session.user.id }
+   const filter: FilterQuery<IList> = { userId: session.user.id }
    if (query.visibility) filter.public = query.visibility === 'public'
    const lists = await List.find(filter)
    res.json(lists)
@@ -26,7 +26,7 @@ const post = withSession(async (req, res, session) => {
       },
    })
 
-   const created = await List.create({ ...body, user: session.user.id })
+   const created = await List.create({ ...body, userId: session.user.id })
    res.json(created)
 })
 

@@ -1,6 +1,6 @@
+import { Settings } from 'generated/server'
+import User from 'models/Users'
 import { createFactory } from '..'
-import { ISettings } from '../../models/Settings'
-import User from '../../models/User'
 
 createFactory(User, faker => {
    const name = faker.name.firstName()
@@ -8,7 +8,7 @@ createFactory(User, faker => {
    const emailVerified = true
    const joinedAt = faker.date.past(3).toISOString()
 
-   const settings: ISettings = {
+   const settings: Settings = {
       visibility: {
          profile: true,
          favourites: faker.datatype.boolean(),

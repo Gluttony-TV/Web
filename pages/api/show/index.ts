@@ -1,7 +1,7 @@
+import { searchShow } from 'lib/api'
+import validate from 'lib/validate'
+import { forMethod } from 'lib/wrapper'
 import * as Joi from 'types-joi'
-import { searchShow } from '../../../lib/api'
-import validate from '../../../lib/validate'
-import { forMethod } from '../../../lib/wrapper'
 
 export default forMethod('get', async (req, res) => {
    validate(req, {

@@ -1,21 +1,21 @@
 import { Check, Pen, Times } from '@styled-icons/fa-solid'
+import Button, { ButtonLink } from 'components/Button'
+import FavouriteButton from 'components/FavouriteButton'
+import Image from 'components/Image'
+import Page from 'components/Page'
+import Season from 'components/Season'
+import ShowTitle from 'components/show/Title'
+import { useProgress } from 'hooks/useProgress'
+import { getEpisodes, getShow } from 'lib/api'
+import database, { serialize } from 'lib/database'
+import { IEpisode } from 'models/Episodes'
+import List, { IList } from 'models/Lists'
+import Progress, { IProgress } from 'models/Progresses'
+import { IShowFull } from 'models/Shows'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession, useSession } from 'next-auth/react'
 import { createElement, useReducer } from 'react'
 import styled from 'styled-components'
-import Button, { ButtonLink } from '../../../components/Button'
-import FavouriteButton from '../../../components/FavouriteButton'
-import Image from '../../../components/Image'
-import Page from '../../../components/Page'
-import Season from '../../../components/Season'
-import ShowTitle from '../../../components/show/Title'
-import { useProgress } from '../../../hooks/useProgress'
-import { getEpisodes, getShow } from '../../../lib/api'
-import database, { serialize } from '../../../lib/database'
-import { IEpisode } from '../../../models/Episode'
-import List, { IList } from '../../../models/List'
-import Progress, { IProgress } from '../../../models/Progress'
-import { IShowFull } from '../../../models/Show'
 
 export interface Props {
    lists?: IList[]
@@ -36,8 +36,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    const [progress, lists] = session
       ? await Promise.all([
-           Progress.findOne({ user: session.user.id, show: show.id }),
-           List.find({ user: session.user.id, show: show.id }),
+           Progress.findOne({ userId: session.user.id, show: show.id }),
+           List.find({ userId: session.user.id, show: show.id }),
         ])
       : []
 

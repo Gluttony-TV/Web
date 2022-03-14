@@ -1,0 +1,25 @@
+type Query {
+   listUsers: [User!]!
+   getUser(id: ID!): User
+}
+
+type User {
+   id: ID!
+   name: String!
+   joinedAt: String!
+   email: String!
+   image: String
+   emailVerified: Boolean!
+   seeded: Boolean
+   settings: Settings!
+}
+
+type Settings {
+   visibility: VisiblitySettings!
+}
+
+type VisiblitySettings {
+   profile: Boolean!
+   progress: Boolean!
+   favourites: Boolean!
+}

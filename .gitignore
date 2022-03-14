@@ -35,3 +35,4 @@ tsconfig.tsbuildinfo
 .vercel
 
 compiled-lang
+generated

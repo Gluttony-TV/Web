@@ -1,8 +1,8 @@
+import database from 'lib/database'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { Session } from 'next-auth'
 import { getSession } from 'next-auth/react'
 import { ApiError } from 'next/dist/server/api-utils'
-import database from './database'
 
 export interface AuthenticatedApiHandler {
    (req: NextApiRequest, res: NextApiResponse, session: Session): void | Promise<void>

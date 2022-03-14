@@ -1,9 +1,9 @@
+import { Progress } from 'generated/queries'
 import { groupBy } from 'lodash'
+import { extendEpisodes, IEpisode } from 'models/Episodes'
 import { useMemo } from 'react'
-import { extendEpisodes, IEpisode } from '../models/Episode'
-import { IProgress } from '../models/Progress'
 
-export function useEpisodesInfo({ episodes, progress }: { episodes: IEpisode[]; progress?: IProgress }) {
+export function useEpisodesInfo({ episodes, progress }: { episodes: IEpisode[]; progress?: Progress }) {
    const extendedEpisodes = useMemo(() => extendEpisodes(episodes, progress), [episodes, progress])
    const seasons = useMemo(() => {
       const grouped = groupBy(extendedEpisodes, e => e.seasonNumber)

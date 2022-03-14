@@ -1,11 +1,11 @@
+import { ButtonLink } from 'components/Button'
+import Page from 'components/Page'
+import { Title } from 'components/Text'
+import useResource from 'hooks/api/useResource'
+import { serialize, Serialized } from 'lib/database'
+import User, { IUser } from 'models/Users'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { ButtonLink } from '../../../components/Button'
-import Page from '../../../components/Page'
-import { Title } from '../../../components/Text'
-import useResource from '../../../hooks/api/useResource'
-import { serialize, Serialized } from '../../../lib/database'
-import User, { IUser } from '../../../models/User'
 
 interface Props {
    user: Serialized<IUser>

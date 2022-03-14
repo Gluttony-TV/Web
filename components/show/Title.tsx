@@ -1,9 +1,9 @@
+import Head from 'components/Head'
+import { Title } from 'components/Text'
+import { IShow } from 'models/Shows'
 import { transparentize } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'
-import { IShow } from '../../models/Show'
-import Head from '../Head'
-import { Title } from '../Text'
 
 const ShowTitle: FC<
    IShow & {

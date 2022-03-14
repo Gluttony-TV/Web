@@ -1,0 +1,60 @@
+type Query {
+   getShow(id: Int!): Show
+   searchShows(by: String!): [Show!]
+}
+
+type Show {
+   id: Int!
+   tvdb_id: Int!
+   name: String!
+   slug: String!
+   image: String!
+   thumbnail: String
+   first_air_time: String
+   next_air_time: String
+   year: String
+   score: String
+   status: Status!
+   overview: String!
+   originalNetwork: Network!
+
+   seasons: [Season!]!
+   characters: [Character!]!
+   genres: [Genre!]!
+   networks: [Network!]!
+}
+
+type Status {
+   id: Int!
+   name: String!
+   recordType: String!
+   keepUpdated: Boolean!
+}
+
+type Character {
+   id: Int!
+   name: String!
+   image: String!
+}
+
+type Genre {
+   id: Int!
+   name: String!
+   slug: String!
+}
+
+type Artwork {
+   id: Int!
+   image: String!
+   thumbnail: String!
+   type: Int!
+   score: [Int!]!
+}
+
+type Network {
+   id: Int!
+   name: String!
+   slug: String!
+   abbreviation: String!
+   country: String!
+}

@@ -1,9 +1,9 @@
+import useTooltip from 'hooks/useTooltip'
+import { IEpisode, IExtendedEpisode } from 'models/Episodes'
 import { mix } from 'polished'
 import { Dispatch, Fragment, SetStateAction, useCallback, useMemo, VFC } from 'react'
+import { gradient, striped } from 'style/styles'
 import styled, { css } from 'styled-components'
-import useTooltip from '../hooks/useTooltip'
-import { IEpisode, IExtendedEpisode } from '../models/Episode'
-import { gradient, striped } from '../style/styles'
 
 const Season: VFC<{
    setWatched?: Dispatch<SetStateAction<IEpisode['id'][]>>

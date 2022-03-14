@@ -1,12 +1,12 @@
+import Image from 'components/Image'
+import Link from 'components/Link'
+import Page from 'components/Page'
+import { searchShow } from 'lib/api'
+import database from 'lib/database'
+import { IShow } from 'models/Shows'
 import { GetServerSideProps } from 'next'
 import { FC } from 'react'
 import styled from 'styled-components'
-import Image from '../components/Image'
-import Link from '../components/Link'
-import Page from '../components/Page'
-import { searchShow } from '../lib/api'
-import database from '../lib/database'
-import { IShow } from '../models/Show'
 
 interface Props {
    results: IShow[]

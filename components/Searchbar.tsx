@@ -1,13 +1,12 @@
+import { Input } from 'components/Inputs'
+import Link from 'components/Link'
+import { useSearchQuery } from 'generated/client'
+import { useRouterEvent } from 'hooks/useRouterEvent'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { lighten } from 'polished'
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import styled from 'styled-components'
-import useResource from '../hooks/api/useResource'
-import { useRouterEvent } from '../hooks/useRouterEvent'
-import { IShow } from '../models/Show'
-import { Input } from './Inputs'
-import Link from './Link'
 
 const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) => {
    const [search, setSearch] = useState('')
@@ -18,9 +17,11 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
       return v
    }, search)
 
-   const { data: results } = useResource<IShow[]>(`/show?limit=20&search=${search}`, {
-      enabled: preFetch && search.length > 0,
+   const { data } = useSearchQuery({
+      skip: !preFetch || search.length === 0,
    })
+   const results = data?.results
+
    const [visible, setVisible] = useState(false)
 
    useEffect(() => setVisible(!!results), [results, setVisible])

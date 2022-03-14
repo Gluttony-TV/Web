@@ -1,0 +1,17 @@
+schema: ./apollo/modules/**/*.gql
+documents: './apollo/queries/**/*.gql'
+generates:
+   generated/client.ts:
+      plugins:
+         - typescript
+         - typescript-operations
+         - typescript-react-apollo
+      config:
+         withHooks: true
+
+   generated/server.ts:
+      plugins:
+         - typescript
+         - typescript-operations
+         - typescript-resolvers
+         - typed-document-node

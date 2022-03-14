@@ -1,12 +1,12 @@
 import { Heart } from '@styled-icons/fa-solid'
+import useSubmit from 'hooks/api/useSubmit'
+import useTransformed from 'hooks/api/useTransformed'
+import useTooltip from 'hooks/useTooltip'
+import { IList } from 'models/Lists'
+import { IShow } from 'models/Shows'
 import { useSession } from 'next-auth/react'
 import { VFC } from 'react'
 import styled, { useTheme } from 'styled-components'
-import useSubmit from '../hooks/api/useSubmit'
-import useTransformed from '../hooks/api/useTransformed'
-import useTooltip from '../hooks/useTooltip'
-import { IList } from '../models/List'
-import { IShow } from '../models/Show'
 
 const FAVOURITE_LIST = 'favourite'
 

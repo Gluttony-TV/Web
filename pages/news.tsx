@@ -1,18 +1,18 @@
+import Image from 'components/Image'
+import Link from 'components/Link'
+import Page from 'components/Page'
+import { Title } from 'components/Text'
+import { getEpisodes, getShow } from 'lib/api'
+import database from 'lib/database'
+import { exists, loginLink } from 'lib/util'
+import { IExtendedEpisode } from 'models/Episodes'
+import Progress from 'models/Progresses'
+import { IShow } from 'models/Shows'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { darken } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'
-import Image from '../components/Image'
-import Link from '../components/Link'
-import Page from '../components/Page'
-import { Title } from '../components/Text'
-import { getEpisodes, getShow } from '../lib/api'
-import database from '../lib/database'
-import { exists, loginLink } from '../lib/util'
-import { IExtendedEpisode } from '../models/Episode'
-import Progress from '../models/Progress'
-import { IShow } from '../models/Show'
 
 interface Props {
    shows: Array<
@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!session) return loginLink(req)
 
-   const progresses = await Progress.find({ user: session.user.id })
+   const progresses = await Progress.find({ userId: session.user.id })
 
    const shows = await Promise.all(
       progresses.map(async progress => {

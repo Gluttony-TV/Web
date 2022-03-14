@@ -1,7 +1,7 @@
+import validate from 'lib/validate'
+import withSession, { methodSwitch } from 'lib/wrapper'
+import List from 'models/Lists'
 import * as Joi from 'types-joi'
-import validate from '../../../../lib/validate'
-import withSession, { methodSwitch } from '../../../../lib/wrapper'
-import List from '../../../../models/List'
 
 const get = withSession(async (req, res, session) => {
    const { query } = validate(req, {
@@ -10,7 +10,7 @@ const get = withSession(async (req, res, session) => {
       },
    })
 
-   const lists = await List.find({ user: session.user.id, shows: { $elemMatch: { id: query.show } } })
+   const lists = await List.find({ userId: session.user.id, showIds: { $elemMatch: { id: query.show } } })
 
    res.json(lists)
 })

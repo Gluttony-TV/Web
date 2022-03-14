@@ -1,12 +1,12 @@
+import Page from 'components/Page'
+import { Title } from 'components/Text'
+import useResource from 'hooks/api/useResource'
+import { serialize } from 'lib/database'
+import Progress, { IProgress, withShows } from 'models/Progresses'
+import { IShow } from 'models/Shows'
+import User, { IUser } from 'models/Users'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import Page from '../../../components/Page'
-import { Title } from '../../../components/Text'
-import useResource from '../../../hooks/api/useResource'
-import { serialize } from '../../../lib/database'
-import Progress, { IProgress, withShows } from '../../../models/Progress'
-import { IShow } from '../../../models/Show'
-import User, { IUser } from '../../../models/User'
 
 interface Props {
    user: IUser
@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ctx => {
 
    if (!user.settings.visibility.progress) return { notFound: true }
 
-   const progresses = await Progress.find({ user: id })
+   const progresses = await Progress.find({ userId: id })
    const watched = await withShows(progresses)
 
    return { props: serialize({ user, watched }) }

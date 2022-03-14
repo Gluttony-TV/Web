@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose'
 
-export interface ISettings {
+interface ISettings {
    visibility: {
       profile: boolean
       progress: boolean

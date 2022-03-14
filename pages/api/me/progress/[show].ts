@@ -1,8 +1,8 @@
+import validate from 'lib/validate'
+import withSession, { methodSwitch } from 'lib/wrapper'
+import Progress from 'models/Progresses'
 import { NextApiRequest } from 'next'
 import * as Joi from 'types-joi'
-import validate from '../../../../lib/validate'
-import withSession, { methodSwitch } from '../../../../lib/wrapper'
-import Progress from '../../../../models/Progress'
 
 function showId(req: NextApiRequest) {
    validate(req, {
@@ -15,7 +15,7 @@ function showId(req: NextApiRequest) {
 
 const get = withSession(async (req, res, session) => {
    const show = showId(req)
-   const progress = await Progress.findOne({ user: session.user.id, show })
+   const progress = await Progress.findOne({ userId: session.user.id, show })
    res.json(progress)
 })
 
@@ -27,7 +27,7 @@ const put = withSession(async (req, res, session) => {
    })
 
    const show = showId(req)
-   await Progress.updateOne({ user: session.user.id, show }, req.body, { upsert: true })
+   await Progress.updateOne({ userId: session.user.id, show }, req.body, { upsert: true })
 
    res.status(204).send(null)
 })

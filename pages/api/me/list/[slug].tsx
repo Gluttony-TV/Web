@@ -1,10 +1,10 @@
+import validate from 'lib/validate'
+import withSession, { methodSwitch } from 'lib/wrapper'
+import List, { IList } from 'models/Lists'
 import { UpdateQuery } from 'mongoose'
 import { NextApiRequest } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 import * as Joi from 'types-joi'
-import validate from '../../../../lib/validate'
-import withSession, { methodSwitch } from '../../../../lib/wrapper'
-import List, { IList } from '../../../../models/List'
 
 function getSlug(req: NextApiRequest) {
    const { query } = validate(req, {
@@ -18,7 +18,7 @@ function getSlug(req: NextApiRequest) {
 
 const get = withSession(async (req, res, session) => {
    const slug = getSlug(req)
-   const list = await List.findOne({ user: session.user.id, slug }, { shows: false })
+   const list = await List.findOne({ userId: session.user.id, slug }, { shows: false })
 
    if (list) {
       res.json(list)
@@ -46,10 +46,10 @@ const put = withSession(async (req, res, session) => {
    const added = add.map(id => ({ id, addedAt: now }))
 
    const updateQuery: UpdateQuery<IList> = { ...values }
-   if (added.length) updateQuery.$push = { shows: added }
-   else if (remove.length) updateQuery.$pull = { shows: { id: { $in: remove } } }
+   if (added.length) updateQuery.$push = { showIds: added }
+   else if (remove.length) updateQuery.$pull = { showIds: { id: { $in: remove } } }
 
-   await List.updateOne({ user: session.user.id, slug }, updateQuery, { upsert: true })
+   await List.updateOne({ userId: session.user.id, slug }, updateQuery, { upsert: true })
 
    res.json(true)
 })

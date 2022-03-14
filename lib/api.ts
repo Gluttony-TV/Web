@@ -1,10 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import cacheOr, { cache } from 'lib/cache'
+import { exists } from 'lib/util'
+import { extendEpisodes, IEpisode } from 'models/Episodes'
+import { IProgress } from 'models/Progresses'
+import { IShow, IShowFull } from 'models/Shows'
 import { ApiError } from 'next/dist/server/api-utils'
-import { extendEpisodes, IEpisode } from '../models/Episode'
-import { IProgress } from '../models/Progress'
-import { IShow, IShowFull } from '../models/Show'
-import cacheOr, { cache } from './cache'
-import { exists } from './util'
 
 function isAxiosError(err: unknown): err is AxiosError {
    return (err as AxiosError).isAxiosError === true
@@ -91,14 +91,14 @@ export function getTranslation(show: IShowFull['id'], lang = 'eng') {
 export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
    const path = (s: string | number) => (extended !== false ? `${s}/extended` : s)
    const id = await cacheOr(`search/${search}`, () => findId(search))
-   if (!id) return undefined
+   if (!id) return null
 
    const [show, translation] = await Promise.all([
       request<E extends true ? IShowFull : IShow>(`/series/${path(id)}`),
       getTranslation(id),
    ])
 
-   if (!show) return undefined
+   if (!show) return null
 
    cache(`series/${show.id}`, show)
    cache(`series/${show.slug}`, show)

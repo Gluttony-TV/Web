@@ -1,14 +1,14 @@
+import Page from 'components/Page'
+import Select from 'components/Select'
+import ShowTitle from 'components/show/Title'
+import { useEpisodesInfo } from 'hooks/useEpisodesInfo'
 import { DateTime } from 'luxon'
 import { NextPage } from 'next'
 import { useMemo, useState } from 'react'
+import { striped } from 'style/styles'
 import styled, { css } from 'styled-components'
-import Page from '../../../components/Page'
-import Select from '../../../components/Select'
-import ShowTitle from '../../../components/show/Title'
-import { useEpisodesInfo } from '../../../hooks/useEpisodesInfo'
-import { striped } from '../../../style/styles'
-import { Props } from '../[id]'
-export { getServerSideProps } from '../[id]'
+import { Props } from '[id]'
+export { getServerSideProps } from '[id]'
 
 const Show: NextPage<Props> = ({ show, ...props }) => {
    const { percentage, seasons } = useEpisodesInfo(props)

@@ -1,8 +1,8 @@
+import { LinkButton } from 'components/Link'
+import Page from 'components/Page'
+import { Colored, Title } from 'components/Text'
 import { signIn, useSession } from 'next-auth/react'
 import { FC } from 'react'
-import { LinkButton } from '../components/Link'
-import Page from '../components/Page'
-import { Colored, Title } from '../components/Text'
 
 const Home: FC = () => {
    const { data: session } = useSession()

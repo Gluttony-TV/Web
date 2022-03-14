@@ -1,6 +1,6 @@
-import { IProgress } from "./Progress"
+import { Progress } from 'generated/queries'
 
-export interface IEpisode {
+interface IEpisode {
    id: number
    seriesId: number
    name: string
@@ -15,14 +15,14 @@ export interface IEpisode {
    seasonNumber: number
 }
 
-export interface IExtendedEpisode extends IEpisode {
+interface IExtendedEpisode extends IEpisode {
    special: boolean
    ignore: boolean
    watched: boolean
    due: boolean
 }
 
-export function extendEpisodes(episodes: IEpisode[], progress?: IProgress) {
+export function extendEpisodes(episodes: IEpisode[], progress?: Progress) {
    const now = new Date()
 
    return episodes.map<IExtendedEpisode>(e => {

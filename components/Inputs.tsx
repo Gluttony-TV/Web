@@ -1,7 +1,7 @@
+import { useFormError } from 'components/Form'
 import { lighten, transparentize } from 'polished'
 import { Dispatch, FC, InputHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
-import { useFormError } from './Form'
 
 export const InputStyles = css<{ size?: number; error?: boolean }>`
    color: ${p => p.theme.text};

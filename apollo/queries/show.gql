@@ -1,0 +1,19 @@
+fragment baseShow on Show {
+   id
+   tvdb_id
+   name
+   overview
+   image
+}
+
+query show($id: Int!) {
+   show: getShow(id: $id) {
+      ...baseShow
+   }
+}
+
+query search($by: String!) {
+   results: searchShows(by: $by) {
+      ...baseShow
+   }
+}

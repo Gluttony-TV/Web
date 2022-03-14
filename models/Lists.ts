@@ -1,21 +1,21 @@
+import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
 import slugify from 'slugify'
-import { define } from '../lib/database'
 
-export interface IList {
+interface IList {
    id: string
-   user: string
+   userId: string
    name: string
    slug: string
    public: boolean
-   shows: Array<{
+   showIds: Array<{
       id: number
       addedAt: string
    }>
 }
 
 const schema = new Schema({
-   user: {
+   userId: {
       type: Types.ObjectId,
       required: true,
    },
@@ -28,7 +28,7 @@ const schema = new Schema({
       type: Boolean,
       default: true,
    },
-   shows: {
+   showsIds: {
       type: [
          {
             id: Number,

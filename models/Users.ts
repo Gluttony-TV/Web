@@ -1,8 +1,8 @@
+import { define } from 'lib/database'
 import { Schema } from 'mongoose'
-import { define } from '../lib/database'
 import Settings, { ISettings } from './Settings'
 
-export interface IUser {
+interface IUser {
    id: string
    joinedAt: string
    name: string

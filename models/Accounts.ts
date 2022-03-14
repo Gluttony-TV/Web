@@ -1,7 +1,7 @@
+import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
-import { define } from '../lib/database'
 
-export interface IAccount {
+interface IAccount {
    id: string
    provider: string
    type?: string
