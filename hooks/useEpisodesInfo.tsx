@@ -1,4 +1,4 @@
-import { Progress } from 'generated/queries'
+import { Progress } from 'generated/graphql'
 import { groupBy } from 'lodash'
 import { extendEpisodes, IEpisode } from 'models/Episodes'
 import { useMemo } from 'react'

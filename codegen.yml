@@ -1,17 +1,16 @@
 schema: ./apollo/modules/**/*.gql
 documents: './apollo/queries/**/*.gql'
 generates:
-   generated/client.ts:
+   generated/graphql.ts:
       plugins:
+         - add:
+              content: '/* eslint-disable */'
          - typescript
          - typescript-operations
-         - typescript-react-apollo
-      config:
-         withHooks: true
-
-   generated/server.ts:
-      plugins:
-         - typescript
-         - typescript-operations
-         - typescript-resolvers
+         - typescript-resolvers:
+              contextType: pages/api/graphql#ApolloContext
          - typed-document-node
+         - typescript-react-apollo:
+              documentVariablePrefix: Untyped
+              fragmentVariablePrefix: Untyped
+              withHooks: true

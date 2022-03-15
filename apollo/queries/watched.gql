@@ -1,0 +1,25 @@
+fragment baseProgress on Progress {
+   id
+   watched
+   showId
+   userId
+}
+
+fragment progressWithShow on Progress {
+   ...baseProgress
+   show {
+      ...baseShow
+   }
+}
+
+query watched {
+   progresses: getOwnProgresses {
+      ...progressWithShow
+   }
+}
+
+mutation setWatched($show: Int!, $episodes: [Int!]!) {
+   setWatched(show: $show, episodes: $episodes) {
+      ...baseProgress
+   }
+}

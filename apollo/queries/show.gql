@@ -6,9 +6,38 @@ fragment baseShow on Show {
    image
 }
 
+fragment baseEpisode on Episode {
+   id
+   name
+   aired
+   runtime
+   isMovie
+   number
+   seasonNumber
+   special
+   ignore
+   due
+   watched
+}
+
+fragment withEpisodes on Show {
+   ...baseShow
+   episodes {
+      ...baseEpisode
+   }
+}
+
+fragment showWithProgress on Show {
+   ...baseShow
+   isFavourite: isIn(primary: true)
+   progress {
+      ...baseProgress
+   }
+}
+
 query show($id: Int!) {
    show: getShow(id: $id) {
-      ...baseShow
+      ...showWithProgress
    }
 }
 

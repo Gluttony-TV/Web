@@ -1,4 +1,4 @@
-import { Episode, Progress, Show, useProgressQuery } from 'generated/client'
+import { Episode, Progress, Show, useProgressQuery } from 'generated/graphql'
 import { IEpisode } from 'models/Episodes'
 import { IProgress } from 'models/Progresses'
 import { useSession } from 'next-auth/react'

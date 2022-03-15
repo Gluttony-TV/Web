@@ -18,4 +18,9 @@ type Episode {
    isMovie: Int!
    number: Int!
    seasonNumber: Int!
+
+   special: Boolean!
+   ignore: Boolean!
+   watched: Boolean
+   due: Boolean!
 }

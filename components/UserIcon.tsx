@@ -1,5 +1,5 @@
 import Image from 'components/Image'
-import { User } from 'generated/client'
+import { User } from 'generated/graphql'
 import hash from 'md5'
 import { ImageLoader } from 'next/image'
 import { VFC } from 'react'

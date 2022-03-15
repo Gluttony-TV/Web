@@ -1,4 +1,4 @@
-import { Settings } from 'generated/server'
+import { Settings } from 'generated/graphql'
 import User from 'models/Users'
 import { createFactory } from '..'
 

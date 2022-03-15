@@ -17,11 +17,14 @@ type Show {
    status: Status!
    overview: String!
    originalNetwork: Network!
+   episodes: [Episode!]!
 
-   seasons: [Season!]!
    characters: [Character!]!
    genres: [Genre!]!
    networks: [Network!]!
+
+   isIn(slug: String, primary: Boolean): Boolean
+   progress: Progress
 }
 
 type Status {

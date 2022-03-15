@@ -1,17 +1,7 @@
+import { User } from 'generated/graphql'
 import { define } from 'lib/database'
 import { Schema } from 'mongoose'
-import Settings, { ISettings } from './Settings'
-
-interface IUser {
-   id: string
-   joinedAt: string
-   name: string
-   email?: string
-   image?: string
-   emailVerified: boolean
-   settings: ISettings
-   seeded?: boolean
-}
+import Settings from './Settings'
 
 const schema = new Schema({
    joinedAt: {
@@ -39,4 +29,4 @@ schema.set('toJSON', { virtuals: true })
 
 schema.index({ email: 1 }, { unique: true })
 
-export default define<IUser>('User', schema)
+export default define<User>('User', schema)

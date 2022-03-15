@@ -1,7 +1,9 @@
 type Query {
-   listProgresses: [Progress!]!
-   getProgress(show: Int!): Progress
-   progressesOf(user: ID!): [Progress!]
+   getProgressesOf(user: ID!): [Progress!]!
+   getOwnProgresses: [Progress!]!
+
+   getProgressOf(show: Int!, user: ID!): Progress
+   getOwnProgress(show: Int!): Progress
 }
 
 type Mutation {

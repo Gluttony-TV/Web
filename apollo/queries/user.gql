@@ -12,7 +12,13 @@ query user($id: ID!) {
 }
 
 query users {
-   users: listUsers {
+   users: getUsers {
+      ...baseUser
+   }
+}
+
+query self {
+   user: self {
       ...baseUser
    }
 }

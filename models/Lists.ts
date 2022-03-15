@@ -1,18 +1,7 @@
+import { List } from 'generated/graphql'
 import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
 import slugify from 'slugify'
-
-interface IList {
-   id: string
-   userId: string
-   name: string
-   slug: string
-   public: boolean
-   showIds: Array<{
-      id: number
-      addedAt: string
-   }>
-}
 
 const schema = new Schema({
    userId: {
@@ -28,7 +17,11 @@ const schema = new Schema({
       type: Boolean,
       default: true,
    },
-   showsIds: {
+   primary: {
+      type: Boolean,
+      default: false,
+   },
+   shows: {
       type: [
          {
             id: Number,
@@ -42,9 +35,9 @@ schema.set('toJSON', { virtuals: true })
 
 schema.index({ user: 1, name: -1 }, { unique: true })
 
-schema.pre('save', async function (this: IList) {
+schema.pre('save', async function (this: List) {
    if (this.name) this.slug = slugify(this.name, { lower: true })
    else this.name = this.slug
 })
 
-export default define<IList>('List', schema)
+export default define<List>('List', schema)

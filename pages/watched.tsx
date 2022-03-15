@@ -4,8 +4,7 @@ import Button from 'components/Button'
 import Image from 'components/Image'
 import Link from 'components/Link'
 import Page from 'components/Page'
-import { BaseShowFragment, ProgressWithShowFragment } from 'generated/client'
-import { UserProgressesDocument } from 'generated/server'
+import { BaseShowFragment, ProgressWithShowFragment, WatchedDocument } from 'generated/graphql'
 import database from 'lib/database'
 import { loginLink } from 'lib/util'
 import { GetServerSideProps } from 'next'
@@ -26,7 +25,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    if (!session) return loginLink(req)
 
    const client = initializeApollo()
-   const { data } = await client.query({ query: UserProgressesDocument })
+   const { data } = await client.query({ query: WatchedDocument })
    const watched = data.progresses ?? []
 
    return { props: { watched } }
