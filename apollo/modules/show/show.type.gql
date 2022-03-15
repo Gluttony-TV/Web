@@ -1,11 +1,10 @@
 type Query {
-   getShow(id: Int!): Show
+   getShow(id: Int!): Show!
    searchShows(by: String!): [Show!]
 }
 
 type Show {
    id: Int!
-   tvdb_id: Int!
    name: String!
    slug: String!
    image: String!
@@ -18,6 +17,7 @@ type Show {
    overview: String!
    originalNetwork: Network!
    episodes: [Episode!]!
+   seasons: [Season!]!
 
    characters: [Character!]!
    genres: [Genre!]!

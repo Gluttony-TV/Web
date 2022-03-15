@@ -1,8 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { BaseShowFragment, Show } from 'generated/graphql'
+import { BaseShowFragment, Episode, Season, Show } from 'generated/graphql'
 import cacheOr from 'lib/cache'
 import { exists } from 'lib/util'
-import { IEpisode } from 'models/Episodes'
 import { ApiError } from 'next/dist/server/api-utils'
 
 function isAxiosError(err: unknown): err is AxiosError {
@@ -79,12 +78,16 @@ export function getTranslation(show: Show['id'], lang = 'eng') {
 }
 
 export async function getShow(id: Show['id']) {
-   return request<Show>(`/series/${id}`)
+   return request<Show>(`/series/${id}/extended`)
 }
 
 export async function getEpisodes(id: Show['id']) {
-   const response = await request<{ episodes: IEpisode[] }>(`/series/${id}/episodes/official`)
+   const response = await request<{ episodes: Episode[] }>(`/series/${id}/episodes/official`)
    return response?.episodes
+}
+
+export async function getSeason(id: Season['id']) {
+   return request<Season>(`/seasons/${id}/extended`)
 }
 
 export function getTrendingShows() {

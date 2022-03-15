@@ -18,6 +18,12 @@ query watched {
    }
 }
 
+query progress($show: Int!) {
+   progress: getOwnProgress(show: $show) {
+      ...baseProgress
+   }
+}
+
 mutation setWatched($show: Int!, $episodes: [Int!]!) {
    setWatched(show: $show, episodes: $episodes) {
       ...baseProgress

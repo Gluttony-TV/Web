@@ -1,5 +1,5 @@
 import { Resolvers } from 'generated/graphql'
-import { getShow, getTranslation } from 'lib/api'
+import { getEpisodes, getSeason, getShow, getTranslation } from 'lib/api'
 import Lists from 'models/Lists'
 import Progresses from 'models/Progresses'
 
@@ -27,17 +27,18 @@ export const resolvers: Resolvers = {
          const translation = await getTranslation(show.id)
          return translation?.overview ?? show.overview
       },
-      //async episodes(show) {
-      //   const episodes = await getEpisodes(show.id)
-      //   if(show.progress) return episodes
+      async episodes(show) {
+         return getEpisodes(show.id)
+      },
+      //async episodes({ episodes, progress }) {
+      //   if (progress) {
+      //      console.log('extending episodes')
+      //      return episodes.map(e => ({ ...e, watched: progress.watched.includes(e.id) }))
+      //   }
       //   return episodes
-      //}
-      async episodes({ episodes, progress }) {
-         if (progress) {
-            console.log('extending episodes')
-            return episodes.map(e => ({ ...e, watched: progress.watched.includes(e.id) }))
-         }
-         return episodes
+      //},
+      seasons(show) {
+         return Promise.all(show.seasons.map(({ id }) => getSeason(id)))
       },
    },
    Episode: {
@@ -47,8 +48,8 @@ export const resolvers: Resolvers = {
       async due({ aired }) {
          return !aired || new Date(aired) > new Date()
       },
-      async ignore({ aired }) {
-         return !aired || new Date(aired) > new Date()
+      async important({ due, special }) {
+         return !due && !special
       },
    },
 }

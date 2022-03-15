@@ -1,11 +1,11 @@
 type Season {
    id: Int!
    seriesId: String!
-   name: String!
+   name: String
    number: Int!
    image: String!
    network: Network!
-   episodes: Episode!
+   episodes: [Episode!]!
 }
 
 type Episode {
@@ -20,7 +20,6 @@ type Episode {
    seasonNumber: Int!
 
    special: Boolean!
-   ignore: Boolean!
-   watched: Boolean
+   important: Boolean!
    due: Boolean!
 }

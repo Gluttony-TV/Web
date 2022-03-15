@@ -1,63 +1,57 @@
-import { Episode, Progress, Show, useProgressQuery } from 'generated/graphql'
-import { IEpisode } from 'models/Episodes'
-import { IProgress } from 'models/Progresses'
+import { Episode, useProgressQuery, useSetWatchedMutation, WithEpisodesFragment } from 'generated/graphql'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { Dispatch, DispatchWithoutAction, SetStateAction, useCallback } from 'react'
-import useSubmit from './api/useSubmit'
-import { useEpisodesInfo } from './useEpisodesInfo'
+import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'
 
-type ProgressContext = ReturnType<typeof useEpisodesInfo> & {
-   progress?: Progress
-   setWatched?: Dispatch<SetStateAction<Progress['watched']>>
+type ProgressContext = {
+   watched: Episode['id'][]
+   watchedAll?: boolean
+   toggle?: Dispatch<Episode['id']>
    moveProgress?: Dispatch<Episode['id']>
    watchAll?: DispatchWithoutAction
 }
 
-export function useProgress({ show, ...props }: { show?: Show['id']; episodes: Episode[] }): ProgressContext {
+export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>): ProgressContext {
    const { status } = useSession()
-   const { id } = useRouter().query
-   const endpoint = `me/progress/${show ?? id}`
 
-   const { data } = useProgressQuery({
-      variables: { show: show ?? Number.parseInt(id as string) },
+   const { data, loading } = useProgressQuery({
+      variables: { show: show.id },
       skip: status !== 'unauthenticated',
    })
-   const progress = data?.progress ?? undefined
 
-   const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
+   const watched = useMemo(() => data?.progress?.watched ?? [], [data])
 
-   const { mutate: setProgress } = useSubmit<Partial<IProgress>>(endpoint, {
-      method: 'PUT',
-      mutates: { [endpoint]: update => ({ ...progress, ...update }) },
-   })
+   const episodes = useMemo(() => show.seasons?.flatMap(it => it.episodes) ?? [], [show])
+   const important = useMemo(() => episodes.filter(it => !it.due && !it.special), [episodes])
+   const watchedAll = useMemo(() => important.every(it => watched.includes(it.id)), [watched, important])
 
+   const [mutate] = useSetWatchedMutation()
    const setWatched = useCallback(
-      (value: SetStateAction<IProgress['watched']>) => {
-         const watched = typeof value === 'function' ? value(progress?.watched ?? []) : value
-         setProgress({ watched })
-      },
-      [setProgress, progress]
+      (episodes: Episode['id'][]) => mutate({ variables: { show: show.id, episodes } }),
+      [mutate, show]
    )
 
    const moveProgress = useCallback(
-      (to: IEpisode['id']) => {
-         const index = episodes.findIndex(e => e.id === to)
-         const watched = episodes
-            .filter(e => !e.ignore)
-            .filter(({ id }) => episodes.findIndex(it => it.id === id) <= index)
-            .map(e => e.id)
+      (to: Episode['id']) => {
+         const index = important.findIndex(e => e.id === to)
+         const watched = important.slice(0, index).map(e => e.id)
          setWatched(watched)
       },
-      [episodes, setWatched]
+      [important, setWatched]
    )
 
    const watchAll = useCallback(() => {
       if (watchedAll) setWatched([])
-      else setWatched(episodes.filter(e => !e.ignore).map(e => e.id))
-   }, [watchedAll, episodes, setWatched])
+      else setWatched(important.map(e => e.id))
+   }, [watchedAll, important, setWatched])
 
-   if (status === 'authenticated')
-      return { progress, setWatched, moveProgress, watchAll, episodes, watchedAll, ...rest }
-   return { episodes, watchedAll, ...rest }
+   const toggle = useCallback(
+      (episode: Episode['id']) => {
+         if (watched.includes(episode)) setWatched(watched.filter(it => it !== episode))
+         else setWatched([...watched, episode])
+      },
+      [watched, setWatched]
+   )
+
+   if (loading) return { watchedAll, watched }
+   return { watchedAll, watched, moveProgress, watchAll, toggle }
 }

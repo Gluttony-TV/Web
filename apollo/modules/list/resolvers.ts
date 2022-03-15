@@ -30,7 +30,7 @@ export const resolvers: Resolvers = {
          return await Lists.findOne(query)
       },
 
-      async isIn(_, { show, ...filter }, context) {
+      async isInList(_, { show, ...filter }, context) {
          if (!context.user) throw new AuthenticationError('You need to be logged in see your lists')
          const exists = await Lists.exists({ ...filter, userId: context.user.id, shows: { id: show } })
          return !!exists

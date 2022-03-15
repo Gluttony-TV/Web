@@ -1,9 +1,11 @@
 fragment baseShow on Show {
    id
-   tvdb_id
    name
    overview
    image
+   status {
+      name
+   }
 }
 
 fragment baseEpisode on Episode {
@@ -15,29 +17,27 @@ fragment baseEpisode on Episode {
    number
    seasonNumber
    special
-   ignore
    due
-   watched
+}
+
+fragment baseSeason on Season {
+   id
+   name
 }
 
 fragment withEpisodes on Show {
    ...baseShow
-   episodes {
-      ...baseEpisode
-   }
-}
-
-fragment showWithProgress on Show {
-   ...baseShow
-   isFavourite: isIn(primary: true)
-   progress {
-      ...baseProgress
+   seasons {
+      ...baseSeason
+      episodes {
+         ...baseEpisode
+      }
    }
 }
 
 query show($id: Int!) {
    show: getShow(id: $id) {
-      ...showWithProgress
+      ...withEpisodes
    }
 }
 

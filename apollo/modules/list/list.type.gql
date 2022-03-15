@@ -2,11 +2,11 @@ type Query {
    getOwnLists: [List!]!
    getListsOf(user: ID!): [List!]!
 
-   getOwnList(slug: String!): List
-   getListOf(slug: String!, user: ID!): List
-   getList(id: ID!): List
+   getOwnList(slug: String!): List!
+   getListOf(slug: String!, user: ID!): List!
+   getList(id: ID!): List!
 
-   isIn(show: Int!, slug: String, primary: Boolean): Boolean!
+   isInList(show: Int!, slug: String, primary: Boolean): Boolean!
 }
 
 type Mutation {

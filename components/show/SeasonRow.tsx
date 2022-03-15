@@ -1,35 +1,33 @@
+import { Episode, Season } from 'generated/graphql'
 import useTooltip from 'hooks/useTooltip'
-import { IEpisode, IExtendedEpisode } from 'models/Episodes'
 import { mix } from 'polished'
-import { Dispatch, Fragment, SetStateAction, useCallback, useMemo, VFC } from 'react'
+import { Dispatch, Fragment, useCallback, useMemo, VFC } from 'react'
 import { gradient, striped } from 'style/styles'
 import styled, { css } from 'styled-components'
 
-const Season: VFC<{
-   setWatched?: Dispatch<SetStateAction<IEpisode['id'][]>>
-   moveProgress?: Dispatch<IEpisode['id']>
-   episodes: IExtendedEpisode[]
-   editing?: boolean
-}> = ({ setWatched, moveProgress, episodes, editing }) => {
+const SeasonRow: VFC<
+   Pick<Season, 'episodes'> & {
+      toggle?: Dispatch<Episode['id']>
+      moveProgress?: Dispatch<Episode['id']>
+      watched?: Episode['id'][]
+      editing?: boolean
+   }
+> = ({ toggle, moveProgress, episodes, editing, watched }) => {
    useTooltip()
 
    const click = useCallback(
-      (episode: Pick<IExtendedEpisode, 'id' | 'watched' | 'due'>, shift: boolean) => {
+      (episode: Episode['id'], shift: boolean) => {
          if (!editing) return
-         if (episode.due) return
          if (shift && moveProgress) {
-            moveProgress(episode.id)
-         } else if (setWatched) {
-            if (episode.watched) setWatched(w => w.filter(e => e !== episode.id))
-            else setWatched(w => [...w, episode.id])
+            moveProgress(episode)
+         } else if (toggle) {
+            toggle(episode)
          }
       },
-      [setWatched, moveProgress, editing]
+      [toggle, moveProgress, editing]
    )
 
-   const now = Date.now()
-
-   const wrappedEpisodes = useMemo<IExtendedEpisode[][]>(() => {
+   const wrappedEpisodes = useMemo(() => {
       if (episodes.length < 20) return [episodes]
       return [episodes.slice(0, 10), episodes.slice(episodes.length - 10)]
    }, [episodes])
@@ -38,18 +36,18 @@ const Season: VFC<{
       <Row>
          {wrappedEpisodes.map((episodes, i) => (
             <Fragment key={i}>
-               {i !== 0 && <Episode>...</Episode>}
-               {episodes.map(({ number, name, aired, seasonNumber, ...episode }) => (
-                  <Episode
-                     key={episode.id}
+               {i !== 0 && <EpisodePanel>...</EpisodePanel>}
+               {episodes.map(({ number, name, due, seasonNumber, id }) => (
+                  <EpisodePanel
+                     key={id}
                      data-tip={name}
                      title={`Season ${seasonNumber} - ${name}`}
-                     disabled={new Date(aired).getTime() > now}
-                     watched={episode.watched}
+                     disabled={due}
+                     watched={watched?.includes(id)}
                      editing={editing}
-                     onClick={e => click(episode, e.shiftKey)}>
+                     onClick={e => click(id, e.shiftKey)}>
                      {number}
-                  </Episode>
+                  </EpisodePanel>
                ))}
             </Fragment>
          ))}
@@ -57,7 +55,7 @@ const Season: VFC<{
    )
 }
 
-const Episode = styled.button<{ watched?: boolean; disabled?: boolean; editing?: boolean }>`
+const EpisodePanel = styled.button<{ watched?: boolean; disabled?: boolean; editing?: boolean }>`
    text-align: center;
    padding: 0.5rem;
    font-size: 0.8rem;
@@ -103,4 +101,4 @@ const Row = styled.div`
    }
 `
 
-export default Season
+export default SeasonRow

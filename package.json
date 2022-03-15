@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "build": "yarn graphql:gen && next build",
+    "build": "yarn lang && yarn graphql:gen && next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "lint": "eslint --fix **/*.{ts,tsx}",

@@ -2,17 +2,18 @@ import { ContextFunction } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-micro'
 import { schema } from 'apollo/schema'
 import { Maybe, User } from 'generated/graphql'
+import { IncomingMessage } from 'http'
 import database from 'lib/database'
 import microCors from 'micro-cors'
-import { IncomingRequest } from 'next-auth'
+import { getSession } from 'next-auth/react'
 
 export interface ApolloContext {
    user: Maybe<User>
 }
 
-const context: ContextFunction<{ req: IncomingRequest }, ApolloContext> = async ctx => {
-   console.log(ctx.req.cookies)
-   return { user: null }
+const context: ContextFunction<{ req: IncomingMessage }, ApolloContext> = async ({ req }) => {
+   const session = await getSession({ req })
+   return { user: session?.user ?? null }
 }
 
 const apolloServer = new ApolloServer({ schema, introspection: true, context })
