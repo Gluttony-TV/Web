@@ -6,12 +6,12 @@ type Query {
    getListOf(slug: String!, user: ID!): List!
    getList(id: ID!): List!
 
-   isInList(show: Int!, slug: String, primary: Boolean): Boolean!
+   isInList(show: ApiID!, slug: String, primary: Boolean): Boolean!
 }
 
 type Mutation {
-   addToList(shows: [Int!]!, slug: String, primary: Boolean): List!
-   removeFromList(shows: [Int!]!, slug: String, primary: Boolean): List!
+   addToList(shows: [ApiID!]!, slug: String, primary: Boolean): List!
+   removeFromList(shows: [ApiID!]!, slug: String, primary: Boolean): List!
 }
 
 type List {
@@ -21,11 +21,11 @@ type List {
    public: Boolean!
    primary: Boolean!
    userId: ID!
-   shows: [ListEntry!]
+   shows: [ListEntry!]!
 }
 
 type ListEntry {
-   id: Int!
-   addedAt: String!
+   id: ApiID!
+   addedAt: Date!
    show: Show!
 }

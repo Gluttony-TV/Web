@@ -1,3 +1,4 @@
+import { Account } from 'generated/graphql'
 import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
 
@@ -46,6 +47,4 @@ const schema = new Schema({
    scope: String,
 })
 
-schema.set('toJSON', { virtuals: true })
-
-export default define<IAccount>('Account', schema)
+export default define<Account>('Account', schema)

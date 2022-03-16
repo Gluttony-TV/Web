@@ -1,5 +1,5 @@
-import { Resolvers } from 'generated/graphql'
-import { getEpisodes, getSeason, getShow, getTranslation } from 'lib/api'
+import { Resolvers, Status } from 'generated/graphql'
+import { getEpisodes, getSeason, getShow, getTranslation, searchShow } from 'lib/api'
 import Lists from 'models/Lists'
 import Progresses from 'models/Progresses'
 
@@ -7,6 +7,9 @@ export const resolvers: Resolvers = {
    Query: {
       getShow(_, args) {
          return getShow(args.id)
+      },
+      searchShows(_, args) {
+         return searchShow(args.by, args.limit ?? undefined, args.offset ?? undefined)
       },
    },
    Show: {
@@ -38,7 +41,18 @@ export const resolvers: Resolvers = {
       //   return episodes
       //},
       seasons(show) {
-         return Promise.all(show.seasons.map(({ id }) => getSeason(id)))
+         return Promise.all(show.seasons.filter(it => it.type.type === 'official').map(it => getSeason(it.id)))
+      },
+      image(show) {
+         return show.image ?? (show as any).image_url
+      },
+      status(show): Status {
+         if (typeof show.status === 'string') return { name: show.status }
+         return show.status
+      },
+      id(show) {
+         if (typeof show.id === 'string') return Number.parseInt((show.id as string).substring(7))
+         return show.id
       },
    },
    Episode: {

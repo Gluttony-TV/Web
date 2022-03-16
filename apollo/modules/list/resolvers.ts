@@ -18,36 +18,40 @@ export const resolvers: Resolvers = {
       },
 
       async getList(_, args, context) {
-         return await Lists.findOne({ _id: args.id, $or: [{ userId: context.user?.id }, { public: true }] })
+         return await Lists.findOrFail({ _id: args.id, $or: [{ userId: context.user?.id }, { public: true }] })
       },
       async getOwnList(_, args, context) {
          if (!context.user) throw new AuthenticationError('You need to be logged in see your lists')
-         return await Lists.findOne({ slug: args.slug, userId: context.user.id })
+         return await Lists.findOrFail({ slug: args.slug, userId: context.user.id })
       },
       async getListOf(_, args, context) {
          const query: FilterQuery<List> = { slug: args.slug, userId: args.user }
          if (args.user !== context.user?.id) query.public = true
-         return await Lists.findOne(query)
+         return await Lists.findOrFail(query)
       },
 
       async isInList(_, { show, ...filter }, context) {
          if (!context.user) throw new AuthenticationError('You need to be logged in see your lists')
-         const exists = await Lists.exists({ ...filter, userId: context.user.id, shows: { id: show } })
+         const exists = await Lists.exists({ ...filter, userId: context.user.id, 'shows.id': show })
          return !!exists
       },
    },
    Mutation: {
-      async addToList(_, { shows, ...filter }) {
-         const addedAt = new Date().toISOString()
+      async addToList(_, { shows, ...filter }, context) {
+         const addedAt = Date.now()
          const added = shows.map(id => ({ id, addedAt }))
-         const list = await Lists.findOneAndUpdate(filter, { $push: { shows: added } }, { new: true })
+         const list = await Lists.findOneAndUpdate(
+            { ...filter, userId: context.user.id },
+            { $push: { shows: added } },
+            { new: true }
+         )
          if (!list) throw new NotFoundError('List not found')
          return list
       },
-      async removeFromList(_, { shows, ...filter }) {
+      async removeFromList(_, { shows, ...filter }, context) {
          const list = await Lists.findOneAndUpdate(
-            filter,
-            { $pull: { showIds: { id: { $in: shows } } } },
+            { ...filter, userId: context.user.id },
+            { $pull: { shows: { id: { $in: shows } } } },
             { new: true }
          )
          if (!list) throw new NotFoundError('List not found')

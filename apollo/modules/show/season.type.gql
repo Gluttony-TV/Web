@@ -1,16 +1,23 @@
 type Season {
-   id: Int!
+   id: ApiID!
    seriesId: String!
    name: String
    number: Int!
    image: String!
    network: Network!
    episodes: [Episode!]!
+   type: SeasonType!
+}
+
+type SeasonType {
+   id: String!
+   name: String!
+   type: String!
 }
 
 type Episode {
-   id: Int!
-   seriesId: Int!
+   id: ApiID!
+   seriesId: ApiID!
    name: String!
    aired: String
    runtime: Int!

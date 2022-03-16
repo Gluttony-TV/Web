@@ -1,4 +1,4 @@
-import { prefetchQueries } from 'apollo/client'
+import { prefetchQueries } from 'apollo/server'
 import FavouriteButton from 'components/FavouriteButton'
 import Image from 'components/Image'
 import Page from 'components/Page'
@@ -9,8 +9,8 @@ import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import styled from 'styled-components'
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-   return prefetchQueries(async client => {
+export const getServerSideProps: GetServerSideProps = async ({ query, req }) => {
+   return prefetchQueries({ req }, async client => {
       await client.query({ query: ShowDocument, variables: { id: Number.parseInt(query.id as string) } })
    })
 }

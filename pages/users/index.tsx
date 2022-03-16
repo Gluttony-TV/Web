@@ -1,24 +1,18 @@
-import { initializeApollo } from 'apollo/client'
+import { prefetchQueries } from 'apollo/server'
 import Link from 'components/Link'
 import Page from 'components/Page'
 import { Title } from 'components/Text'
 import UserIcon from 'components/UserIcon'
-import { BaseUserFragment, UsersDocument, useUsersQuery } from 'generated/graphql'
-import { Serialized } from 'lib/database'
+import { UsersDocument, useUsersQuery } from 'generated/graphql'
 import { GetServerSideProps, NextPage } from 'next'
 
-interface Props {
-   users: Serialized<BaseUserFragment>[]
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   return prefetchQueries(ctx, async client => {
+      await client.query({ query: UsersDocument })
+   })
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-   const client = initializeApollo()
-   const { data } = await client.query({ query: UsersDocument })
-   const users = data?.users ?? []
-   return { props: { users } }
-}
-
-const Users: NextPage<Props> = () => {
+const Users: NextPage = () => {
    const { data } = useUsersQuery()
 
    return (
@@ -27,7 +21,7 @@ const Users: NextPage<Props> = () => {
          {data?.users.map(user => (
             <Link key={user.id} href={`/users/${user.id}`}>
                {user.name}
-               <UserIcon {...user} size={100} />
+               <UserIcon user={user} size={100} />
             </Link>
          ))}
       </Page>

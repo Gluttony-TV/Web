@@ -3,6 +3,8 @@ fragment baseShow on Show {
    name
    overview
    image
+   thumbnail
+   year
    status {
       name
    }
@@ -23,6 +25,10 @@ fragment baseEpisode on Episode {
 fragment baseSeason on Season {
    id
    name
+   type {
+      type
+      name
+   }
 }
 
 fragment withEpisodes on Show {
@@ -35,7 +41,7 @@ fragment withEpisodes on Show {
    }
 }
 
-query show($id: Int!) {
+query show($id: ApiID!) {
    show: getShow(id: $id) {
       ...withEpisodes
    }

@@ -31,8 +31,6 @@ const schema = new Schema({
    },
 })
 
-schema.set('toJSON', { virtuals: true })
-
 schema.index({ user: 1, name: -1 }, { unique: true })
 
 schema.pre('save', async function (this: List) {

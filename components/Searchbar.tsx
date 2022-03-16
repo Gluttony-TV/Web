@@ -53,7 +53,7 @@ const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) =
             {children}
             {visible &&
                results?.map(show => (
-                  <Link key={show.id} href={`/show/${show.tvdb_id}`}>
+                  <Link key={show.id} href={`/show/${show.id}`}>
                      <li>{show.name}</li>
                   </Link>
                ))}

@@ -5,13 +5,20 @@ generates:
       plugins:
          - add:
               content: '/* eslint-disable */'
+
          - typescript
          - typescript-operations
          - typescript-resolvers:
-              contextType: pages/api/graphql#ApolloContext
+              contextType: apollo/server#ApolloContext
          - typed-document-node
+
          - typescript-react-apollo:
               documentVariablePrefix: Untyped
               fragmentVariablePrefix: Untyped
               withHooks: true
-              apolloReactHooksImportFrom: hooks/useSuspendedQuery
+
+config:
+   strictScalars: true
+   scalars:
+      Date: number
+      ApiID: number

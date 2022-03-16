@@ -1,15 +1,15 @@
 import faker from '@faker-js/faker'
 import { readdirSync } from 'fs'
 import database from 'lib/database'
-import Progress from 'models/Progresses'
-import User from 'models/Users'
+import Lists from 'models/Lists'
+import Progresses from 'models/Progresses'
+import Users from 'models/Users'
 import { join, resolve } from 'path'
 import { factory } from '.'
 
 async function run() {
-   await database()
-   //const db = await database()
-   //await db.connection.dropCollection('users')
+   const db = await database()
+   await db.connection.dropDatabase()
 
    const dir = resolve(__dirname, 'factories')
    const factories = readdirSync(dir)
@@ -18,9 +18,14 @@ async function run() {
       require(join(dir, file))
    })
 
-   const users = await factory(User).createMany(20)
+   const users = await factory(Users).createMany(20)
    await Promise.all(
-      users.map(u => factory(Progress).createMany(faker.datatype.number({ min: 3, max: 20 }), { userId: u.id }))
+      users.map(u =>
+         Promise.all([
+            factory(Progresses).createMany(faker.datatype.number({ min: 3, max: 20 }), { userId: u.id }),
+            factory(Lists).create({ userId: u.id, primary: true, name: 'Favourites' }),
+         ])
+      )
    )
 }
 

@@ -1,54 +1,27 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
-import database from 'lib/database'
+import { HttpLink } from '@apollo/client/link/http'
 import { useMemo } from 'react'
 
 let apolloClient: ApolloClient<unknown> | null = null
 
-function createIsomorphLink() {
-   if (typeof window === 'undefined') {
-      const { SchemaLink } = require('@apollo/client/link/schema')
-      const { schema } = require('./schema')
-      return new SchemaLink({ schema })
-   } else {
-      const { HttpLink } = require('@apollo/client/link/http')
-      return new HttpLink({
-         uri: '/api/graphql',
-         credentials: 'same-origin',
-      })
-   }
-}
-
 function createApolloClient() {
+   const link = new HttpLink({
+      uri: '/api/graphql',
+      credentials: 'same-origin',
+   })
    return new ApolloClient({
-      ssrMode: typeof window === 'undefined',
-      link: createIsomorphLink(),
+      link,
       cache: new InMemoryCache(),
    })
 }
 
-export async function prefetchQueries<P>(consumer: (client: ApolloClient<unknown>) => P) {
-   await database()
-   const client = initializeApollo()
-   const extraProps = consumer(client)
-   return { props: { ...extraProps, initialApolloState: client.cache.extract() } }
-}
-
-export function initializeApollo(initialState = null) {
+function initializeApollo(initialState: unknown) {
    const _apolloClient = apolloClient ?? createApolloClient()
-
-   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
-   // gets hydrated here
-   if (initialState) {
-      _apolloClient.cache.restore(initialState)
-   }
-   // For SSG and SSR always create a new Apollo Client
-   if (typeof window === 'undefined') return _apolloClient
-   // Create the Apollo Client once in the client
+   if (initialState) _apolloClient.cache.restore(initialState)
    if (!apolloClient) apolloClient = _apolloClient
-
    return _apolloClient
 }
 
-export function useApollo(initialState) {
+export function useApollo(initialState: unknown) {
    return useMemo(() => initializeApollo(initialState), [initialState])
 }

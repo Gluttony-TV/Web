@@ -1,15 +1,14 @@
 import { Dev, Discord, Github, Google } from '@styled-icons/fa-brands'
 import { Plug } from '@styled-icons/fa-solid'
 import { StyledIcon, StyledIconProps } from '@styled-icons/styled-icon'
+import { prefetchQueries } from 'apollo/server'
 import { LinkButton } from 'components/Link'
 import Page from 'components/Page'
 import { Title } from 'components/Text'
+import { SelfDocument, useSelfQuery } from 'generated/graphql'
 import useTooltip from 'hooks/useTooltip'
-import { serialize, Serialized } from 'lib/database'
 import { loginLink } from 'lib/util'
 import { DateTime } from 'luxon'
-import Account, { IAccount } from 'models/Accounts'
-import User, { IUser } from 'models/Users'
 import { GetServerSideProps, NextPage } from 'next'
 import { getSession, signOut } from 'next-auth/react'
 import { transparentize } from 'polished'
@@ -17,20 +16,12 @@ import { createElement } from 'react'
 import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 
-type Props = Serialized<{ user: IUser; accounts: IAccount[] }>
-
-export const getServerSideProps: GetServerSideProps<Props> = async req => {
-   const session = await getSession(req)
-   if (!session) return loginLink(req)
-
-   const [user, accounts] = await Promise.all([
-      User.findById(session.user.id),
-      Account.find({ userId: session.user.id }),
-   ])
-
-   if (!user) return { notFound: true }
-
-   return { props: serialize({ user, accounts }) }
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const session = await getSession(ctx)
+   if (!session) return loginLink(ctx)
+   return prefetchQueries(ctx, async client => {
+      await client.query({ query: SelfDocument })
+   })
 }
 
 const ICONS: Record<string, StyledIcon | undefined> = {
@@ -39,9 +30,13 @@ const ICONS: Record<string, StyledIcon | undefined> = {
    discord: Discord,
 }
 
-const Profile: NextPage<Props> = ({ user, accounts }) => {
+const Profile: NextPage = () => {
    useTooltip()
-   const created = DateTime.fromISO(user.joinedAt)
+   const { data } = useSelfQuery()
+
+   if (!data) return <p>Loading...</p>
+
+   const created = DateTime.fromMillis(data.user.joinedAt)
 
    return (
       <Page>
@@ -51,14 +46,14 @@ const Profile: NextPage<Props> = ({ user, accounts }) => {
          <Panels>
             <BigPanel>
                <label htmlFor='username'>Username</label>
-               <p id='username'>{user.name}</p>
+               <p id='username'>{data.user.name}</p>
             </BigPanel>
 
-            {user.email && (
+            {data.user.email && (
                <>
                   <Panel>
                      <label htmlFor='email'>E-Mail</label>
-                     <p id='email'>{user.email ?? 'No email provided'}</p>
+                     <p id='email'>{data.user.email ?? 'No email provided'}</p>
                   </Panel>
                </>
             )}
@@ -73,11 +68,11 @@ const Profile: NextPage<Props> = ({ user, accounts }) => {
             <Panel>
                <label htmlFor='connections'>Connections</label>
                <Icons id='connections'>
-                  {user.seeded && <Dev size='1em' data-tip='Development User' />}
-                  {accounts.map(({ provider, providerAccountId }) =>
+                  {data.user.seeded && <Dev size='1em' data-tip='Development User' />}
+                  {data.user.accounts.map(({ provider, id }) =>
                      createElement(ICONS[provider] ?? Plug, {
                         'data-tip': provider,
-                        key: `${provider}-${providerAccountId}`,
+                        key: id,
                         size: '1em',
                      } as StyledIconProps)
                   )}

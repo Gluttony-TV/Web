@@ -1,13 +1,13 @@
 type Query {
-   getShow(id: Int!): Show!
-   searchShows(by: String!): [Show!]
+   getShow(id: ApiID!): Show!
+   searchShows(by: String!, limit: Int, offset: Int): [Show!]
 }
 
 type Show {
-   id: Int!
+   id: ApiID!
    name: String!
    slug: String!
-   image: String!
+   image: String
    thumbnail: String
    first_air_time: String
    next_air_time: String
@@ -28,26 +28,25 @@ type Show {
 }
 
 type Status {
-   id: Int!
    name: String!
-   recordType: String!
-   keepUpdated: Boolean!
+   recordType: String
+   keepUpdated: Boolean
 }
 
 type Character {
-   id: Int!
+   id: ApiID!
    name: String!
    image: String!
 }
 
 type Genre {
-   id: Int!
+   id: ApiID!
    name: String!
    slug: String!
 }
 
 type Artwork {
-   id: Int!
+   id: ApiID!
    image: String!
    thumbnail: String!
    type: Int!
@@ -55,7 +54,7 @@ type Artwork {
 }
 
 type Network {
-   id: Int!
+   id: ApiID!
    name: String!
    slug: String!
    abbreviation: String!

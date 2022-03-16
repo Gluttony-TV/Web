@@ -15,7 +15,7 @@ export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>):
 
    const { data, loading } = useProgressQuery({
       variables: { show: show.id },
-      skip: status !== 'unauthenticated',
+      skip: status !== 'authenticated',
    })
 
    const watched = useMemo(() => data?.progress?.watched ?? [], [data])

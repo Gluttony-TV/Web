@@ -1,5 +1,4 @@
 import { AuthenticationError } from 'apollo-server-micro'
-import { NotFoundError } from 'apollo/errors'
 import { Resolvers } from 'generated/graphql'
 import { getShow } from 'lib/api'
 import Progresses from 'models/Progresses'
@@ -14,13 +13,6 @@ export const resolvers: Resolvers = {
             userId: context.user.id,
          })
       },
-      async getProgressOf(_, args, context) {
-         return await Progresses.findOne({
-            showId: args.show,
-            userId: args.user,
-            'settings.visibility.progress': true,
-         })
-      },
       async getOwnProgresses(_, _args, context) {
          if (!context.user) throw new AuthenticationError('You need to be signed in to access your progress')
          return await Progresses.find({ userId: context.user.id })
@@ -29,7 +21,6 @@ export const resolvers: Resolvers = {
    Mutation: {
       async setWatched(_, args, context) {
          if (!context.user) throw new AuthenticationError('You need to be signed in to modify your progress')
-
          return await Progresses.findOneAndUpdate(
             { showId: args.show, userId: context.user.id },
             { watched: args.episodes },
@@ -39,14 +30,10 @@ export const resolvers: Resolvers = {
    },
    Progress: {
       show(progress) {
-         const show = getShow(progress.showId)
-         if (!show) throw new NotFoundError('Show not found')
-         return show
+         return getShow(progress.showId)
       },
-      async user(progress) {
-         const user = await Users.findById(progress.userId)
-         if (!user) throw new NotFoundError('User not found')
-         return user
+      user(progress) {
+         return Users.findOrFail({ _id: progress.userId })
       },
    },
 }

@@ -1,34 +1,20 @@
 import { Th, ThLarge } from '@styled-icons/fa-solid'
-import { initializeApollo } from 'apollo/client'
+import { prefetchQueries } from 'apollo/server'
 import Button from 'components/Button'
 import Image from 'components/Image'
 import Link from 'components/Link'
 import Page from 'components/Page'
-import { BaseShowFragment, ProgressWithShowFragment, WatchedDocument } from 'generated/graphql'
-import database from 'lib/database'
-import { loginLink } from 'lib/util'
-import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
+import { BaseShowFragment, useWatchedQuery, WatchedDocument } from 'generated/graphql'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { transparentize } from 'polished'
 import { createElement, Dispatch, FC, SetStateAction, useState } from 'react'
 import styled from 'styled-components'
 
-interface Props {
-   watched: ProgressWithShowFragment[]
-}
-
-export const getServerSideProps: GetServerSideProps<Props> = async req => {
-   await database()
-
-   const session = await getSession(req)
-   if (!session) return loginLink(req)
-
-   const client = initializeApollo()
-   const { data } = await client.query({ query: WatchedDocument })
-   const watched = data.progresses ?? []
-
-   return { props: { watched } }
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   return prefetchQueries(ctx, async client => {
+      await client.query({ query: WatchedDocument })
+   })
 }
 
 enum View {
@@ -36,15 +22,17 @@ enum View {
    SMALL_CELLS = 100,
 }
 
-const Watched: FC<Props> = ({ watched }) => {
+const Watched: NextPage = () => {
    const { query } = useRouter()
    const [view, setView] = useState(query.view ? Number.parseInt(query.view.toString()) : View.BIG_CELLS)
+
+   const { data } = useWatchedQuery()
 
    return (
       <Page>
          <ViewSelect value={view} onChange={setView} />
          <Grid size={view}>
-            {watched.map(progress => (
+            {data?.progresses.map(progress => (
                <Cell key={progress.id} size={view} {...progress} />
             ))}
          </Grid>

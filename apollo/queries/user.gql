@@ -3,6 +3,7 @@ fragment baseUser on User {
    name
    joinedAt
    email
+   seeded
    settings {
       visibility {
          profile
@@ -10,6 +11,12 @@ fragment baseUser on User {
          favourites
       }
    }
+}
+
+fragment baseAccount on Account {
+   id
+   provider
+   name
 }
 
 query user($id: ID!) {
@@ -27,5 +34,8 @@ query users {
 query self {
    user: self {
       ...baseUser
+      accounts {
+         ...baseAccount
+      }
    }
 }

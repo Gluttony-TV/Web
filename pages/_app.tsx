@@ -7,7 +7,7 @@ import theme from 'lib/theme'
 import { SessionProvider } from 'next-auth/react'
 import { AppComponent } from 'next/dist/shared/lib/router/router'
 import { darken } from 'polished'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { IntlProvider } from 'react-intl'
 import 'style/reset.css'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
@@ -26,9 +26,7 @@ const App: AppComponent = ({ Component, pageProps }) => {
                   <Container>
                      <Nav />
                      <Tooltip />
-                     <Suspense fallback={Loading}>
-                        <Component {...pageProps} />
-                     </Suspense>
+                     <Component {...pageProps} />
                   </Container>
                </IntlProvider>
             </ThemeProvider>
@@ -38,8 +36,6 @@ const App: AppComponent = ({ Component, pageProps }) => {
 }
 
 const Container = styled.section``
-
-const Loading = () => <p>Loading...</p>
 
 const GlobalStyles = createGlobalStyle`
    html, body {

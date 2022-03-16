@@ -25,8 +25,6 @@ const schema = new Schema({
    },
 })
 
-schema.set('toJSON', { virtuals: true })
-
 schema.index({ email: 1 }, { unique: true })
 
 export default define<User>('User', schema)

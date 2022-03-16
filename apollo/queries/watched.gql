@@ -18,13 +18,13 @@ query watched {
    }
 }
 
-query progress($show: Int!) {
+query progress($show: ApiID!) {
    progress: getOwnProgress(show: $show) {
       ...baseProgress
    }
 }
 
-mutation setWatched($show: Int!, $episodes: [Int!]!) {
+mutation setWatched($show: ApiID!, $episodes: [ApiID!]!) {
    setWatched(show: $show, episodes: $episodes) {
       ...baseProgress
    }

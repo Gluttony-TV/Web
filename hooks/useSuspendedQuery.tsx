@@ -1,6 +1,6 @@
 import { QueryHookOptions, TypedDocumentNode, useQuery as useBaseQuery } from '@apollo/client'
 import { DocumentNode } from 'graphql'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 export * from '@apollo/client'
 
@@ -8,18 +8,24 @@ export function useQuery<TData, TVariables>(
    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
    options?: QueryHookOptions<TData, TVariables>
 ) {
-   const ref = useRef<() => void>()
    const { data, error, loading } = useBaseQuery(query, options)
 
-   useEffect(() => {
-      if (loading)
+   const resolve = useRef<() => void>()
+   const promise = useMemo(
+      () =>
          new Promise<void>(res => {
-            ref.current = res
-         })
-      else ref.current?.()
-   }, [loading])
+            resolve.current = res
+         }),
+      []
+   )
+
+   useEffect(() => {
+      return () => {
+         resolve.current?.()
+      }
+   })
 
    if (error) throw error
-   if (loading) throw ref.current
+   if (loading) throw promise
    return { data: data as TData }
 }

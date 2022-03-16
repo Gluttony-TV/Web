@@ -1,12 +1,12 @@
 import { Settings } from 'generated/graphql'
-import User from 'models/Users'
+import Users from 'models/Users'
 import { createFactory } from '..'
 
-createFactory(User, faker => {
+createFactory(Users, faker => {
    const name = faker.name.firstName()
    const email = faker.internet.email(name, undefined, 'example.com')
    const emailVerified = true
-   const joinedAt = faker.date.past(3).toISOString()
+   const joinedAt = faker.date.past(3).getTime()
 
    const settings: Settings = {
       visibility: {

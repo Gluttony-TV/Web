@@ -1,17 +1,6 @@
-import { getShow } from 'lib/api'
-import { define, serialize } from 'lib/database'
-import { exists } from 'lib/util'
+import { Progress } from 'generated/graphql'
+import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
-import { IEpisode } from './Episodes'
-import { IShow } from './Shows'
-
-interface IProgress {
-   id: string
-   userId: string
-   showId: IShow['id']
-   show?: IShow
-   watched: IEpisode['id'][]
-}
 
 const schema = new Schema({
    userId: {
@@ -27,18 +16,6 @@ const schema = new Schema({
    },
 })
 
-schema.set('toJSON', { virtuals: true })
-
 schema.index({ user: 1, show: -1 }, { unique: true })
 
-export async function withShow(progress: IProgress): Promise<IProgress | undefined> {
-   const show = await getShow(progress.showId)
-   return show && { ...serialize(progress), show }
-}
-
-export async function withShows(progresses: IProgress[]) {
-   const mapped = await Promise.all(progresses.map(withShow))
-   return mapped.filter(exists)
-}
-
-export default define<IProgress>('Progress', schema)
+export default define<Progress>('Progress', schema)
