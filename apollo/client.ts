@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
+import database from 'lib/database'
 import { useMemo } from 'react'
 
 let apolloClient: ApolloClient<unknown> | null = null
@@ -23,6 +24,13 @@ function createApolloClient() {
       link: createIsomorphLink(),
       cache: new InMemoryCache(),
    })
+}
+
+export async function prefetchQueries<P>(consumer: (client: ApolloClient<unknown>) => P) {
+   await database()
+   const client = initializeApollo()
+   const extraProps = consumer(client)
+   return { props: { ...extraProps, initialApolloState: client.cache.extract() } }
 }
 
 export function initializeApollo(initialState = null) {

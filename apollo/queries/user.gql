@@ -3,6 +3,13 @@ fragment baseUser on User {
    name
    joinedAt
    email
+   settings {
+      visibility {
+         profile
+         progress
+         favourites
+      }
+   }
 }
 
 query user($id: ID!) {

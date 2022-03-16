@@ -1,30 +1,24 @@
-import { initializeApollo } from 'apollo/client'
+import { prefetchQueries } from 'apollo/client'
 import FavouriteButton from 'components/FavouriteButton'
 import Image from 'components/Image'
 import Page from 'components/Page'
 import Seasons from 'components/show/Seasons'
 import ShowTitle from 'components/show/Title'
 import { ShowDocument, useShowQuery } from 'generated/graphql'
-import database from 'lib/database'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import styled from 'styled-components'
 
-export const getServerSidePropss: GetServerSideProps = async () => {
-   await database()
-   const client = initializeApollo()
-
-   client.query({ query: ShowDocument })
-
-   return {
-      props: { initialApolloState: client.cache.extract() },
-   }
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+   return prefetchQueries(async client => {
+      await client.query({ query: ShowDocument, variables: { id: Number.parseInt(query.id as string) } })
+   })
 }
 
 const ShowPage: NextPage = () => {
    const router = useRouter()
    const id = Number.parseInt(router.query.id as string)
-   const { data, error } = useShowQuery({ variables: { id } })
+   const { data } = useShowQuery({ variables: { id } })
 
    const percentage = 20
 

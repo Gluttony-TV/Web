@@ -14,3 +14,4 @@ generates:
               documentVariablePrefix: Untyped
               fragmentVariablePrefix: Untyped
               withHooks: true
+              apolloReactHooksImportFrom: hooks/useSuspendedQuery

@@ -1,13 +1,5 @@
 import { Schema } from 'mongoose'
 
-interface ISettings {
-   visibility: {
-      profile: boolean
-      progress: boolean
-      favourites: boolean
-   }
-}
-
 const Settings = new Schema({
    visibility: {
       profile: {

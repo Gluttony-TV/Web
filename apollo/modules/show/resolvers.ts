@@ -48,8 +48,5 @@ export const resolvers: Resolvers = {
       async due({ aired }) {
          return !aired || new Date(aired) > new Date()
       },
-      async important({ due, special }) {
-         return !due && !special
-      },
    },
 }
