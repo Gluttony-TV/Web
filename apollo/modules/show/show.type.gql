@@ -7,7 +7,7 @@ type Show {
    id: ApiID!
    name: String!
    slug: String!
-   image: String
+   image: String!
    thumbnail: String
    first_air_time: String
    next_air_time: String

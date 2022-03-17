@@ -1,33 +1,37 @@
 import Page from 'components/Page'
 import Select from 'components/Select'
 import ShowTitle from 'components/show/Title'
-import { useEpisodesInfo } from 'hooks/useEpisodesInfo'
+import { Season, useShowQuery } from 'generated/graphql'
 import { DateTime } from 'luxon'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { striped } from 'style/styles'
 import styled, { css } from 'styled-components'
-import { Props } from '[id]'
-export { getServerSideProps } from '[id]'
 
-const Show: NextPage<Props> = ({ show, ...props }) => {
-   const { percentage, seasons } = useEpisodesInfo(props)
-   const [season, setSeason] = useState<string>()
+const EpisodesPage: NextPage = () => {
+   const router = useRouter()
+   const id = Number.parseInt(router.query.id as string)
+   const { data } = useShowQuery({ variables: { id } })
+
+   const [season, setSeason] = useState<Season['number']>()
    const visible = useMemo(() => {
-      if (season) return seasons.filter(s => s.number === season)
-      return seasons
-   }, [seasons, season])
+      if (season) return data?.show.seasons.filter(s => s.number === season)
+      return data?.show.seasons
+   }, [data, season])
+
+   if (!data) return
 
    return (
       <Style>
-         <ShowTitle {...show} percentage={percentage} />
+         <ShowTitle {...data.show} />
 
          <label htmlFor='season-select'>Season</label>
          <Select
             id='season-select'
             values={[
                { display: 'All', value: undefined },
-               ...seasons.map(({ number }) => ({ value: number, display: `Season ${number}` })),
+               ...data.show.seasons.map(({ number }) => ({ value: number, display: `Season ${number}` })),
             ]}
             value={season}
             onChange={setSeason}
@@ -38,7 +42,7 @@ const Show: NextPage<Props> = ({ show, ...props }) => {
                <Season key={i}>
                   <h4>Season {number}</h4>
                   {episodes.map(e => (
-                     <Episode key={e.id} watched={e.watched} due={e.due}>
+                     <Episode key={e.id} watched={false} due={e.due}>
                         <span>{e.name}</span>
                         <span>{e.aired && DateTime.fromISO(e.aired).toLocaleString()}</span>
                      </Episode>
@@ -83,4 +87,4 @@ const Style = styled(Page)`
       'seasons';
 `
 
-export default Show
+export default EpisodesPage

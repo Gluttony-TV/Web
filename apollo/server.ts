@@ -3,6 +3,7 @@ import { SchemaLink } from '@apollo/client/link/schema'
 import { ContextFunction } from 'apollo-server-core'
 import { Maybe } from 'generated/graphql'
 import database from 'lib/database'
+import { EmptyObject } from 'lib/util'
 import { Session } from 'next-auth'
 import { getSession, GetSessionParams } from 'next-auth/react'
 import { GetServerSidePropsResult } from 'next/types'
@@ -13,15 +14,19 @@ export interface ApolloContext {
    user: Maybe<Session['user']>
 }
 
+type Props<T> = (T extends void ? EmptyObject : T) & {
+   initialApolloState: unknown
+}
+
 export async function prefetchQueries<P>(
    ctx: GetSessionParams,
    consumer: (client: ApolloClient<unknown>) => Promise<P>
-): Promise<GetServerSidePropsResult<P>> {
+): Promise<GetServerSidePropsResult<Props<P>>> {
    await database()
    const client = await createApolloClient(ctx)
    try {
       const extraProps = await consumer(client)
-      return { props: { ...extraProps, initialApolloState: client.cache.extract() } }
+      return { props: { ...(extraProps ?? {}), initialApolloState: client.cache.extract() } }
    } catch (e) {
       if (e instanceof NotFoundError) {
          return { notFound: true }

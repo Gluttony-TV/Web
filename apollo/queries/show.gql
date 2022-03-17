@@ -25,6 +25,7 @@ fragment baseEpisode on Episode {
 fragment baseSeason on Season {
    id
    name
+   number
    type {
       type
       name

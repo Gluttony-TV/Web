@@ -1,4 +1,5 @@
 import { Episode, useProgressQuery, useSetWatchedMutation, WithEpisodesFragment } from 'generated/graphql'
+import { flatMap } from 'lodash'
 import { useSession } from 'next-auth/react'
 import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'
 
@@ -20,7 +21,7 @@ export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>):
 
    const watched = useMemo(() => data?.progress?.watched ?? [], [data])
 
-   const episodes = useMemo(() => show.seasons?.flatMap(it => it.episodes) ?? [], [show])
+   const episodes = useMemo(() => flatMap(show.seasons ?? [], it => it.episodes), [show])
    const important = useMemo(() => episodes.filter(it => !it.due && !it.special), [episodes])
    const watchedAll = useMemo(() => important.every(it => watched.includes(it.id)), [watched, important])
 
