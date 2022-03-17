@@ -1,22 +1,23 @@
+import { ApolloProvider } from '@apollo/client'
+import { useApollo } from 'apollo/client'
+import Head from 'components/Head'
+import Nav from 'components/Nav'
+import Tooltip from 'components/Tooltip'
+import theme from 'lib/theme'
 import { SessionProvider } from 'next-auth/react'
 import { AppComponent } from 'next/dist/shared/lib/router/router'
 import { darken } from 'polished'
 import React from 'react'
 import { IntlProvider } from 'react-intl'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import 'style/reset.css'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
-import Head from '../components/Head'
-import Nav from '../components/Nav'
-import Tooltip from '../components/Tooltip'
-import theme from '../lib/theme'
-import '../style/reset.css'
-
-const client = new QueryClient()
 
 const App: AppComponent = ({ Component, pageProps }) => {
+   const apollo = useApollo(pageProps.initialApolloState)
+
    return (
       <SessionProvider session={pageProps.session}>
-         <QueryClientProvider client={client}>
+         <ApolloProvider client={apollo}>
             <ThemeProvider theme={theme}>
                <IntlProvider locale='en'>
                   <Head />
@@ -29,12 +30,12 @@ const App: AppComponent = ({ Component, pageProps }) => {
                   </Container>
                </IntlProvider>
             </ThemeProvider>
-         </QueryClientProvider>
+         </ApolloProvider>
       </SessionProvider>
    )
 }
 
-const Container = styled.div``
+const Container = styled.section``
 
 const GlobalStyles = createGlobalStyle`
    html, body {

@@ -1,5 +1,5 @@
+import { NavHeight } from 'components/Nav'
 import styled from 'styled-components'
-import { NavHeight } from './Nav'
 
 const Page = styled.section<{ maximized?: boolean }>`
    display: grid;

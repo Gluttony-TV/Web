@@ -1,33 +1,20 @@
 import { Th, ThLarge } from '@styled-icons/fa-solid'
-import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
+import { prefetchQueries } from 'apollo/server'
+import Button from 'components/Button'
+import Image from 'components/Image'
+import Link from 'components/Link'
+import Page from 'components/Page'
+import { BaseShowFragment, useWatchedQuery, WatchedDocument } from 'generated/graphql'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { transparentize } from 'polished'
 import { createElement, Dispatch, FC, SetStateAction, useState } from 'react'
 import styled from 'styled-components'
-import Button from '../components/Button'
-import Image from '../components/Image'
-import Link from '../components/Link'
-import Page from '../components/Page'
-import database, { serialize } from '../lib/database'
-import { loginLink } from '../lib/util'
-import Progress, { IProgress, withShows } from '../models/Progress'
-import { IShow } from '../models/Show'
 
-interface Props {
-   watched: IProgress<IShow>[]
-}
-
-export const getServerSideProps: GetServerSideProps<Props> = async req => {
-   await database()
-
-   const session = await getSession(req)
-   if (!session) return loginLink(req)
-
-   const progresses = await Progress.find({ user: session.user.id })
-   const watched = await withShows(progresses)
-
-   return { props: serialize({ watched }) }
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   return prefetchQueries(ctx, async client => {
+      await client.query({ query: WatchedDocument })
+   })
 }
 
 enum View {
@@ -35,15 +22,17 @@ enum View {
    SMALL_CELLS = 100,
 }
 
-const Watched: FC<Props> = ({ watched }) => {
+const Watched: NextPage = () => {
    const { query } = useRouter()
    const [view, setView] = useState(query.view ? Number.parseInt(query.view.toString()) : View.BIG_CELLS)
+
+   const { data } = useWatchedQuery()
 
    return (
       <Page>
          <ViewSelect value={view} onChange={setView} />
          <Grid size={view}>
-            {watched.map(progress => (
+            {data?.progresses.map(progress => (
                <Cell key={progress.id} size={view} {...progress} />
             ))}
          </Grid>
@@ -84,11 +73,17 @@ const IconBar = styled.div`
    }
 `
 
-const Cell: FC<IProgress<IShow> & { size: View }> = ({ show, size }) => {
+const Cell: FC<{ size: View; show: BaseShowFragment }> = ({ show, size }) => {
    return (
       <Link href={`/show/${show.id}`}>
          <Panel>
-            <Image title={show.name} src={show.image} alt={show.name} width={size} height={(size / 256) * 376} />
+            <Image
+               title={show.name}
+               src={show.image ?? 'TODO'}
+               alt={show.name}
+               width={size}
+               height={(size / 256) * 376}
+            />
 
             <h4>{show.name}</h4>
          </Panel>

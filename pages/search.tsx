@@ -1,40 +1,39 @@
+import { prefetchQueries } from 'apollo/server'
+import Image from 'components/Image'
+import Link from 'components/Link'
+import Page from 'components/Page'
+import { BaseShowFragment, SearchDocument, useSearchQuery } from 'generated/graphql'
 import { GetServerSideProps } from 'next'
 import { FC } from 'react'
 import styled from 'styled-components'
-import Image from '../components/Image'
-import Link from '../components/Link'
-import Page from '../components/Page'
-import { searchShow } from '../lib/api'
-import database from '../lib/database'
-import { IShow } from '../models/Show'
 
 interface Props {
-   results: IShow[]
+   by: string
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async req => {
-   await database()
-
-   const by = req.query.by as string
-
-   const results = await searchShow(by, 10)
-
-   return { props: { results } }
+export const getServerSideProps: GetServerSideProps<Props> = async ctx => {
+   const by = ctx.query.by as string
+   return prefetchQueries(ctx, async client => {
+      await client.query({ query: SearchDocument, variables: { by } })
+      return { by }
+   })
 }
 
-const Search: FC<Props> = ({ results }) => {
+const Search: FC<Props> = ({ by }) => {
+   const { data } = useSearchQuery({ variables: { by } })
+
    return (
       <Style>
-         {results.map(r => (
+         {data?.results.map(r => (
             <Result key={r.id} {...r} />
          ))}
       </Style>
    )
 }
 
-const Result: FC<IShow> = ({ name, year, thumbnail, overview, tvdb_id }) => {
+const Result: FC<BaseShowFragment> = ({ name, year, thumbnail, overview, id }) => {
    return (
-      <Link href={`/show/${tvdb_id}`}>
+      <Link href={`/show/${id}`}>
          <ResultStyle>
             <h3>{name}</h3>
             <Overview>{overview}</Overview>

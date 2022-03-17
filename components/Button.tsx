@@ -1,7 +1,7 @@
+import { InputStyles } from 'components/Inputs'
+import Link, { LinkProps } from 'components/Link'
 import { createElement, FC } from 'react'
 import styled, { css } from 'styled-components'
-import { InputStyles } from './Inputs'
-import Link, { LinkProps } from './Link'
 
 export interface ButtonProps {
    round?: boolean

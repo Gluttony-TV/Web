@@ -1,7 +1,7 @@
 import { faker, Faker } from '@faker-js/faker'
 import { config } from 'dotenv'
+import { DeepPartial } from 'lib/util'
 import { Model } from 'mongoose'
-import { DeepPartial } from '../lib/util'
 
 config({ path: './.env.local' })
 

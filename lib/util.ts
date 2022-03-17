@@ -26,3 +26,5 @@ export type DeepPartial<T> = {
       ? ReadonlyArray<DeepPartial<U>>
       : DeepPartial<T[P]>
 }
+
+export type EmptyObject = Record<string, never>

@@ -1,0 +1,62 @@
+type Query {
+   getShow(id: ApiID!): Show!
+   searchShows(by: String!, limit: Int, offset: Int): [Show!]!
+}
+
+type Show {
+   id: ApiID!
+   name: String!
+   slug: String!
+   image: String
+   thumbnail: String
+   first_air_time: String
+   next_air_time: String
+   year: String
+   score: String
+   status: Status!
+   overview: String!
+   originalNetwork: Network!
+   episodes: [Episode!]!
+   seasons: [Season!]!
+
+   characters: [Character!]!
+   genres: [Genre!]!
+   networks: [Network!]!
+
+   isIn(slug: String, primary: Boolean): Boolean
+   progress: Progress
+}
+
+type Status {
+   name: String!
+   recordType: String
+   keepUpdated: Boolean
+}
+
+type Character {
+   id: ApiID!
+   name: String!
+   image: String!
+}
+
+type Genre {
+   id: ApiID!
+   name: String!
+   slug: String!
+}
+
+type Artwork {
+   id: ApiID!
+   image: String!
+   thumbnail: String!
+   type: Int!
+   score: [Int!]!
+}
+
+type Network {
+   id: ApiID!
+   name: String!
+   slug: String!
+   abbreviation: String!
+   country: String!
+}

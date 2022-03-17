@@ -1,5 +1,5 @@
+import { AppStatus } from 'models'
 import { useSession } from 'next-auth/react'
-import { AppStatus } from '../models'
 
 /**
  * @deprecated

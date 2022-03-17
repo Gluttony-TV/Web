@@ -1,49 +1,62 @@
+import { prefetchQueries } from 'apollo/server'
+import Page from 'components/Page'
+import Select from 'components/Select'
+import ShowTitle from 'components/show/Title'
+import { Season, ShowDocument, useShowQuery } from 'generated/graphql'
 import { DateTime } from 'luxon'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
+import { striped } from 'style/styles'
 import styled, { css } from 'styled-components'
-import Page from '../../../components/Page'
-import Select from '../../../components/Select'
-import ShowTitle from '../../../components/show/Title'
-import { useEpisodesInfo } from '../../../hooks/useEpisodesInfo'
-import { striped } from '../../../style/styles'
-import { Props } from '../[id]'
-export { getServerSideProps } from '../[id]'
 
-const Show: NextPage<Props> = ({ show, ...props }) => {
-   const { percentage, seasons } = useEpisodesInfo(props)
-   const [season, setSeason] = useState<string>()
+export const getServerSideProps: GetServerSideProps = async ({ query, req }) => {
+   return prefetchQueries({ req }, async client => {
+      await client.query({ query: ShowDocument, variables: { id: Number.parseInt(query.id as string) } })
+   })
+}
+
+const EpisodesPage: NextPage = () => {
+   const router = useRouter()
+   const id = Number.parseInt(router.query.id as string)
+   const { data } = useShowQuery({ variables: { id } })
+
+   const [season, setSeason] = useState<Season['number']>()
    const visible = useMemo(() => {
-      if (season) return seasons.filter(s => s.number === season)
-      return seasons
-   }, [seasons, season])
+      if (season) return data?.show.seasons.filter(s => s.number === season)
+      return data?.show.seasons
+   }, [data, season])
+
+   if (!data) return null
 
    return (
       <Style>
-         <ShowTitle {...show} percentage={percentage} />
+         <ShowTitle {...data.show} />
 
          <label htmlFor='season-select'>Season</label>
          <Select
             id='season-select'
             values={[
                { display: 'All', value: undefined },
-               ...seasons.map(({ number }) => ({ value: number, display: `Season ${number}` })),
+               ...data.show.seasons.map(({ number }) => ({ value: number, display: `Season ${number}` })),
             ]}
             value={season}
             onChange={setSeason}
          />
 
          <div>
-            {visible?.map(({ episodes, number }, i) => (
-               <Season key={i}>
-                  <h4>Season {number}</h4>
+            {visible?.map(({ episodes, number, name }, i) => (
+               <SeasonWrapper key={i}>
+                  <h4>
+                     Season {number} - {name}
+                  </h4>
                   {episodes.map(e => (
-                     <Episode key={e.id} watched={e.watched} due={e.due}>
+                     <Episode key={e.id} watched={false} due={e.due}>
                         <span>{e.name}</span>
                         <span>{e.aired && DateTime.fromISO(e.aired).toLocaleString()}</span>
                      </Episode>
                   ))}
-               </Season>
+               </SeasonWrapper>
             ))}
          </div>
       </Style>
@@ -72,7 +85,7 @@ const Episode = styled.li<{ watched?: boolean; due?: boolean }>`
       `};
 `
 
-const Season = styled.ul`
+const SeasonWrapper = styled.ul`
    margin-top: 2rem;
    list-style: none;
 `
@@ -83,4 +96,4 @@ const Style = styled(Page)`
       'seasons';
 `
 
-export default Show
+export default EpisodesPage

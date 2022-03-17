@@ -1,0 +1,34 @@
+type Season {
+   id: ApiID!
+   seriesId: String!
+   name: String
+   overview: String
+   number: Int!
+   image: String!
+   network: Network!
+   episodes: [Episode!]!
+   type: SeasonType!
+}
+
+type SeasonType {
+   id: String!
+   name: String!
+   type: String!
+}
+
+type Episode {
+   id: ApiID!
+   seriesId: ApiID!
+   name: String!
+   overview: String!
+   aired: String
+   runtime: Int
+   image: String!
+   isMovie: Int!
+   number: Int!
+   seasonNumber: Int!
+
+   special: Boolean!
+   important: Boolean!
+   due: Boolean!
+}

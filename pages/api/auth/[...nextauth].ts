@@ -1,14 +1,15 @@
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter'
+import { Settings } from 'generated/graphql'
+import database from 'lib/database'
+import theme from 'lib/theme'
+import { env } from 'lib/util'
+import Account from 'models/Accounts'
+import Lists from 'models/Lists'
+import Users from 'models/Users'
 import NextAuth, { Session } from 'next-auth'
 import { Provider } from 'next-auth/providers'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GitHubProvider from 'next-auth/providers/github'
-import database from '../../../lib/database'
-import theme from '../../../lib/theme'
-import { env } from '../../../lib/util'
-import Account from '../../../models/Account'
-import { ISettings } from '../../../models/Settings'
-import User from '../../../models/User'
 
 const providers: Provider[] = []
 
@@ -27,7 +28,7 @@ if (process.env.NODE_ENV === 'development')
             email: { label: 'email', type: 'text', placeholder: 'E-Mail' },
          },
          async authorize(credentials) {
-            return await User.findOne({ ...credentials, seeded: true })
+            return await Users.findOne({ ...credentials, seeded: true })
          },
       })
    )
@@ -52,10 +53,12 @@ export default NextAuth({
    },
    events: {
       async createUser({ user }) {
-         await User.findByIdAndUpdate(user.id, {
-            settings: {} as ISettings,
+         await Users.findByIdAndUpdate(user.id, {
+            settings: {} as Settings,
             joinedAt: new Date().toISOString(),
          })
+
+         await Lists.create({ primary: true, name: 'Favourites', userId: user.id })
       },
       async signIn({ account, profile }) {
          const { providerAccountId } = account

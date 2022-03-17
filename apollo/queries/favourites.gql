@@ -1,0 +1,22 @@
+fragment baseList on List {
+   id
+   name
+   slug
+   userId
+}
+
+query isFavourite($show: ApiID!) {
+   isFavourite: isInList(show: $show, primary: true)
+}
+
+mutation addFavourite($shows: [ApiID!]!) {
+   list: addToList(shows: $shows, primary: true) {
+      id
+   }
+}
+
+mutation removeFavourite($shows: [ApiID!]!) {
+   list: removeFromList(shows: $shows, primary: true) {
+      id
+   }
+}

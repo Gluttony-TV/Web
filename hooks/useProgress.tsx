@@ -1,67 +1,62 @@
+import { Episode, useProgressQuery, useSetWatchedMutation, WithSeasonsFragment } from 'generated/graphql'
+import { flatMap } from 'lodash'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { Dispatch, DispatchWithoutAction, SetStateAction, useCallback } from 'react'
-import { IEpisode } from '../models/Episode'
-import { IProgress } from '../models/Progress'
-import { IShow } from '../models/Show'
-import useResource from './api/useResource'
-import useSubmit from './api/useSubmit'
-import { useEpisodesInfo } from './useEpisodesInfo'
+import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'
 
-type ProgressContext = ReturnType<typeof useEpisodesInfo> & {
-   progress?: IProgress
-   setWatched?: Dispatch<SetStateAction<IProgress['watched']>>
-   moveProgress?: Dispatch<IEpisode['id']>
+type ProgressContext = {
+   watched: Episode['id'][]
+   watchedAll?: boolean
+   percentage?: number
+   toggle?: Dispatch<Episode['id']>
+   moveProgress?: Dispatch<Episode['id']>
    watchAll?: DispatchWithoutAction
 }
 
-export function useProgress({
-   show,
-   ...props
-}: {
-   show?: IShow['id']
-   episodes: IEpisode[]
-   progress?: IProgress
-}): ProgressContext {
+export function useProgress(show: Pick<WithSeasonsFragment, 'id' | 'seasons'>): ProgressContext {
    const { status } = useSession()
-   const { id } = useRouter().query
-   const endpoint = `me/progress/${show ?? id}`
-   const { data: progress } = useResource<IProgress>(endpoint, {
-      initialData: props.progress,
-      enabled: status === 'authenticated',
-   })
-   const { episodes, watchedAll, ...rest } = useEpisodesInfo({ ...props, progress })
 
-   const { mutate: setProgress } = useSubmit<Partial<IProgress>>(endpoint, {
-      method: 'PUT',
-      mutates: { [endpoint]: update => ({ ...progress, ...update }) },
+   const { data, loading } = useProgressQuery({
+      variables: { show: show.id },
+      skip: status !== 'authenticated',
    })
+
+   const watched = useMemo(() => data?.progress?.watched ?? [], [data])
+
+   const episodes = useMemo(() => flatMap(show.seasons ?? [], it => it.episodes), [show])
+   const important = useMemo(() => episodes.filter(it => !it.due && !it.special), [episodes])
+   const watchedAll = useMemo(() => important.every(it => watched.includes(it.id)), [watched, important])
+
+   // TODO only count important watched
+   const percentage = useMemo(() => (watched.length / important.length) * 100 ?? 0, [important, watched])
+
+   const [mutate] = useSetWatchedMutation()
    const setWatched = useCallback(
-      (value: SetStateAction<IProgress['watched']>) => {
-         const watched = typeof value === 'function' ? value(progress?.watched ?? []) : value
-         setProgress({ watched })
-      },
-      [setProgress, progress]
+      (episodes: Episode['id'][]) => mutate({ variables: { show: show.id, episodes } }),
+      [mutate, show]
    )
 
    const moveProgress = useCallback(
-      (to: IEpisode['id']) => {
-         const index = episodes.findIndex(e => e.id === to)
-         const watched = episodes
-            .filter(e => !e.ignore)
-            .filter(({ id }) => episodes.findIndex(it => it.id === id) <= index)
-            .map(e => e.id)
+      (to: Episode['id']) => {
+         const index = important.findIndex(e => e.id === to)
+         const watched = important.slice(0, index).map(e => e.id)
          setWatched(watched)
       },
-      [episodes, setWatched]
+      [important, setWatched]
    )
 
    const watchAll = useCallback(() => {
       if (watchedAll) setWatched([])
-      else setWatched(episodes.filter(e => !e.ignore).map(e => e.id))
-   }, [watchedAll, episodes, setWatched])
+      else setWatched(important.map(e => e.id))
+   }, [watchedAll, important, setWatched])
 
-   if (status === 'authenticated')
-      return { progress, setWatched, moveProgress, watchAll, episodes, watchedAll, ...rest }
-   return { episodes, watchedAll, ...rest }
+   const toggle = useCallback(
+      (episode: Episode['id']) => {
+         if (watched.includes(episode)) setWatched(watched.filter(it => it !== episode))
+         else setWatched([...watched, episode])
+      },
+      [watched, setWatched]
+   )
+
+   if (loading) return { watchedAll, watched }
+   return { watchedAll, watched, percentage, moveProgress, watchAll, toggle }
 }

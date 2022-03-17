@@ -1,13 +1,13 @@
+import Page from 'components/Page'
+import { Title } from 'components/Text'
+import database from 'lib/database'
+import { loginLink } from 'lib/util'
 import { DateTime } from 'luxon'
+import Progress from 'models/Progresses'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import Page from '../components/Page'
-import { Title } from '../components/Text'
-import database from '../lib/database'
-import { loginLink } from '../lib/util'
-import Progress from '../models/Progress'
 
 export interface IStats {
    episodesWatched: number
@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
 
    if (!session) return loginLink(req)
 
-   const progress = await Progress.find({ user: session.user.id })
+   const progress = await Progress.find({ userId: session.user.id })
    const episodesWatched = progress.reduce((total, p) => total + p.watched.length, 0)
 
    const stats: IStats = {

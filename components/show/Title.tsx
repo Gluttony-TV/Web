@@ -1,12 +1,12 @@
+import Head from 'components/Head'
+import { Title } from 'components/Text'
+import { BaseShowFragment } from 'generated/graphql'
 import { transparentize } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'
-import { IShow } from '../../models/Show'
-import Head from '../Head'
-import { Title } from '../Text'
 
 const ShowTitle: FC<
-   IShow & {
+   BaseShowFragment & {
       percentage?: number
       noTitle?: boolean
    }

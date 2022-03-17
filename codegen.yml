@@ -1,0 +1,24 @@
+schema: ./apollo/modules/**/*.gql
+documents: './apollo/queries/**/*.gql'
+generates:
+   generated/graphql.ts:
+      plugins:
+         - add:
+              content: '/* eslint-disable */'
+
+         - typescript
+         - typescript-operations
+         - typescript-resolvers:
+              contextType: apollo/server#ApolloContext
+         - typed-document-node
+
+         - typescript-react-apollo:
+              documentVariablePrefix: Untyped
+              fragmentVariablePrefix: Untyped
+              withHooks: true
+
+config:
+   strictScalars: true
+   scalars:
+      Date: number
+      ApiID: number

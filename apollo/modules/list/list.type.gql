@@ -1,0 +1,32 @@
+type Query {
+   getOwnLists: [List!]!
+   getListsOf(user: ID!): [List!]!
+
+   getOwnList(slug: String!): List!
+   getListOf(slug: String!, user: ID!): List!
+   getList(id: ID!): List!
+
+   isInList(show: ApiID!, slug: String, primary: Boolean): Boolean!
+}
+
+type Mutation {
+   addToList(shows: [ApiID!]!, slug: String, primary: Boolean): List!
+   removeFromList(shows: [ApiID!]!, slug: String, primary: Boolean): List!
+}
+
+type List {
+   id: ID!
+   name: String!
+   slug: String!
+   public: Boolean!
+   primary: Boolean!
+   userId: ID!
+   user: User!
+   shows: [ListEntry!]!
+}
+
+type ListEntry {
+   id: ApiID!
+   addedAt: Date!
+   show: Show!
+}

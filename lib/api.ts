@@ -1,10 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { BaseShowFragment, Episode, Scalars, Season, Show } from 'generated/graphql'
+import cacheOr from 'lib/cache'
+import { exists } from 'lib/util'
 import { ApiError } from 'next/dist/server/api-utils'
-import { extendEpisodes, IEpisode } from '../models/Episode'
-import { IProgress } from '../models/Progress'
-import { IShow, IShowFull } from '../models/Show'
-import cacheOr, { cache } from './cache'
-import { exists } from './util'
 
 function isAxiosError(err: unknown): err is AxiosError {
    return (err as AxiosError).isAxiosError === true
@@ -64,19 +62,18 @@ function request<R>(endpoint: string, config?: AxiosRequestConfig) {
    })
 }
 
-async function findId(name: string | number) {
-   const id = typeof name === 'number' ? name : Number.parseInt(name)
-   if (!isNaN(id)) return id
-
-   const results = await searchShow(name.toString())
-   const result = results?.[0]
-   return result && Number.parseInt(result.tvdb_id)
+interface SearchedShow extends Show {
+   tvdb_id: number
+   image_url: string
 }
 
 export async function searchShow(by: string, limit = 10, offset = 0) {
    if (!by) return []
-   const all = await request<(IShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`)
-   return all?.slice(0, limit).filter(exists)
+   const all = await request<(SearchedShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`)
+   return all
+      .slice(0, limit)
+      .filter(exists)
+      .map(s => ({ ...s, id: s.tvdb_id, image: s.image ?? s.image_url }))
 }
 
 interface Translation {
@@ -84,41 +81,23 @@ interface Translation {
    overview: string
 }
 
-export function getTranslation(show: IShowFull['id'], lang = 'eng') {
-   return request<Translation>(`series/${show}/translations/${lang}`).catch(() => ({}))
+export function getTranslation(type: string, id: Scalars['ApiID'], lang = 'eng') {
+   return request<Translation>(`${type}/${id}/translations/${lang}`).catch(() => undefined)
 }
 
-export async function getShow<E extends boolean = true>(search: string | number, extended?: E) {
-   const path = (s: string | number) => (extended !== false ? `${s}/extended` : s)
-   const id = await cacheOr(`search/${search}`, () => findId(search))
-   if (!id) return undefined
-
-   const [show, translation] = await Promise.all([
-      request<E extends true ? IShowFull : IShow>(`/series/${path(id)}`),
-      getTranslation(id),
-   ])
-
-   if (!show) return undefined
-
-   cache(`series/${show.id}`, show)
-   cache(`series/${show.slug}`, show)
-
-   return { ...show, ...translation }
+export async function getShow(id: Show['id']) {
+   return request<Show>(`/series/${id}/extended`)
 }
 
-export function getEpisodes(show: string | number, progress?: IProgress) {
-   return cacheOr(
-      `episodes/${show}`,
-      async () => {
-         const id = await findId(show)
-         const result = await request<{ episodes: IEpisode[] }>(`/series/${id}/episodes/official`)
-         if (!result) return []
-         return extendEpisodes(result.episodes, progress)
-      },
-      10
-   )
+export async function getEpisodes(id: Show['id']) {
+   const response = await request<{ episodes: Episode[] }>(`/series/${id}/episodes/official`)
+   return response?.episodes
+}
+
+export async function getSeason(id: Season['id']) {
+   return request<Season>(`/seasons/${id}/extended`)
 }
 
 export function getTrendingShows() {
-   return request<IShow[]>('series/filter?lang=eng&sort=score&year=2021&country=usa')
+   return request<BaseShowFragment[]>('series/filter?lang=eng&sort=score&year=2021&country=usa')
 }

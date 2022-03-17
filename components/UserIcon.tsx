@@ -1,8 +1,8 @@
+import Image from 'components/Image'
+import { User } from 'generated/graphql'
 import hash from 'md5'
 import { ImageLoader } from 'next/image'
 import { VFC } from 'react'
-import { IUser } from '../models/User'
-import Image from './Image'
 
 const gravatarLoader: ImageLoader = ({ src, width }) => {
    const normalized = src.toLowerCase().trim()
@@ -10,8 +10,8 @@ const gravatarLoader: ImageLoader = ({ src, width }) => {
    return `https://www.gravatar.com/avatar/${hashed}?r=g&d=mp&size=${width}`
 }
 
-const UserIcon: VFC<Pick<IUser, 'email' | 'name'> & { size: number }> = ({ email, name, size, ...props }) => (
-   <Image {...props} loader={gravatarLoader} src={email!} alt={name} width={size} height={size} />
+const UserIcon: VFC<{ user: Pick<User, 'email' | 'name'>; size: number }> = ({ user, size, ...props }) => (
+   <Image {...props} loader={gravatarLoader} src={user.email} alt={user.name} width={size} height={size} />
 )
 
 export default UserIcon
