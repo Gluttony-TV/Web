@@ -17,4 +17,5 @@ type Progress {
    show: Show!
    user: User!
    watched: [ApiID!]!
+   episodes: [Episode!]
 }

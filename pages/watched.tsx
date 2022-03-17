@@ -77,7 +77,13 @@ const Cell: FC<{ size: View; show: BaseShowFragment }> = ({ show, size }) => {
    return (
       <Link href={`/show/${show.id}`}>
          <Panel>
-            <Image title={show.name} src={show.image} alt={show.name} width={size} height={(size / 256) * 376} />
+            <Image
+               title={show.name}
+               src={show.image ?? 'TODO'}
+               alt={show.name}
+               width={size}
+               height={(size / 256) * 376}
+            />
 
             <h4>{show.name}</h4>
          </Panel>

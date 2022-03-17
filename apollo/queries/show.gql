@@ -33,6 +33,12 @@ fragment baseSeason on Season {
 }
 
 fragment withEpisodes on Show {
+   episodes {
+      ...baseEpisode
+   }
+}
+
+fragment withSeasons on Show {
    ...baseShow
    seasons {
       ...baseSeason
@@ -44,7 +50,7 @@ fragment withEpisodes on Show {
 
 query show($id: ApiID!) {
    show: getShow(id: $id) {
-      ...withEpisodes
+      ...withSeasons
    }
 }
 

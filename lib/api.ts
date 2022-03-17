@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { BaseShowFragment, Episode, Season, Show } from 'generated/graphql'
+import { BaseShowFragment, Episode, Scalars, Season, Show } from 'generated/graphql'
 import cacheOr from 'lib/cache'
 import { exists } from 'lib/util'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -62,10 +62,18 @@ function request<R>(endpoint: string, config?: AxiosRequestConfig) {
    })
 }
 
+interface SearchedShow extends Show {
+   tvdb_id: number
+   image_url: string
+}
+
 export async function searchShow(by: string, limit = 10, offset = 0) {
    if (!by) return []
-   const all = await request<(Show | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`)
-   return all?.slice(0, limit).filter(exists) ?? []
+   const all = await request<(SearchedShow | undefined)[]>(`/search?type=series&query=${by}&offset=${offset}`)
+   return all
+      .slice(0, limit)
+      .filter(exists)
+      .map(s => ({ ...s, id: s.tvdb_id, image: s.image ?? s.image_url }))
 }
 
 interface Translation {
@@ -73,8 +81,8 @@ interface Translation {
    overview: string
 }
 
-export function getTranslation(show: Show['id'], lang = 'eng') {
-   return request<Translation>(`series/${show}/translations/${lang}`).catch(() => undefined)
+export function getTranslation(type: string, id: Scalars['ApiID'], lang = 'eng') {
+   return request<Translation>(`${type}/${id}/translations/${lang}`).catch(() => undefined)
 }
 
 export async function getShow(id: Show['id']) {

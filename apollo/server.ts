@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
 import { SchemaLink } from '@apollo/client/link/schema'
 import { ContextFunction } from 'apollo-server-core'
 import { Maybe } from 'generated/graphql'
@@ -15,7 +15,7 @@ export interface ApolloContext {
 }
 
 type Props<T> = (T extends void ? EmptyObject : T) & {
-   initialApolloState: unknown
+   initialApolloState: NormalizedCacheObject
 }
 
 export async function prefetchQueries<P>(
@@ -26,7 +26,8 @@ export async function prefetchQueries<P>(
    const client = await createApolloClient(ctx)
    try {
       const extraProps = await consumer(client)
-      return { props: { ...(extraProps ?? {}), initialApolloState: client.cache.extract() } }
+      const props = { ...(extraProps ?? {}), initialApolloState: client.cache.extract() } as Props<P>
+      return { props }
    } catch (e) {
       if (e instanceof NotFoundError) {
          return { notFound: true }

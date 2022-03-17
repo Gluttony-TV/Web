@@ -1,13 +1,20 @@
+import { prefetchQueries } from 'apollo/server'
 import Page from 'components/Page'
 import Select from 'components/Select'
 import ShowTitle from 'components/show/Title'
-import { Season, useShowQuery } from 'generated/graphql'
+import { Season, ShowDocument, useShowQuery } from 'generated/graphql'
 import { DateTime } from 'luxon'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { striped } from 'style/styles'
 import styled, { css } from 'styled-components'
+
+export const getServerSideProps: GetServerSideProps = async ({ query, req }) => {
+   return prefetchQueries({ req }, async client => {
+      await client.query({ query: ShowDocument, variables: { id: Number.parseInt(query.id as string) } })
+   })
+}
 
 const EpisodesPage: NextPage = () => {
    const router = useRouter()
@@ -20,7 +27,7 @@ const EpisodesPage: NextPage = () => {
       return data?.show.seasons
    }, [data, season])
 
-   if (!data) return
+   if (!data) return null
 
    return (
       <Style>
@@ -38,16 +45,18 @@ const EpisodesPage: NextPage = () => {
          />
 
          <div>
-            {visible?.map(({ episodes, number }, i) => (
-               <Season key={i}>
-                  <h4>Season {number}</h4>
+            {visible?.map(({ episodes, number, name }, i) => (
+               <SeasonWrapper key={i}>
+                  <h4>
+                     Season {number} - {name}
+                  </h4>
                   {episodes.map(e => (
                      <Episode key={e.id} watched={false} due={e.due}>
                         <span>{e.name}</span>
                         <span>{e.aired && DateTime.fromISO(e.aired).toLocaleString()}</span>
                      </Episode>
                   ))}
-               </Season>
+               </SeasonWrapper>
             ))}
          </div>
       </Style>
@@ -76,7 +85,7 @@ const Episode = styled.li<{ watched?: boolean; due?: boolean }>`
       `};
 `
 
-const Season = styled.ul`
+const SeasonWrapper = styled.ul`
    margin-top: 2rem;
    list-style: none;
 `

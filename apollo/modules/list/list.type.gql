@@ -21,6 +21,7 @@ type List {
    public: Boolean!
    primary: Boolean!
    userId: ID!
+   user: User!
    shows: [ListEntry!]!
 }
 

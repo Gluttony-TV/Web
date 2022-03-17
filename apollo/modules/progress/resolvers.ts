@@ -1,8 +1,14 @@
-import { AuthenticationError } from 'apollo-server-micro'
+import { AuthenticationError, ForbiddenError } from 'apollo-server-micro'
+import { ApolloContext } from 'apollo/server'
 import { Resolvers } from 'generated/graphql'
-import { getShow } from 'lib/api'
 import Progresses from 'models/Progresses'
 import Users from 'models/Users'
+
+async function guard(id: string, context: ApolloContext) {
+   if (id === context.user.id) return
+   const user = await Users.findOrFail({ _id: id })
+   if (!user.settings.visibility.progress) throw new ForbiddenError('Cannot access private progress')
+}
 
 export const resolvers: Resolvers = {
    Query: {
@@ -17,6 +23,14 @@ export const resolvers: Resolvers = {
          if (!context.user) throw new AuthenticationError('You need to be signed in to access your progress')
          return await Progresses.find({ userId: context.user.id })
       },
+      async getProgressesOf(_, args, context) {
+         guard(args.user, context)
+         return Progresses.find({ userId: args.user })
+      },
+      async getProgressOf(_, args, context) {
+         guard(args.user, context)
+         return Progresses.findOne({ userId: args.user, showId: args.show })
+      },
    },
    Mutation: {
       async setWatched(_, args, context) {
@@ -28,12 +42,10 @@ export const resolvers: Resolvers = {
          )
       },
    },
-   Progress: {
-      show(progress) {
-         return getShow(progress.showId)
-      },
-      user(progress) {
-         return Users.findOrFail({ _id: progress.userId })
+   Show: {
+      async progress(show, _, context) {
+         if (!context.user) return null
+         return await Progresses.findOne({ userId: context.user.id, showId: show.id })
       },
    },
 }

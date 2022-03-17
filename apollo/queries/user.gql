@@ -25,6 +25,15 @@ query user($id: ID!) {
    }
 }
 
+query userWatched($id: ID!) {
+   user: getUser(id: $id) {
+      ...baseUser
+   }
+   watched: getProgressesOf(user: $id) {
+      ...progressWithShow
+   }
+}
+
 query users {
    users: getUsers {
       ...baseUser

@@ -18,6 +18,15 @@ query watched {
    }
 }
 
+query watchedEpisodes {
+   progresses: getOwnProgresses {
+      ...progressWithShow
+      show {
+         ...withEpisodes
+      }
+   }
+}
+
 query progress($show: ApiID!) {
    progress: getOwnProgress(show: $show) {
       ...baseProgress

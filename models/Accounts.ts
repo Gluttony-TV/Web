@@ -2,23 +2,6 @@ import { Account } from 'generated/graphql'
 import { define } from 'lib/database'
 import { Schema, Types } from 'mongoose'
 
-interface IAccount {
-   id: string
-   provider: string
-   type?: string
-   providerAccountId?: string
-   access_token: string
-   expires_at: number
-   refresh_token?: string
-   refresh_token_expires_in?: number
-   token_type?: string
-   id_token?: string
-   scope?: string
-   userId?: string
-   name?: string
-   email?: string
-}
-
 const schema = new Schema({
    userId: {
       type: Types.ObjectId,

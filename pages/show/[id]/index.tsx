@@ -35,7 +35,7 @@ const ShowPage: NextPage = () => {
 
          <p>{show.overview}</p>
 
-         <Poster src={show.image} alt={`Artwork for ${show.name}`} height={1000} width={680} />
+         <Poster src={show.image ?? 'TODO'} alt={`Artwork for ${show.name}`} height={1000} width={680} />
 
          <Seasons show={show} />
       </Style>

@@ -2,6 +2,7 @@ type Season {
    id: ApiID!
    seriesId: String!
    name: String
+   overview: String
    number: Int!
    image: String!
    network: Network!
@@ -19,8 +20,9 @@ type Episode {
    id: ApiID!
    seriesId: ApiID!
    name: String!
+   overview: String!
    aired: String
-   runtime: Int!
+   runtime: Int
    image: String!
    isMovie: Int!
    number: Int!

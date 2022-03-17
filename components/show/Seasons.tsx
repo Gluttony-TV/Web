@@ -1,13 +1,13 @@
 import { Check, Pen, Times } from '@styled-icons/fa-solid'
 import Button, { ButtonLink } from 'components/Button'
-import { WithEpisodesFragment } from 'generated/graphql'
+import { WithSeasonsFragment } from 'generated/graphql'
 import { useProgress } from 'hooks/useProgress'
 import { useSession } from 'next-auth/react'
 import { createElement, useReducer, VFC } from 'react'
 import styled from 'styled-components'
 import SeasonRow from './SeasonRow'
 
-const Seasons: VFC<{ show: Pick<WithEpisodesFragment, 'seasons' | 'id'> }> = ({ show }) => {
+const Seasons: VFC<{ show: Pick<WithSeasonsFragment, 'seasons' | 'id'> }> = ({ show }) => {
    const { status } = useSession()
    const { watchAll, watchedAll, ...seasonProps } = useProgress(show)
 

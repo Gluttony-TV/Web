@@ -1,7 +1,6 @@
 import { AuthenticationError } from 'apollo-server-micro'
 import { NotFoundError } from 'apollo/errors'
 import { List, Resolvers } from 'generated/graphql'
-import { getShow } from 'lib/api'
 import Lists from 'models/Lists'
 import { FilterQuery } from 'mongoose'
 
@@ -56,11 +55,6 @@ export const resolvers: Resolvers = {
          )
          if (!list) throw new NotFoundError('List not found')
          return list
-      },
-   },
-   ListEntry: {
-      show({ id }) {
-         return getShow(id)
       },
    },
 }

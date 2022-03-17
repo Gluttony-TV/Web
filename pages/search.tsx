@@ -2,27 +2,29 @@ import { prefetchQueries } from 'apollo/server'
 import Image from 'components/Image'
 import Link from 'components/Link'
 import Page from 'components/Page'
-import { BaseShowFragment, SearchDocument } from 'generated/graphql'
+import { BaseShowFragment, SearchDocument, useSearchQuery } from 'generated/graphql'
 import { GetServerSideProps } from 'next'
 import { FC } from 'react'
 import styled from 'styled-components'
 
 interface Props {
-   results: BaseShowFragment[]
+   by: string
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ctx => {
    const by = ctx.query.by as string
    return prefetchQueries(ctx, async client => {
-      const { data } = await client.query({ query: SearchDocument, variables: { by } })
-      return { results: data.results ?? [] }
+      await client.query({ query: SearchDocument, variables: { by } })
+      return { by }
    })
 }
 
-const Search: FC<Props> = ({ results }) => {
+const Search: FC<Props> = ({ by }) => {
+   const { data } = useSearchQuery({ variables: { by } })
+
    return (
       <Style>
-         {results.map(r => (
+         {data?.results.map(r => (
             <Result key={r.id} {...r} />
          ))}
       </Style>

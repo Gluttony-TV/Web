@@ -26,4 +26,14 @@ export const resolvers: Resolvers = {
          return await Accounts.find({ userId: user.id })
       },
    },
+   Progress: {
+      user(progress) {
+         return Users.findOrFail({ _id: progress.userId })
+      },
+   },
+   List: {
+      user(progress) {
+         return Users.findOrFail({ _id: progress.userId })
+      },
+   },
 }

@@ -1,4 +1,4 @@
-import { Episode, useProgressQuery, useSetWatchedMutation, WithEpisodesFragment } from 'generated/graphql'
+import { Episode, useProgressQuery, useSetWatchedMutation, WithSeasonsFragment } from 'generated/graphql'
 import { flatMap } from 'lodash'
 import { useSession } from 'next-auth/react'
 import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'
@@ -6,12 +6,13 @@ import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'
 type ProgressContext = {
    watched: Episode['id'][]
    watchedAll?: boolean
+   percentage?: number
    toggle?: Dispatch<Episode['id']>
    moveProgress?: Dispatch<Episode['id']>
    watchAll?: DispatchWithoutAction
 }
 
-export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>): ProgressContext {
+export function useProgress(show: Pick<WithSeasonsFragment, 'id' | 'seasons'>): ProgressContext {
    const { status } = useSession()
 
    const { data, loading } = useProgressQuery({
@@ -24,6 +25,9 @@ export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>):
    const episodes = useMemo(() => flatMap(show.seasons ?? [], it => it.episodes), [show])
    const important = useMemo(() => episodes.filter(it => !it.due && !it.special), [episodes])
    const watchedAll = useMemo(() => important.every(it => watched.includes(it.id)), [watched, important])
+
+   // TODO only count important watched
+   const percentage = useMemo(() => (watched.length / important.length) * 100 ?? 0, [important, watched])
 
    const [mutate] = useSetWatchedMutation()
    const setWatched = useCallback(
@@ -54,5 +58,5 @@ export function useProgress(show: Pick<WithEpisodesFragment, 'id' | 'seasons'>):
    )
 
    if (loading) return { watchedAll, watched }
-   return { watchedAll, watched, moveProgress, watchAll, toggle }
+   return { watchedAll, watched, percentage, moveProgress, watchAll, toggle }
 }

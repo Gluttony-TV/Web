@@ -1,18 +1,17 @@
-import { Episode, Season } from 'generated/graphql'
+import { BaseEpisodeFragment, Episode } from 'generated/graphql'
 import useTooltip from 'hooks/useTooltip'
 import { mix } from 'polished'
 import { Dispatch, Fragment, useCallback, useMemo, VFC } from 'react'
 import { gradient, striped } from 'style/styles'
 import styled, { css } from 'styled-components'
 
-const SeasonRow: VFC<
-   Pick<Season, 'episodes'> & {
-      toggle?: Dispatch<Episode['id']>
-      moveProgress?: Dispatch<Episode['id']>
-      watched?: Episode['id'][]
-      editing?: boolean
-   }
-> = ({ toggle, moveProgress, episodes, editing, watched }) => {
+const SeasonRow: VFC<{
+   episodes: BaseEpisodeFragment[]
+   toggle?: Dispatch<Episode['id']>
+   moveProgress?: Dispatch<Episode['id']>
+   watched?: Episode['id'][]
+   editing?: boolean
+}> = ({ toggle, moveProgress, episodes, editing, watched }) => {
    useTooltip()
 
    const click = useCallback(

@@ -1,13 +1,13 @@
 type Query {
    getShow(id: ApiID!): Show!
-   searchShows(by: String!, limit: Int, offset: Int): [Show!]
+   searchShows(by: String!, limit: Int, offset: Int): [Show!]!
 }
 
 type Show {
    id: ApiID!
    name: String!
    slug: String!
-   image: String!
+   image: String
    thumbnail: String
    first_air_time: String
    next_air_time: String
