@@ -20,7 +20,7 @@ providers.push(
    })
 )
 
-if (process.env.NODE_ENV === 'development')
+if (process.env.NODE_ENV === 'development') {
    providers.push(
       CredentialsProvider({
          name: 'seeder user',
@@ -32,6 +32,18 @@ if (process.env.NODE_ENV === 'development')
          },
       })
    )
+}
+
+async function populateUser(id: string) {
+   await Promise.all([
+      Users.findByIdAndUpdate(id, {
+         settings: {} as Settings,
+         joinedAt: new Date().toISOString(),
+      }),
+
+      Lists.create({ primary: true, name: 'Favourites', userId: id }),
+   ])
+}
 
 export default NextAuth({
    secret: env('JWT_SECRET'),
@@ -53,15 +65,11 @@ export default NextAuth({
    },
    events: {
       async createUser({ user }) {
-         await Users.findByIdAndUpdate(user.id, {
-            settings: {} as Settings,
-            joinedAt: new Date().toISOString(),
-         })
-
-         await Lists.create({ primary: true, name: 'Favourites', userId: user.id })
+         await populateUser(user.id)
       },
-      async signIn({ account, profile }) {
+      async signIn({ account, profile, user }) {
          const { providerAccountId } = account
+         await populateUser(user.id)
          if (profile) {
             const { name, email } = profile
             await Account.updateOne({ providerAccountId }, { name, email })

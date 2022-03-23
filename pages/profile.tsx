@@ -16,7 +16,6 @@ import { GetServerSideProps, NextPage } from 'next'
 import { getSession, signOut } from 'next-auth/react'
 import { transparentize } from 'polished'
 import { createElement } from 'react'
-import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
@@ -43,9 +42,7 @@ const Profile: NextPage = () => {
 
    return (
       <Page>
-         <Title>
-            <FormattedMessage description='Profile page title' defaultMessage='Your Profile' />
-         </Title>
+         <Title>Your Profile</Title>
          <Panels>
             <BigPanel>
                <label htmlFor='username'>Username</label>

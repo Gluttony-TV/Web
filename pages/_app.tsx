@@ -4,6 +4,7 @@ import Head from 'components/Head'
 import Nav from 'components/Nav'
 import Tooltip from 'components/Tooltip'
 import theme from 'lib/theme'
+import { Settings } from 'luxon'
 import { SessionProvider } from 'next-auth/react'
 import { AppComponent } from 'next/dist/shared/lib/router/router'
 import { darken } from 'polished'
@@ -11,6 +12,8 @@ import React from 'react'
 import { IntlProvider } from 'react-intl'
 import 'style/reset.css'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
+
+Settings.defaultLocale = 'en-US'
 
 const App: AppComponent = ({ Component, pageProps }) => {
    const apollo = useApollo(pageProps.initialApolloState)
