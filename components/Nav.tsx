@@ -1,4 +1,5 @@
-import { CookieBite, Question } from '@styled-icons/fa-solid'
+import { CookieBite } from '@styled-icons/fa-solid/CookieBite'
+import { Question } from '@styled-icons/fa-solid/Question'
 import { StyledIcon } from '@styled-icons/styled-icon'
 import Link from 'components/Link'
 import LoadingIndicator from 'components/LoadingIndicator'

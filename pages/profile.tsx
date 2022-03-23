@@ -1,4 +1,7 @@
-import { Dev, Discord, Github, Google } from '@styled-icons/fa-brands'
+import { Dev } from '@styled-icons/fa-brands/Dev'
+import { Discord } from '@styled-icons/fa-brands/Discord'
+import { Github } from '@styled-icons/fa-brands/Github'
+import { Google } from '@styled-icons/fa-brands/Google'
 import { Plug } from '@styled-icons/fa-solid'
 import { StyledIcon, StyledIconProps } from '@styled-icons/styled-icon'
 import { prefetchQueries } from 'apollo/server'

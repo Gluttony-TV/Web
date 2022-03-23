@@ -1,4 +1,5 @@
-import { Th, ThLarge } from '@styled-icons/fa-solid'
+import { Th } from '@styled-icons/fa-solid/Th'
+import { ThLarge } from '@styled-icons/fa-solid/ThLarge'
 import { prefetchQueries } from 'apollo/server'
 import Button from 'components/Button'
 import Image from 'components/Image'

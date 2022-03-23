@@ -1,4 +1,6 @@
-import { Check, Pen, Times } from '@styled-icons/fa-solid'
+import { Check } from '@styled-icons/fa-solid/Check'
+import { Pen } from '@styled-icons/fa-solid/Pen'
+import { Times } from '@styled-icons/fa-solid/Times'
 import Button, { ButtonLink } from 'components/Button'
 import { WithSeasonsFragment } from 'generated/graphql'
 import { useProgress } from 'hooks/useProgress'

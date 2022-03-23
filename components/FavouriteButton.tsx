@@ -1,4 +1,4 @@
-import { Heart } from '@styled-icons/fa-solid'
+import { Heart } from '@styled-icons/fa-solid/Heart'
 import {
    Show,
    UntypedisFavouriteDocument,
