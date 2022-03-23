@@ -115,7 +115,7 @@ const Increasing: FC<{
 
    useEffect(() => {
       if (children) return move(children)
-   }, [children])
+   }, [children, move])
 
    const displayed = useMemo(() => (float ? current : Math.round(current)), [current, float])
 
