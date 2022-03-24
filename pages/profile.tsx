@@ -123,8 +123,8 @@ const Panel = styled.div`
    }
 `
 
-const BigPanel = styled(Panel)`
-   grid-column: 1 / 3;
-`
+//const BigPanel = styled(Panel)`
+//   grid-column: 1 / 3;
+//`
 
 export default Profile
