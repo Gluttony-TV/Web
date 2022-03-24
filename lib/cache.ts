@@ -4,18 +4,21 @@ const stdTTL = 600
 
 export default async function cacheOr<T>(key: string, supplier: () => T | Promise<T>, ttl = stdTTL): Promise<T> {
    global.cache = global.cache ?? new Cache({ stdTTL })
-   const promise = `${key}#promise`
+   const promiseKey = `${key}#promise`
 
-   const cached = global.cache.get<T>(key) ?? global.cache.get<Promise<T>>(promise)
+   const cached = global.cache.get<T>(key) ?? global.cache.get<Promise<T>>(promiseKey)
    if (cached) return cached
 
    const supplied = supplier()
-   global.cache.set(promise, supplied, ttl)
-   const result = await supplied
+   global.cache.set(promiseKey, supplied, ttl)
 
-   global.cache.set(key, result, ttl)
-
-   return supplied
+   try {
+      const result = await supplied
+      global.cache.set(key, result, ttl)
+      return supplied
+   } finally {
+      global.cache.del(promiseKey)
+   }
 }
 
 export function invalidate(key: string) {

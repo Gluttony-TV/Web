@@ -46,7 +46,10 @@ export const resolvers: Resolvers = {
       ...translations('seasons'),
    },
    Episode: {
-      ...translations('episodes'),
+      //...translations('episodes'),
+      name(episode) {
+         return episode.name ?? 'WTF!!!'
+      },
       async special(episode) {
          return episode.seasonNumber <= 0
       },

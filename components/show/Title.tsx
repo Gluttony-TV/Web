@@ -1,22 +1,24 @@
 import Head from 'components/Head'
 import { Title } from 'components/Text'
-import { BaseShowFragment } from 'generated/graphql'
+import { WithSeasonsFragment } from 'generated/graphql'
+import { useProgress } from 'hooks/useProgress'
 import { transparentize } from 'polished'
 import { FC } from 'react'
 import styled from 'styled-components'
 
 const ShowTitle: FC<
-   BaseShowFragment & {
-      percentage?: number
+   WithSeasonsFragment & {
       noTitle?: boolean
    }
-> = ({ name, percentage = 0, status, noTitle, children }) => {
+> = ({ name, status, noTitle, children, ...show }) => {
+   const { percentage } = useProgress(show)
+
    return (
       <Style>
          {noTitle || <Head title={name} />}
          <Name>{name}</Name>
          <Status>{status.name}</Status>
-         {percentage > 0 && <ProgressSpan>{Math.max(0, Math.min(100, Math.round(percentage)))}%</ProgressSpan>}
+         {!!percentage && <ProgressSpan>{Math.max(0, Math.min(100, Math.round(percentage)))}%</ProgressSpan>}
          <Children>{children}</Children>
       </Style>
    )

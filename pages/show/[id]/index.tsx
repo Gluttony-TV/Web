@@ -20,16 +20,12 @@ const ShowPage: NextPage = () => {
    const id = Number.parseInt(router.query.id as string)
    const { data } = useShowQuery({ variables: { id } })
 
-   const percentage = 20
-
    if (!data) return <p>Loading</p>
    const { show } = data
 
-   if (!show) return <p>No data found</p>
-
    return (
       <Style>
-         <ShowTitle {...show} percentage={percentage}>
+         <ShowTitle {...show}>
             <FavouriteButton show={show.id} />
          </ShowTitle>
 

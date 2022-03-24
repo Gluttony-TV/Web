@@ -4,6 +4,8 @@ import cacheOr from 'lib/cache'
 import { exists } from 'lib/util'
 import { ApiError } from 'next/dist/server/api-utils'
 
+const API_TTL = process.env.NODE_ENV === 'development' ? 6000 : 600
+
 function isAxiosError(err: unknown): err is AxiosError {
    return (err as AxiosError).isAxiosError === true
 }
@@ -37,29 +39,56 @@ async function getToken() {
    return global.api.token
 }
 
-function request<R>(endpoint: string, config?: AxiosRequestConfig) {
-   return cacheOr(endpoint, async () => {
-      try {
-         const token = await getToken()
+export function isCachingError(error: any) {
+   if (!error || typeof error !== 'object') return false
+   if ('status' in error) return error.status === 404
+   if ('statusCode' in error) return error.statusCode === 404
+   return false
+}
 
-         const { data } = (await API(endpoint, {
-            ...config,
-            headers: {
-               Authorization: `Bearer ${token}`,
-               'Content-Type': 'application/json',
-               Accept: 'application/json',
-               ...config?.headers,
-            },
-         })) as AxiosResponse<{ data: R }>
+async function uncachedRequest<R>(endpoint: string, config?: AxiosRequestConfig) {
+   try {
+      const token = await getToken()
 
-         return data.data
-      } catch (err) {
-         if (isAxiosError(err)) console.error(`Request to ${err.request?.path} failed with message`, err.response?.data)
-         else if (err instanceof Error) console.error(err.message)
-         else console.error(err)
-         throw new ApiError(500, (err as Error).message)
+      const { data } = (await API(endpoint, {
+         ...config,
+         headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            ...config?.headers,
+         },
+      })) as AxiosResponse<{ data: R }>
+
+      return data.data
+   } catch (err) {
+      if (isAxiosError(err)) {
+         throw new ApiError(err.response?.status ?? 500, err.response?.data?.message ?? err.response?.statusText)
+      } else {
+         const { message } = err as Error
+         throw new ApiError(500, message)
       }
-   })
+   }
+}
+
+function request<R>(endpoint: string, config?: AxiosRequestConfig) {
+   return cacheOr(endpoint, async () => uncachedRequest<R>(endpoint, config), API_TTL)
+}
+
+async function requestOptional<R>(endpoint: string, config?: AxiosRequestConfig) {
+   return cacheOr(
+      endpoint,
+      async () => {
+         try {
+            return await uncachedRequest<R>(endpoint, config)
+         } catch (e) {
+            if (isCachingError(e)) return null
+            return null
+            //else throw e
+         }
+      },
+      API_TTL
+   )
 }
 
 interface SearchedShow extends Show {
@@ -82,7 +111,7 @@ interface Translation {
 }
 
 export function getTranslation(type: string, id: Scalars['ApiID'], lang = 'eng') {
-   return request<Translation>(`${type}/${id}/translations/${lang}`).catch(() => undefined)
+   return requestOptional<Translation>(`${type}/${id}/translations/${lang}`).catch(() => undefined)
 }
 
 export async function getShow(id: Show['id']) {

@@ -3,6 +3,7 @@ import Page from 'components/Page'
 import Select from 'components/Select'
 import ShowTitle from 'components/show/Title'
 import { Season, ShowDocument, useShowQuery } from 'generated/graphql'
+import { useProgress } from 'hooks/useProgress'
 import { DateTime } from 'luxon'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -27,7 +28,9 @@ const EpisodesPage: NextPage = () => {
       return data?.show.seasons
    }, [data, season])
 
-   if (!data) return null
+   const { watched } = useProgress(data?.show ?? { id, seasons: [] })
+
+   if (!data) return <p>Loading</p>
 
    return (
       <Style>
@@ -51,7 +54,7 @@ const EpisodesPage: NextPage = () => {
                      Season {number} - {name}
                   </h4>
                   {episodes.map(e => (
-                     <Episode key={e.id} watched={false} due={e.due}>
+                     <Episode key={e.id} watched={watched.includes(e.id)} due={e.due}>
                         <span>{e.name}</span>
                         <span>{e.aired && DateTime.fromISO(e.aired).toLocaleString()}</span>
                      </Episode>

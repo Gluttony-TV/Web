@@ -26,10 +26,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async req => {
    if (!session) return loginLink(req)
    return prefetchQueries(req, async client => {
       const { data } = await client.query({ query: WatchedEpisodesDocument })
-      const shows = data.progresses.map(progress => {
-         const missing: BaseEpisodeFragment[] = []
-         return { ...progress.show, missing }
-      })
+      const shows = data.progresses
+         .map(progress => {
+            const { episodes, ...show } = progress.show
+            const important = episodes.filter(it => !it.due && !it.special)
+            const missing = important.filter(it => !progress.watched.includes(it.id))
+            return { ...show, missing }
+         })
+         .filter(it => it.missing.length > 0)
 
       return { shows }
    })

@@ -8,6 +8,7 @@ import { prefetchQueries } from 'apollo/server'
 import { LinkButton } from 'components/Link'
 import Page from 'components/Page'
 import { Title } from 'components/Text'
+import UserIcon from 'components/UserIcon'
 import { SelfDocument, useSelfQuery } from 'generated/graphql'
 import useTooltip from 'hooks/useTooltip'
 import { loginLink } from 'lib/util'
@@ -43,11 +44,14 @@ const Profile: NextPage = () => {
    return (
       <Page>
          <Title>Your Profile</Title>
+
          <Panels>
-            <BigPanel>
+            <Panel>
                <label htmlFor='username'>Username</label>
                <p id='username'>{data.user.name}</p>
-            </BigPanel>
+            </Panel>
+
+            <UserIcon user={data.user} size={100} />
 
             {data.user.email && (
                <>
@@ -88,7 +92,8 @@ const Profile: NextPage = () => {
 const Panels = styled.section`
    display: grid;
    gap: 2rem;
-   grid-template: repeat(1fr, 2);
+   grid-template-columns: repeat(2, 1fr);
+   justify-content: center;
 `
 
 const Icons = styled.ul`
@@ -105,7 +110,7 @@ const Panel = styled.div`
    display: grid;
    gap: 0.5rem;
    padding: 1rem;
-   border-radius: 10px;
+   border-radius: 0.5rem;
    background: ${p => transparentize(0.9, p.theme.secondary)};
 
    &:hover {
