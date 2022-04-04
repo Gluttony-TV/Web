@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
    return prefetchQueries(ctx, async client => {
-      await client.query({ query: WatchedDocument, variables: { amount: 20 } })
+      await client.query({ query: WatchedDocument })
    })
 }
 
@@ -41,7 +41,7 @@ const Watched: NextPage = () => {
             <Button
                onClick={() =>
                   fetchMore({
-                     variables: { after: data.progresses.pageInfo.endCursor },
+                     variables: { after: data.progresses.pageInfo.endCursor, amount: 10 },
                   })
                }>
                More

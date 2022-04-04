@@ -29,7 +29,11 @@ async function database() {
    return cached.conn
 }
 
-export function register<M>(name: string, schema: Schema<Document & M>): Model<M> {
+interface DefinitionOptions {
+   limit?: number
+}
+
+export function register<M>(name: string, schema: Schema<Document & M>, options: DefinitionOptions): Model<M> {
    schema.set('toJSON', { virtuals: true })
 
    schema.statics.findOrFail = async function (...args: Parameters<typeof this.findOne>) {
@@ -39,14 +43,17 @@ export function register<M>(name: string, schema: Schema<Document & M>): Model<M
    }
 
    schema.statics.paginate = async function (input?: PaginationInput, filter?: FilterQuery<M>) {
-      return paginateModel(this, input ?? {}, filter)
+      const defaultedInput = { ...input }
+      if (defaultedInput.before && !defaultedInput.last) defaultedInput.last = options.limit
+      if (!defaultedInput.before && !defaultedInput.first) defaultedInput.first = options.limit
+      return paginateModel<M>(this as any, defaultedInput, filter)
    }
 
    return mongoose.model<M>(name, schema)
 }
 
-export function define<M>(name: string, schema: Schema<Document & M>): Model<M> {
-   return mongoose.models[name] ?? register(name, schema)
+export function define<M>(name: string, schema: Schema<Document & M>, options: DefinitionOptions = {}): Model<M> {
+   return mongoose.models[name] ?? register(name, schema, options)
 }
 
 export default database

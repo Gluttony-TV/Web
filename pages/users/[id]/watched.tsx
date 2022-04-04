@@ -20,9 +20,9 @@ const Users: NextPage = () => {
       <Page>
          <Title>{data?.user.name}</Title>
          <div>
-            {data?.watched.map(({ show, watched }) => (
-               <p key={show.id}>
-                  {show.name} {watched.length}
+            {data?.watched.edges.map(({ node }) => (
+               <p key={node.show.id}>
+                  {node.show.name} {node.watched.length}
                </p>
             ))}
          </div>

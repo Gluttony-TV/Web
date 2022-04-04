@@ -18,4 +18,4 @@ const schema = new Schema({
 
 schema.index({ user: 1, show: -1 }, { unique: true })
 
-export default define<Progress>('Progress', schema)
+export default define<Progress>('Progress', schema, { limit: 20 })
