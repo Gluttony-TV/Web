@@ -1,0 +1,26 @@
+scalar Cursor
+
+type PageInfo {
+   hasNextPage: Boolean!
+   hasPreviousPage: Boolean!
+   startCursor: Cursor
+   endCursor: Cursor
+}
+
+input PaginationInput {
+   after: Cursor
+   first: Int
+   before: Cursor
+   last: Int
+}
+
+#type TodoConnection {
+#   totalCount: Int!
+#   pageInfo: PageInfo!
+#   edges: [TodoEdge]
+#}
+#
+#type TodoEdge {
+#   node: Todo
+#   cursor: Cursor!
+#}

@@ -1,9 +1,20 @@
 type Query {
    getProgressesOf(user: ID!): [Progress!]!
-   getOwnProgresses: [Progress!]!
+   getOwnProgresses(input: PaginationInput): ProgressConnection!
 
    getProgressOf(show: ApiID!, user: ID!): Progress
    getOwnProgress(show: ApiID!): Progress
+}
+
+type ProgressConnection {
+   totalCount: Int!
+   pageInfo: PageInfo!
+   edges: [ProgressEdge!]!
+}
+
+type ProgressEdge {
+   node: Progress!
+   cursor: Cursor!
 }
 
 type Mutation {

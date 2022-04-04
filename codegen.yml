@@ -22,3 +22,4 @@ config:
    scalars:
       Date: number
       ApiID: number
+      Cursor: string

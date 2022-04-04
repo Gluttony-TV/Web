@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { SchemaLink } from '@apollo/client/link/schema'
 import { ContextFunction } from 'apollo-server-core'
 import { Maybe } from 'generated/graphql'
@@ -7,6 +7,7 @@ import { EmptyObject } from 'lib/util'
 import { Session } from 'next-auth'
 import { getSession, GetSessionParams } from 'next-auth/react'
 import { GetServerSidePropsResult } from 'next/types'
+import createCache from './cache'
 import { NotFoundError } from './errors'
 import { schema } from './schema'
 
@@ -47,6 +48,6 @@ async function createApolloClient(ctx: GetSessionParams) {
    return new ApolloClient({
       ssrMode: true,
       link,
-      cache: new InMemoryCache(),
+      cache: createCache(),
    })
 }

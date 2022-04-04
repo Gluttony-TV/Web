@@ -23,11 +23,25 @@ const apiIDScalar = new GraphQLScalarType<number>({
    parseValue: v => v as number,
    parseLiteral(ast) {
       if (ast.kind === Kind.INT) return parseInt(ast.value, 10)
-      throw new Error('Invalid Date literal')
+      throw new Error('Invalid API ID literal')
+   },
+})
+
+const cursorScalar = new GraphQLScalarType<string>({
+   name: 'Cursor',
+   description: 'Pagination Cursor',
+   //serialize: v => Buffer.from(v as string).toString('base64'),
+   //parseValue: v => Buffer.from(v as string, 'base64').toString('ascii'),
+   serialize: v => v as string,
+   parseValue: v => v as string,
+   parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) return ast.value as string
+      throw new Error('Invalid Cursor literal')
    },
 })
 
 export const resolvers: Resolvers = {
    Date: dateScalar,
    ApiID: apiIDScalar,
+   Cursor: cursorScalar,
 }

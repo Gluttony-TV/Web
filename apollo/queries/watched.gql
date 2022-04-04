@@ -12,17 +12,30 @@ fragment progressWithShow on Progress {
    }
 }
 
-query watched {
-   progresses: getOwnProgresses {
-      ...progressWithShow
+query watched($after: Cursor) {
+   progresses: getOwnProgresses(input: { first: 10, after: $after }) {
+      pageInfo {
+         hasNextPage
+         endCursor
+      }
+      edges {
+         cursor
+         node {
+            ...progressWithShow
+         }
+      }
    }
 }
 
 query watchedEpisodes {
    progresses: getOwnProgresses {
-      ...progressWithShow
-      show {
-         ...withEpisodes
+      edges {
+         node {
+            ...progressWithShow
+            show {
+               ...withEpisodes
+            }
+         }
       }
    }
 }

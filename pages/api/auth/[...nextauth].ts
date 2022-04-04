@@ -41,7 +41,7 @@ async function populateUser(id: string) {
          joinedAt: new Date().toISOString(),
       }),
 
-      Lists.create({ primary: true, name: 'Favourites', userId: id }),
+      Lists.updateOne({ primary: true, userId: id }, { name: 'Favourites' }, { upsert: true }),
    ])
 }
 

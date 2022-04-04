@@ -1,6 +1,7 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { ApolloClient } from '@apollo/client'
 import { HttpLink } from '@apollo/client/link/http'
 import { useMemo } from 'react'
+import createCache from './cache'
 
 let apolloClient: ApolloClient<unknown> | null = null
 
@@ -11,7 +12,7 @@ function createApolloClient() {
    })
    return new ApolloClient({
       link,
-      cache: new InMemoryCache(),
+      cache: createCache(),
    })
 }
 

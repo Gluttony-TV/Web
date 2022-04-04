@@ -27,16 +27,26 @@ const Watched: NextPage = () => {
    const { query } = useRouter()
    const [view, setView] = useState(query.view ? Number.parseInt(query.view.toString()) : View.BIG_CELLS)
 
-   const { data } = useWatchedQuery()
+   const { data, fetchMore } = useWatchedQuery()
 
    return (
       <Page>
          <ViewSelect value={view} onChange={setView} />
          <Grid size={view}>
-            {data?.progresses.map(progress => (
-               <Cell key={progress.id} size={view} {...progress} />
+            {data?.progresses.edges.map(({ node }) => (
+               <Cell key={node.id} size={view} {...node} />
             ))}
          </Grid>
+         {data?.progresses.pageInfo.hasNextPage && (
+            <Button
+               onClick={() =>
+                  fetchMore({
+                     variables: { after: data.progresses.pageInfo.endCursor },
+                  })
+               }>
+               More
+            </Button>
+         )}
       </Page>
    )
 }
