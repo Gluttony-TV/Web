@@ -1,5 +1,5 @@
 type Query {
-   getProgressesOf(user: ID!): [Progress!]!
+   getProgressesOf(user: ID!, input: PaginationInput): ProgressConnection!
    getOwnProgresses(input: PaginationInput): ProgressConnection!
 
    getProgressOf(show: ApiID!, user: ID!): Progress

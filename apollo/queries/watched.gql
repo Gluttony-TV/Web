@@ -12,8 +12,8 @@ fragment progressWithShow on Progress {
    }
 }
 
-query watched($after: Cursor) {
-   progresses: getOwnProgresses(input: { first: 10, after: $after }) {
+query watched($after: Cursor, $amount: Int = 10) {
+   progresses: getOwnProgresses(input: { first: $amount, after: $after }) {
       pageInfo {
          hasNextPage
          endCursor

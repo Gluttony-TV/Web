@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
    return prefetchQueries(ctx, async client => {
-      await client.query({ query: WatchedDocument })
+      await client.query({ query: WatchedDocument, variables: { amount: 20 } })
    })
 }
 

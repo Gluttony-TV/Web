@@ -1,5 +1,7 @@
 import { NotFoundError } from 'apollo/errors'
-import mongoose, { ConnectOptions, Document, Model, Schema } from 'mongoose'
+import { paginateModel } from 'apollo/pagination'
+import { PaginationInput } from 'generated/graphql'
+import mongoose, { ConnectOptions, Document, FilterQuery, Model, Schema } from 'mongoose'
 import { env } from './util'
 
 /**
@@ -29,11 +31,17 @@ async function database() {
 
 export function register<M>(name: string, schema: Schema<Document & M>): Model<M> {
    schema.set('toJSON', { virtuals: true })
+
    schema.statics.findOrFail = async function (...args: Parameters<typeof this.findOne>) {
       const match = await this.findOne(...args)
       if (match) return match
       throw new NotFoundError(`${name} not found`)
    }
+
+   schema.statics.paginate = async function (input?: PaginationInput, filter?: FilterQuery<M>) {
+      return paginateModel(this, input ?? {}, filter)
+   }
+
    return mongoose.model<M>(name, schema)
 }
 

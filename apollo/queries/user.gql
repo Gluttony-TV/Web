@@ -30,7 +30,14 @@ query userWatched($id: ID!) {
       ...baseUser
    }
    watched: getProgressesOf(user: $id) {
-      ...progressWithShow
+      pageInfo {
+         ...Forwards
+      }
+      edges {
+         node {
+            ...progressWithShow
+         }
+      }
    }
 }
 
