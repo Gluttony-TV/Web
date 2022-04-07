@@ -4,10 +4,10 @@ export function exists<T>(t: T | null | undefined): t is T {
    return (t ?? null) !== null
 }
 
-export async function loginLink(_req: GetServerSidePropsContext) {
+export async function loginLink({ resolvedUrl }: GetServerSidePropsContext) {
    return {
       redirect: {
-         destination: `/api/auth/signin`,
+         destination: `/api/auth/signin?from=${resolvedUrl}`,
          permanent: false,
       },
    }

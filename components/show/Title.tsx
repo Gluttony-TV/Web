@@ -1,6 +1,6 @@
 import Head from 'components/Head'
 import { Title } from 'components/Text'
-import { WithSeasonsFragment } from 'generated/graphql'
+import { WithSeasonsFragment } from 'graphql/generated/operations'
 import { useProgress } from 'hooks/useProgress'
 import { transparentize } from 'polished'
 import { FC } from 'react'

@@ -1,4 +1,5 @@
-import { BaseEpisodeFragment, Episode } from 'generated/graphql'
+import { Episode } from 'graphql/generated/models'
+import { BaseEpisodeFragment } from 'graphql/generated/operations'
 import useTooltip from 'hooks/useTooltip'
 import { Dispatch, Fragment, useCallback, useMemo, useState, VFC } from 'react'
 import styled from 'styled-components'

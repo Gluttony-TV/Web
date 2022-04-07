@@ -1,4 +1,6 @@
-import { Episode, useProgressQuery, useSetWatchedMutation, WithSeasonsFragment } from 'generated/graphql'
+import { useProgressQuery, useSetWatchedMutation } from 'graphql/generated/hooks'
+import { Episode } from 'graphql/generated/models'
+import { WithSeasonsFragment } from 'graphql/generated/operations'
 import { flatMap } from 'lodash'
 import { useSession } from 'next-auth/react'
 import { Dispatch, DispatchWithoutAction, useCallback, useMemo } from 'react'

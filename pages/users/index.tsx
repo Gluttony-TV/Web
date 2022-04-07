@@ -1,9 +1,10 @@
-import { prefetchQueries } from 'apollo/server'
 import Link from 'components/Link'
 import Page from 'components/Page'
 import { Title } from 'components/Text'
 import UserIcon from 'components/UserIcon'
-import { UsersDocument, useUsersQuery } from 'generated/graphql'
+import { prefetchQueries } from 'graphql/apollo/server'
+import { useUsersQuery } from 'graphql/generated/hooks'
+import { UsersDocument } from 'graphql/generated/server'
 import { GetServerSideProps, NextPage } from 'next'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {

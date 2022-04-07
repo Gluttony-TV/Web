@@ -1,8 +1,9 @@
-import { prefetchQueries } from 'apollo/server'
 import { ButtonLink } from 'components/Button'
 import Page from 'components/Page'
 import { Title } from 'components/Text'
-import { UserDocument, useUserQuery } from 'generated/graphql'
+import { prefetchQueries } from 'graphql/apollo/server'
+import { useUserQuery } from 'graphql/generated/hooks'
+import { UserDocument } from 'graphql/generated/server'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 

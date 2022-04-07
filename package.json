@@ -11,7 +11,7 @@
     "lang:compile": "formatjs compile-folder --ast --format simple lang generated/lang",
     "lang": "yarn lang:extract && yarn lang:compile",
     "seed": "ts-node seeder/cli",
-    "graphql:gen": "ts-node apollo/importGenerator && graphql-codegen"
+    "graphql:gen": "ts-node graphql/importGenerator && graphql-codegen"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -30,7 +30,7 @@
     "@styled-icons/fa-solid": "^10.34.0",
     "@types/luxon": "^2.0.4",
     "@types/node-cache": "^4.2.5",
-    "apollo-server-micro": "^3.6.4",
+    "apollo-server-micro": "^3.6.7",
     "axios": "^0.26.1",
     "graphql": "^16.3.0",
     "graphql-tools": "^8.2.0",

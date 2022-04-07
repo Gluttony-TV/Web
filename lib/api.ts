@@ -1,12 +1,13 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { BaseShowFragment, Episode, Scalars, Season, Show } from 'generated/graphql'
+import { Episode, Scalars, Season, Show } from 'graphql/generated/models'
+import { BaseShowFragment } from 'graphql/generated/operations'
 import cacheOr from 'lib/cache'
 import { exists } from 'lib/util'
 import { ApiError } from 'next/dist/server/api-utils'
 
 const API_TTL = process.env.NODE_ENV === 'development' ? 6000 : 600
 
-function isAxiosError(err: unknown): err is AxiosError {
+function isAxiosError(err: unknown): err is AxiosError<{ message?: string }> {
    return (err as AxiosError).isAxiosError === true
 }
 
@@ -39,11 +40,9 @@ async function getToken() {
    return global.api.token
 }
 
-export function isCachingError(error: any) {
+export function isCachingError(error: unknown) {
    if (!error || typeof error !== 'object') return false
-   if ('status' in error) return error.status === 404
-   if ('statusCode' in error) return error.statusCode === 404
-   return false
+   return (error as AxiosError).response?.status === 404 || (error as ApiError).statusCode === 404
 }
 
 async function uncachedRequest<R>(endpoint: string, config?: AxiosRequestConfig) {
@@ -63,7 +62,10 @@ async function uncachedRequest<R>(endpoint: string, config?: AxiosRequestConfig)
       return data.data
    } catch (err) {
       if (isAxiosError(err)) {
-         throw new ApiError(err.response?.status ?? 500, err.response?.data?.message ?? err.response?.statusText)
+         throw new ApiError(
+            err.response?.status ?? 500,
+            err.response?.data?.message ?? err.response?.statusText ?? 'Unknown Error Occured'
+         )
       } else {
          const { message } = err as Error
          throw new ApiError(500, message)

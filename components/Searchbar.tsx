@@ -1,6 +1,6 @@
 import { Input } from 'components/Inputs'
 import Link from 'components/Link'
-import { useSearchQuery } from 'generated/graphql'
+import { useSearchQuery } from 'graphql/generated/hooks'
 import { useRouterEvent } from 'hooks/useRouterEvent'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'

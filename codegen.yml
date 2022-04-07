@@ -1,24 +1,50 @@
-schema: ./apollo/modules/**/*.gql
-documents: './apollo/queries/**/*.gql'
+schema: ./graphql/modules/**/*.gql
+documents: './graphql/queries/**/*.gql'
 generates:
-   generated/graphql.ts:
+   graphql/generated/models.ts:
+      plugins:
+         - typescript:
+              noExport: false
+
+   graphql/generated/operations.ts:
       plugins:
          - add:
-              content: '/* eslint-disable */'
+              content: |
+                 /* eslint-disable */
+                 import * as Models from './models'
+         - typescript-operations:
+              noExport: false
 
-         - typescript
+   graphql/generated/server.ts:
+      plugins:
+         - add:
+              content: |
+                 /* eslint-disable */
+                 import * as Models from './models'
+
          - typescript-operations
-         - typescript-resolvers:
-              contextType: apollo/server#ApolloContext
-         - typed-document-node
+         - typescript-resolvers
+         - typed-document-node:
+              noExport: false
 
+   graphql/generated/hooks.ts:
+      plugins:
+         - add:
+              content: |
+                 /* eslint-disable */
+                 import * as Operations from './operations'
          - typescript-react-apollo:
-              documentVariablePrefix: Untyped
-              fragmentVariablePrefix: Untyped
+              documentVariablePrefix: __Client
+              fragmentVariablePrefix: __Client
+              importOperationTypesFrom: Operations
+              noExport: false
               withHooks: true
+              withRefetchFn: true
 
 config:
-   strictScalars: true
+   contextType: graphql/apollo/server#ApolloContext
+   noExport: true
+   namespacedImportName: Models
    scalars:
       Date: number
       ApiID: number

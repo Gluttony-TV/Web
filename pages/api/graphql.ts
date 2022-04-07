@@ -1,7 +1,7 @@
 import { ApolloServer } from 'apollo-server-micro'
-import { schema } from 'apollo/schema'
-import { context } from 'apollo/server'
-import database from 'lib/database'
+import database from 'database'
+import { schema } from 'graphql/apollo/schema'
+import { context } from 'graphql/apollo/server'
 import microCors from 'micro-cors'
 
 const apolloServer = new ApolloServer({ schema, introspection: true, context })

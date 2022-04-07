@@ -1,4 +1,4 @@
-import database from 'lib/database'
+import database from 'database'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { Session } from 'next-auth'
 import { getSession } from 'next-auth/react'

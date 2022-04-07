@@ -34,4 +34,4 @@ tsconfig.tsbuildinfo
 # vercel
 .vercel
 
-generated
+graphql/generated/

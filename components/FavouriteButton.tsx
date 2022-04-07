@@ -1,11 +1,11 @@
 import { Heart } from '@styled-icons/fa-solid/Heart'
 import {
-   Show,
-   UntypedisFavouriteDocument,
+   refetchIsFavouriteQuery,
    useAddFavouriteMutation,
    useIsFavouriteQuery,
    useRemoveFavouriteMutation,
-} from 'generated/graphql'
+} from 'graphql/generated/hooks'
+import { Show } from 'graphql/generated/models'
 import useTooltip from 'hooks/useTooltip'
 import { useSession } from 'next-auth/react'
 import { useCallback, VFC } from 'react'
@@ -17,10 +17,13 @@ const FavouriteButton: VFC<{ show: Show['id'] }> = ({ show }) => {
    const { status } = useSession()
 
    const { data, loading, updateQuery } = useIsFavouriteQuery({ variables: { show }, skip: status !== 'authenticated' })
-   const [add] = useAddFavouriteMutation({ variables: { shows: show }, refetchQueries: [UntypedisFavouriteDocument] })
+   const [add] = useAddFavouriteMutation({
+      variables: { shows: show },
+      refetchQueries: [refetchIsFavouriteQuery({ show })],
+   })
    const [remove] = useRemoveFavouriteMutation({
       variables: { shows: show },
-      refetchQueries: [UntypedisFavouriteDocument],
+      refetchQueries: [refetchIsFavouriteQuery({ show })],
    })
 
    const toggle = useCallback(() => {

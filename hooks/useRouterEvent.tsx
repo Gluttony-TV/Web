@@ -6,5 +6,5 @@ export function useRouterEvent(event: RouterEvent, callback: DispatchWithoutActi
    useEffect(() => {
       events.on(event, callback)
       return () => events.off(event, callback)
-   }, [callback, events])
+   }, [callback, events, event])
 }

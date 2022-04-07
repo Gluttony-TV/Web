@@ -1,5 +1,5 @@
-import { PaginationConnection } from 'apollo/pagination'
-import { InputMaybe, PaginationInput } from 'generated/graphql'
+import { InputMaybe, PaginationInput } from 'graphql/generated/models'
+import { PaginationConnection } from 'graphql/pagination'
 import 'mongoose'
 
 declare module 'mongoose' {
