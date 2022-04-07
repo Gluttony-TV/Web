@@ -10,7 +10,7 @@
     "test:ci": "yarn type-check && yarn lint && jest",
     "format": "prettier --write **/*.{ts,tsx}",
     "lang:extract": "formatjs extract {pages,components}/**/*.{ts,tsx} --format simple --id-interpolation-pattern [sha512:contenthash:base64:6] --out-file lang/en.json",
-    "lang:compile": "formatjs compile-folder --ast --format simple lang generated/lang",
+    "lang:compile": "formatjs compile-folder --ast --format simple lang lang/generated",
     "lang": "yarn lang:extract && yarn lang:compile",
     "seed": "ts-node seeder/cli",
     "graphql:gen": "ts-node graphql/importGenerator && graphql-codegen"
