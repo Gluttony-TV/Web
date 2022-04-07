@@ -19,7 +19,7 @@ const Users: NextPage = () => {
    return (
       <Page>
          <Title>Users</Title>
-         {data?.users.map(user => (
+         {data?.users.edges.map(({ node: user }) => (
             <Link key={user.id} href={`/users/${user.id}`}>
                {user.name}
                <UserIcon user={user} size={100} />

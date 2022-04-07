@@ -1,7 +1,18 @@
 type Query {
-   getUsers: [User!]!
+   getUsers(input: PaginationInput): UserConnection!
    getUser(id: ID!): User!
    self: User!
+}
+
+type UserConnection {
+   totalCount: Int!
+   pageInfo: PageInfo!
+   edges: [UserEdge!]!
+}
+
+type UserEdge {
+   node: User!
+   cursor: Cursor!
 }
 
 type User {

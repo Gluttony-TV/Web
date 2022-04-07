@@ -43,7 +43,14 @@ query userWatched($id: ID!) {
 
 query users {
    users: getUsers {
-      ...baseUser
+      pageInfo {
+         ...Forwards
+      }
+      edges {
+         node {
+            ...baseUser
+         }
+      }
    }
 }
 

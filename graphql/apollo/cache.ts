@@ -8,6 +8,7 @@ export default function createCache() {
             fields: {
                getOwnProgresses: customPagination(),
                getProgressesOf: customPagination(),
+               getUsers: customPagination(),
             },
          },
       },

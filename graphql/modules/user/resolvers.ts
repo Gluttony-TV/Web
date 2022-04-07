@@ -10,8 +10,8 @@ const visibilityFilter = (context: ApolloContext) => ({
 
 export const resolvers: Resolvers = {
    Query: {
-      async getUsers(_, _args, context) {
-         return await Users.find(visibilityFilter(context))
+      async getUsers(_, args, context) {
+         return await Users.paginate(args.input, visibilityFilter(context))
       },
       getUser(_, args, context) {
          return Users.findOrFail({ _id: args.id, ...visibilityFilter(context) })

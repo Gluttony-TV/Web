@@ -27,4 +27,4 @@ const schema = new Schema({
 
 schema.index({ email: 1 }, { unique: true })
 
-export default define<User>('User', schema)
+export default define<User>('User', schema, { limit: 30 })
