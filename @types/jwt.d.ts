@@ -17,11 +17,14 @@
 //}
 
 import 'next-auth'
+import { DefaultSession } from 'next-auth'
 
 declare module 'next-auth' {
    export interface Session {
-      user: Required<Session['user']> & {
-         id: number
+      user: Required<DefaultSession['user']> & {
+         id: string
+         name: string
+         email: string
       }
    }
 }

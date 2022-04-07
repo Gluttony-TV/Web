@@ -1,7 +1,7 @@
 import Image from 'components/Image'
 import { User } from 'graphql/generated/models'
 import hash from 'md5'
-import { ImageLoader } from 'next/image'
+import { ImageLoader, ImageProps } from 'next/image'
 import { VFC } from 'react'
 import styled from 'styled-components'
 
@@ -11,7 +11,7 @@ const gravatarLoader: ImageLoader = ({ src, width }) => {
    return `https://www.gravatar.com/avatar/${hashed}?r=g&d=mp&size=${width}`
 }
 
-type Props = {
+type Props = Omit<ImageProps, 'src' | 'alt' | 'width' | 'size' | 'layout'> & {
    user: Pick<User, 'email' | 'name' | 'image'>
    size: string | number
 }

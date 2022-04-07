@@ -6756,6 +6756,11 @@ rc@^1.2.7, rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-click-away-listener@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-click-away-listener/-/react-click-away-listener-2.1.0.tgz#c3884a31966395c5f7fe17ff59db3579ab92e7fa"
+  integrity sha512-D8l2a7zCgtUpo8FVeYb6rtWugxoUjPrWattu7DNakAMAHI8F81T6PAbuAco5qBkRLIS97Jr+0sl9Bf8iPzMTNg==
+
 react-dom@^18.0.0-rc.2:
   version "18.0.0-rc.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.0.0-rc.2.tgz#b0a55afc2a2385e9e518071eaf7c89f0c214bba5"

@@ -5,11 +5,12 @@ import Link from 'components/Link'
 import LoadingIndicator from 'components/LoadingIndicator'
 import Searchbar from 'components/Searchbar'
 import { useRouterEvent } from 'hooks/useRouterEvent'
-import { signIn, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { lighten } from 'polished'
 import { createElement, FC, useState, VFC } from 'react'
 import styled, { css } from 'styled-components'
+import NavDropdown from './NavDropdown'
 
 export const NavHeight = '5rem'
 const LoadingBarHeight = '1rem'
@@ -27,6 +28,7 @@ const NavBar: FC = () => {
             <Searchbar />
             {status === 'authenticated' && <LoggedIn />}
             {status === 'unauthenticated' && <LoggedOut />}
+            <NavDropdown />
          </Nav>
          <LoadingIndicator visible={loading} height={LoadingBarHeight} />
       </Wrapper>
@@ -35,20 +37,13 @@ const NavBar: FC = () => {
 
 const LoggedIn: VFC = () => (
    <>
-      <Tab display='Profile' path='/profile' />
       <Tab display='Watched' path='/watched' />
       <Tab display='News' path='/news' />
       <Tab display='Stats' path='/stats' />
    </>
 )
 
-const LoggedOut: VFC = () => (
-   <>
-      <TabLink as='button' onClick={() => signIn()}>
-         Login
-      </TabLink>
-   </>
-)
+const LoggedOut: VFC = () => <></>
 
 const Wrapper = styled.section`
    height: ${NavHeight};
