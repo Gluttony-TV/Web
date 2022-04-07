@@ -1,27 +1,32 @@
 import { faker, Faker } from '@faker-js/faker'
-import { config } from 'dotenv'
 import { DeepPartial } from 'lib/util'
 import { Model } from 'mongoose'
 
-config({ path: './.env.local' })
-
-type Builder<M> = (faker: Faker) => DeepPartial<M> | Promise<DeepPartial<M>>
+type Builder<M> = (faker: Faker, ctx: DeepPartial<M>) => DeepPartial<M> | Promise<DeepPartial<M>>
 
 class Factory<M> {
    constructor(private builder: Builder<M>, private model: Model<M>) {}
 
    private async build(ctx: DeepPartial<M>) {
-      return { ...(await this.builder(faker)), ...ctx }
+      return { ...(await this.builder(faker, ctx)), ...ctx }
    }
 
    async create(ctx: DeepPartial<M> = {}) {
+      console.log(`Created one ${this.model.modelName}`)
       const created = await this.build(ctx)
       return this.model.insertMany(created)
    }
 
-   async createMany(amount: number, ctx: DeepPartial<M> = {}) {
-      const created = await Promise.all(new Array(amount).fill(null).map(() => this.build(ctx)))
-      return this.model.insertMany(created)
+   async createAmount(amount: number, ctx: DeepPartial<M> = {}) {
+      const values = await Promise.all(new Array(amount).fill(null).map(() => ctx))
+      return this.createMany(values)
+   }
+
+   async createMany(values: DeepPartial<M>[]) {
+      const created = await Promise.all(values.map(ctx => this.build(ctx)))
+      const inserted = await this.model.insertMany(created)
+      console.log(`Created ${inserted.length} ${this.model.modelName}`)
+      return inserted
    }
 }
 

@@ -2,14 +2,10 @@ import Progress from 'database/models/Progresses'
 import { getEpisodes, getTrendingShows } from 'lib/api'
 import { createFactory } from '..'
 
-async function getShows() {
+createFactory(Progress, async (faker, ctx) => {
    const shows = await getTrendingShows()
-   return Promise.all(shows.map(async show => ({ show, episodes: await getEpisodes(show.id) })))
-}
-
-createFactory(Progress, async faker => {
-   const shows = await getShows()
-   const { show, episodes } = faker.random.arrayElement(shows)
+   const showId = ctx.showId ?? faker.random.arrayElement(shows).id
+   const episodes = await getEpisodes(showId)
    const watched = episodes.slice(0, faker.datatype.number({ min: 1, max: episodes.length })).map(e => e.id)
-   return { showId: show.id, watched }
+   return { showId, watched }
 })

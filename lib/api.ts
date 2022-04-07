@@ -11,7 +11,6 @@ function isAxiosError(err: unknown): err is AxiosError<{ message?: string }> {
    return (err as AxiosError).isAxiosError === true
 }
 
-const { TVDB_API_KEY, TVDB_API_PIN } = process.env
 global.api = {}
 
 const API = axios.create({ baseURL: 'https://api4.thetvdb.com/v4' })
@@ -24,12 +23,15 @@ interface LoginResponse {
 }
 
 async function login() {
-   const { data } = (await API.post('login', {
+   const { TVDB_API_KEY, TVDB_API_PIN } = process.env
+
+   const { data } = await API.post<LoginResponse>('login', {
       apikey: TVDB_API_KEY,
       pin: TVDB_API_PIN,
-   })) as AxiosResponse<LoginResponse>
+   })
+
    if (data.status !== 'success') throw new Error('Unable to login into TVDB API')
-   return data.data.token as string
+   return data.data.token
 }
 
 async function getToken() {

@@ -4,6 +4,7 @@ fragment baseUser on User {
    joinedAt
    email
    seeded
+   image
    settings {
       visibility {
          profile
@@ -41,8 +42,9 @@ query userWatched($id: ID!) {
    }
 }
 
-query users {
-   users: getUsers {
+query users($after: Cursor) {
+   users: getUsers(input: { after: $after }) {
+      totalCount
       pageInfo {
          ...Forwards
       }

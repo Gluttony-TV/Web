@@ -7,6 +7,7 @@ createFactory(Users, faker => {
    const email = faker.internet.email(name, undefined, 'example.com')
    const emailVerified = true
    const joinedAt = faker.date.past(3).getTime()
+   const image = faker.helpers.randomize([faker.internet.avatar(), null])
 
    const settings: Settings = {
       visibility: {
@@ -16,5 +17,5 @@ createFactory(Users, faker => {
       },
    }
 
-   return { name, email, emailVerified, settings, joinedAt, seeded: true }
+   return { name, email, emailVerified, settings, joinedAt, image, seeded: true }
 })
