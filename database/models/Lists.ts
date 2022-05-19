@@ -33,9 +33,13 @@ const schema = new Schema({
 
 schema.index({ user: 1, name: -1 }, { unique: true })
 
-schema.pre('save', async function (this: List) {
-   if (this.name) this.slug = slugify(this.name, { lower: true })
-   else this.name = this.slug
+schema.pre('save', function (this: List) {
+   schema.emit('seeded', this)
+})
+
+schema.on('seeded', (list: List) => {
+   if (list.name) list.slug = slugify(list.name, { lower: true })
+   else list.name = list.slug
 })
 
 export default define<List>('List', schema)
