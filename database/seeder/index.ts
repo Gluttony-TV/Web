@@ -8,11 +8,12 @@ class Factory<M> {
    constructor(private builder: Builder<M>, private model: Model<M>) {}
 
    private async build(ctx: DeepPartial<M>) {
-      return { ...(await this.builder(faker, ctx)), ...ctx }
+      const built = { ...(await this.builder(faker, ctx)), ...ctx }
+      this.model.schema.emit('seeded', built)
+      return built
    }
 
    async create(ctx: DeepPartial<M> = {}) {
-      console.log(`Created one ${this.model.modelName}`)
       const created = await this.build(ctx)
       return this.model.insertMany(created)
    }
@@ -25,7 +26,6 @@ class Factory<M> {
    async createMany(values: DeepPartial<M>[]) {
       const created = await Promise.all(values.map(ctx => this.build(ctx)))
       const inserted = await this.model.insertMany(created)
-      console.log(`Created ${inserted.length} ${this.model.modelName}`)
       return inserted
    }
 }

@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "concurrently next \"graphql-codegen --watch\"",
+    "dev": "next",
+    "dev-graphql": "concurrently next \"graphql-codegen --watch\"",
     "build": "yarn lang && yarn graphql:gen && next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
