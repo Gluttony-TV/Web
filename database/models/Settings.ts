@@ -14,6 +14,10 @@ const Settings = new Schema({
          type: Boolean,
          default: false,
       },
+      ratings: {
+         type: Boolean,
+         default: false,
+      },
    },
 })
 

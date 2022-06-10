@@ -1,6 +1,7 @@
 import FavouriteButton from 'components/FavouriteButton'
 import Image from 'components/Image'
 import Page from 'components/Page'
+import RatingButton from 'components/RatingButton'
 import Seasons from 'components/show/Seasons'
 import ShowTitle from 'components/show/Title'
 import { prefetchQueries } from 'graphql/apollo/server'
@@ -28,6 +29,7 @@ const ShowPage: NextPage = () => {
       <Style>
          <ShowTitle {...show}>
             <FavouriteButton show={show.id} />
+            <RatingButton show={show.id} />
          </ShowTitle>
 
          <p>{show.overview}</p>

@@ -1,0 +1,31 @@
+type Query {
+   getRatingsOf(user: ID!, input: PaginationInput): RatingConnection!
+   getOwnRatings(input: PaginationInput): RatingConnection!
+
+   getRatingOf(show: ApiID!, user: ID!): Rating
+   getOwnRating(show: ApiID!): Rating
+}
+
+type Mutation {
+   moveAbove(showA: ApiID!, showB: ApiID!): Int
+}
+
+type RatingConnection {
+   totalCount: Int!
+   pageInfo: PageInfo!
+   edges: [RatingEdge!]!
+}
+
+type RatingEdge {
+   node: Rating!
+   cursor: Cursor!
+}
+
+type Rating {
+   id: ID!
+   userId: ID!
+   showId: ApiID!
+   show: Show!
+   user: User!
+   position: Int!
+}

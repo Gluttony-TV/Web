@@ -6,17 +6,6 @@ type Query {
    getOwnProgress(show: ApiID!): Progress
 }
 
-type ProgressConnection {
-   totalCount: Int!
-   pageInfo: PageInfo!
-   edges: [ProgressEdge!]!
-}
-
-type ProgressEdge {
-   node: Progress!
-   cursor: Cursor!
-}
-
 type Mutation {
    setWatched(show: ApiID!, episodes: [ApiID!]!): Progress!
 }
@@ -29,4 +18,15 @@ type Progress {
    user: User!
    watched: [ApiID!]!
    episodes: [Episode!]
+}
+
+type ProgressConnection {
+   totalCount: Int!
+   pageInfo: PageInfo!
+   edges: [ProgressEdge!]!
+}
+
+type ProgressEdge {
+   node: Progress!
+   cursor: Cursor!
 }

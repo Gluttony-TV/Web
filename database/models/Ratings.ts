@@ -1,5 +1,5 @@
 import { define } from 'database'
-import { Progress } from 'graphql/generated/models'
+import { Rating } from 'graphql/generated/models'
 import { Schema, Types } from 'mongoose'
 
 const schema = new Schema({
@@ -11,11 +11,12 @@ const schema = new Schema({
       type: Number,
       required: true,
    },
-   watched: {
-      type: [Number],
+   position: {
+      type: Number,
+      required: true,
    },
 })
 
 schema.index({ userId: 1, showId: -1 }, { unique: true })
 
-export default define<Progress>('Progress', schema, { limit: 20 })
+export default define<Rating>('Rating', schema, { limit: 20 })

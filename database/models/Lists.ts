@@ -31,7 +31,7 @@ const schema = new Schema({
    },
 })
 
-schema.index({ user: 1, name: -1 }, { unique: true })
+schema.index({ userId: 1, name: -1 }, { unique: true })
 
 schema.pre('save', function (this: List) {
    schema.emit('seeded', this)

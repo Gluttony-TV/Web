@@ -20,7 +20,6 @@ export const resolvers: Resolvers = {
          })
       },
       async getOwnProgresses(_, args, context) {
-         args.input?.after
          if (!context.user) throw new AuthenticationError('You need to be signed in to access your progress')
          return await Progresses.paginate(args.input, { userId: context.user.id })
       },

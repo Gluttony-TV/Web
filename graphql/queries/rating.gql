@@ -1,0 +1,12 @@
+fragment baseRating on Rating {
+   id
+   position
+   showId
+   userId
+}
+
+query rating($show: ApiID!) {
+   rating: getOwnRating(show: $show) {
+      ...baseRating
+   }
+}

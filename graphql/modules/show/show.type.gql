@@ -25,6 +25,7 @@ type Show {
 
    isIn(slug: String, primary: Boolean): Boolean
    progress: Progress
+   rating: Rating
 }
 
 type Status {
