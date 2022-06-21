@@ -44,7 +44,7 @@
     "micro-cors": "^0.1.1",
     "mongoose": "^6.2.6",
     "next": "^12.1.0",
-    "next-auth": "^4.3.3",
+    "next-auth": "^4.5.0",
     "node-cache": "^5.1.2",
     "polished": "^4.1.4",
     "react": "^18.0.0-rc.2",
