@@ -4,12 +4,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 module.exports = withBundleAnalyzer({
-   reactStrictMode: true,
+   output: 'standalone',
    compiler: {
       styledComponents: true,
    },
    images: {
       domains: ['artworks.thetvdb.com'],
    },
-   experimental: {},
 })
