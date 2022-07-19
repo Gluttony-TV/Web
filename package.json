@@ -44,7 +44,7 @@
     "micro-cors": "^0.1.1",
     "mongoose": "^6.2.6",
     "next": "12",
-    "next-auth": "^4.0.5",
+    "next-auth": "^4.3.3",
     "node-cache": "^5.1.2",
     "polished": "^4.1.4",
     "react": "^18.2.0",
@@ -53,7 +53,7 @@
     "react-intl": "^5.20.12",
     "react-is": "^17.0.2",
     "react-tooltip": "^4.2.21",
-    "sharp": "^0.30.2",
+    "sharp": "^0.30.5",
     "slugify": "^1.6.5",
     "styled-components": "^5.3.3"
   },

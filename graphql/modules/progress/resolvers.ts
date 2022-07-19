@@ -5,7 +5,7 @@ import { ApolloContext } from 'graphql/apollo/server'
 import { Resolvers } from 'graphql/generated/server'
 
 async function guard(id: string, context: ApolloContext) {
-   if (id === context.user.id) return
+   if (id === context.user?.id) return
    const user = await Users.findOrFail({ _id: id })
    if (!user.settings.visibility.progress) throw new ForbiddenError('Cannot access private progress')
 }

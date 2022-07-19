@@ -38,6 +38,8 @@ export const resolvers: Resolvers = {
    },
    Mutation: {
       async addToList(_, { shows, ...filter }, context) {
+         if (!context.user) throw new AuthenticationError('Need to be logged in to modify your lists')
+
          const addedAt = Date.now()
          const added = shows.map(id => ({ id, addedAt }))
          const list = await Lists.findOneAndUpdate(
@@ -49,6 +51,8 @@ export const resolvers: Resolvers = {
          return list
       },
       async removeFromList(_, { shows, ...filter }, context) {
+         if (!context.user) throw new AuthenticationError('Need to be logged in to modify your lists')
+
          const list = await Lists.findOneAndUpdate(
             { ...filter, userId: context.user.id },
             { $pull: { shows: { id: { $in: shows } } } },
