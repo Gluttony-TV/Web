@@ -1,11 +1,11 @@
 import { Episode } from 'graphql/generated/models'
 import { BaseEpisodeFragment } from 'graphql/generated/operations'
 import useTooltip from 'hooks/useTooltip'
-import { Dispatch, Fragment, useCallback, useMemo, useState, VFC } from 'react'
+import { Dispatch, FC, Fragment, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import EpisodePanel from './EpisodePanel'
 
-const SeasonRow: VFC<{
+const SeasonRow: FC<{
    episodes: BaseEpisodeFragment[]
    toggle?: Dispatch<Episode['id']>
    moveProgress?: Dispatch<Episode['id']>

@@ -1,7 +1,7 @@
 import { AuthenticationError } from 'apollo-server-micro'
 import Lists from 'database/models/Lists'
 import { NotFoundError } from 'graphql/apollo/errors'
-import { List } from 'graphql/generated/models'
+import { List, ListEntry } from 'graphql/generated/models'
 import { Resolvers } from 'graphql/generated/server'
 import { FilterQuery } from 'mongoose'
 
@@ -41,10 +41,10 @@ export const resolvers: Resolvers = {
          if (!context.user) throw new AuthenticationError('Need to be logged in to modify your lists')
 
          const addedAt = Date.now()
-         const added = shows.map(id => ({ id, addedAt }))
+         const added = shows.map(id => ({ id, addedAt } as ListEntry))
          const list = await Lists.findOneAndUpdate(
             { ...filter, userId: context.user.id },
-            { $push: { shows: added } },
+            { $push: { shows: { $each: added } } },
             { new: true }
          )
          if (!list) throw new NotFoundError('List not found')

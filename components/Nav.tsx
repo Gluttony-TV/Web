@@ -8,7 +8,7 @@ import { useRouterEvent } from 'hooks/useRouterEvent'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { lighten } from 'polished'
-import { createElement, FC, useState, VFC } from 'react'
+import { createElement, FC, useState } from 'react'
 import styled, { css } from 'styled-components'
 import NavDropdown from './NavDropdown'
 
@@ -35,7 +35,7 @@ const NavBar: FC = () => {
    )
 }
 
-const LoggedIn: VFC = () => (
+const LoggedIn: FC = () => (
    <>
       <Tab display='Watched' path='/watched' />
       <Tab display='News' path='/news' />
@@ -43,7 +43,7 @@ const LoggedIn: VFC = () => (
    </>
 )
 
-const LoggedOut: VFC = () => <></>
+const LoggedOut: FC = () => <></>
 
 const Wrapper = styled.section`
    height: ${NavHeight};

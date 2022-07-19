@@ -5,11 +5,11 @@ import Button, { ButtonLink } from 'components/Button'
 import { WithSeasonsFragment } from 'graphql/generated/operations'
 import { useProgress } from 'hooks/useProgress'
 import { useSession } from 'next-auth/react'
-import { createElement, useReducer, VFC } from 'react'
+import { createElement, FC, useReducer } from 'react'
 import styled from 'styled-components'
 import SeasonRow from './SeasonRow'
 
-const Seasons: VFC<{ show: Pick<WithSeasonsFragment, 'seasons' | 'id'> }> = ({ show }) => {
+const Seasons: FC<{ show: Pick<WithSeasonsFragment, 'seasons' | 'id'> }> = ({ show }) => {
    const { status } = useSession()
    const { watchAll, watchedAll, ...seasonProps } = useProgress(show)
 

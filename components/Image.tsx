@@ -1,7 +1,7 @@
 import NextImage, { ImageProps } from 'next/image'
-import { VFC } from 'react'
+import { FC } from 'react'
 
-const Image: VFC<ImageProps> = ({ className, ...props }) => (
+const Image: FC<ImageProps> = ({ className, ...props }) => (
    <span className={className}>
       <NextImage objectFit='cover' {...props} />
    </span>

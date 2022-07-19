@@ -5,10 +5,10 @@ import { useRouterEvent } from 'hooks/useRouterEvent'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { lighten } from 'polished'
-import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import { FC, KeyboardEvent, PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import styled from 'styled-components'
 
-const Searchbar: FC<{ preFetch?: boolean }> = ({ children, preFetch = false }) => {
+const Searchbar: FC<PropsWithChildren<{ preFetch?: boolean }>> = ({ children, preFetch = false }) => {
    const [search, setSearch] = useState('')
    const router = useRouter()
    const debouncedSearch = useMemo(() => debounce(setSearch, 300), [setSearch])

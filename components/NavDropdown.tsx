@@ -1,13 +1,13 @@
 import { useRouterEvent } from 'hooks/useRouterEvent'
 import { signIn, useSession } from 'next-auth/react'
 import { darken } from 'polished'
-import { useState, VFC } from 'react'
+import { FC, useState } from 'react'
 import ClickAway from 'react-click-away-listener'
 import styled from 'styled-components'
 import Link, { LinkButton } from './Link'
 import UserIcon from './UserIcon'
 
-const NavDropdown: VFC = () => {
+const NavDropdown: FC = () => {
    const { data: session } = useSession()
    const [visible, setVisible] = useState(false)
 

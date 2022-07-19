@@ -8,10 +8,10 @@ import {
 import { Show } from 'graphql/generated/models'
 import useTooltip from 'hooks/useTooltip'
 import { useSession } from 'next-auth/react'
-import { useCallback, VFC } from 'react'
+import { FC, useCallback } from 'react'
 import styled, { useTheme } from 'styled-components'
 
-const FavouriteButton: VFC<{ show: Show['id'] }> = ({ show }) => {
+const FavouriteButton: FC<{ show: Show['id'] }> = ({ show }) => {
    useTooltip()
    const { primary, text } = useTheme()
    const { status } = useSession()

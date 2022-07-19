@@ -1,12 +1,12 @@
 import NextLink, { LinkProps as BaseProps } from 'next/link'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import styled, { css } from 'styled-components'
 
 interface StyleProps {
    underline?: 'always' | 'hover' | 'none'
 }
 
-export interface LinkProps extends BaseProps, StyleProps {}
+export interface LinkProps extends BaseProps, StyleProps, PropsWithChildren {}
 
 const Style = styled.a<StyleProps>`
    text-decoration: ${p => (p.underline === 'always' ? 'underline' : 'none')};

@@ -1,9 +1,9 @@
 import { darken } from 'polished'
-import { useEffect, useReducer, VFC } from 'react'
+import { FC, useEffect, useReducer } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { useTheme } from 'styled-components'
 
-const Tooltip: VFC = () => {
+const Tooltip: FC = () => {
    const { bg } = useTheme()
    const [mounted, setMounted] = useReducer(() => true, false)
 

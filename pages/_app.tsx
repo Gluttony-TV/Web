@@ -6,8 +6,9 @@ import { useApollo } from 'graphql/apollo/client'
 import { useRouterEvent } from 'hooks/useRouterEvent'
 import theme from 'lib/theme'
 import { Settings } from 'luxon'
+import { NextComponentType } from 'next'
 import { SessionProvider } from 'next-auth/react'
-import { AppComponent } from 'next/dist/shared/lib/router/router'
+import { AppContext, AppProps } from 'next/app'
 import { darken } from 'polished'
 import React from 'react'
 import { IntlProvider } from 'react-intl'
@@ -17,7 +18,7 @@ import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 
 Settings.defaultLocale = 'en-US'
 
-const App: AppComponent = ({ Component, pageProps }) => {
+const App: NextComponentType<AppContext, AppProps, AppProps> = ({ Component, pageProps }) => {
    const apollo = useApollo(pageProps.initialApolloState)
    useRouterEvent('routeChangeComplete', ReactTooltip.rebuild)
 

@@ -3,13 +3,15 @@ import { Title } from 'components/Text'
 import { WithSeasonsFragment } from 'graphql/generated/operations'
 import { useProgress } from 'hooks/useProgress'
 import { transparentize } from 'polished'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import styled from 'styled-components'
 
 const ShowTitle: FC<
-   WithSeasonsFragment & {
-      noTitle?: boolean
-   }
+   PropsWithChildren<
+      WithSeasonsFragment & {
+         noTitle?: boolean
+      }
+   >
 > = ({ name, status, noTitle, children, ...show }) => {
    const { percentage } = useProgress(show)
 

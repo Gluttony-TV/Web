@@ -1,7 +1,7 @@
-import { FC, Suspense } from 'react'
+import { FC, PropsWithChildren, Suspense } from 'react'
 import ErrorBoundary from './ErrorBoundary'
 
-const AppSuspense: FC = ({ children }) => (
+const AppSuspense: FC<PropsWithChildren> = ({ children }) => (
    <ErrorBoundary>
       <Suspense fallback={<Loading />}>{children}</Suspense>
    </ErrorBoundary>

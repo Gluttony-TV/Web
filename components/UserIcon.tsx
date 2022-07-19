@@ -2,7 +2,7 @@ import Image from 'components/Image'
 import { User } from 'graphql/generated/models'
 import hash from 'md5'
 import { ImageLoader, ImageProps } from 'next/image'
-import { VFC } from 'react'
+import { FC } from 'react'
 import styled from 'styled-components'
 
 const gravatarLoader: ImageLoader = ({ src, width }) => {
@@ -16,7 +16,7 @@ type Props = Omit<ImageProps, 'src' | 'alt' | 'width' | 'size' | 'layout'> & {
    size: string | number
 }
 
-const UserIcon: VFC<Props> = ({ user, size, ...props }) => (
+const UserIcon: FC<Props> = ({ user, size, ...props }) => (
    <Style size={size} data-tip={user.name}>
       {user.image ? (
          <img {...props} src={user.image} alt={user.name} />
